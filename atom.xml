@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>BeenLi&#39;s blog</title>
-  <icon>http://yoursite.com/icon.png</icon>
+  <icon>http://blog.beenli.com/icon.png</icon>
   <subtitle>趁还年轻, 多折腾几下</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
-  <updated>2020-03-31T14:33:09.468Z</updated>
-  <id>http://yoursite.com/</id>
+  <link href="http://blog.beenli.com/"/>
+  <updated>2020-03-31T15:29:03.034Z</updated>
+  <id>http://blog.beenli.com/</id>
   
   <author>
     <name>Wan Li</name>
@@ -18,10 +18,10 @@
   
   <entry>
     <title>单链表翻转</title>
-    <link href="http://yoursite.com/2020/03/30/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%BF%BB%E8%BD%AC/"/>
-    <id>http://yoursite.com/2020/03/30/%E5%8D%95%E9%93%BE%E8%A1%A8%E7%BF%BB%E8%BD%AC/</id>
-    <published>2020-03-30T15:50:58.000Z</published>
-    <updated>2020-03-31T14:33:09.468Z</updated>
+    <link href="http://blog.beenli.com/posts/39c22857.html"/>
+    <id>http://blog.beenli.com/posts/39c22857.html</id>
+    <published>2020-03-31T15:50:58.000Z</published>
+    <updated>2020-03-31T15:29:03.034Z</updated>
     
     <summary type="html">
     
@@ -30,19 +30,34 @@
     </summary>
     
     
-      <category term="Data Structure" scheme="http://yoursite.com/categories/Data-Structure/"/>
+      <category term="Data Structure" scheme="http://blog.beenli.com/categories/Data-Structure/"/>
     
     
-      <category term="C" scheme="http://yoursite.com/tags/C/"/>
+      <category term="C" scheme="http://blog.beenli.com/tags/C/"/>
     
   </entry>
   
   <entry>
-    <title>Verilog Testbench</title>
-    <link href="http://yoursite.com/2020/03/30/Verilog-Testbench/"/>
-    <id>http://yoursite.com/2020/03/30/Verilog-Testbench/</id>
+    <title>test</title>
+    <link href="http://blog.beenli.com/posts/d87f7e0c.html"/>
+    <id>http://blog.beenli.com/posts/d87f7e0c.html</id>
+    <published>2020-03-31T15:28:04.000Z</published>
+    <updated>2020-03-31T15:28:14.160Z</updated>
+    
+    <summary type="html">
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Testbench</title>
+    <link href="http://blog.beenli.com/posts/bc753b52.html"/>
+    <id>http://blog.beenli.com/posts/bc753b52.html</id>
     <published>2020-03-30T11:57:08.000Z</published>
-    <updated>2020-03-30T11:58:51.743Z</updated>
+    <updated>2020-03-31T15:30:18.813Z</updated>
     
     <summary type="html">
     
@@ -58,10 +73,10 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="http://yoursite.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="http://blog.beenli.com/categories/Digital-IC/"/>
     
     
-      <category term="verilog" scheme="http://yoursite.com/tags/verilog/"/>
+      <category term="verilog" scheme="http://blog.beenli.com/tags/verilog/"/>
     
   </entry>
   
