@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>单链表翻转</title>
-    <url>/posts/39c22857.html</url>
+    <url>/posts/39c22857/</url>
     <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a>单链表翻转</h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">struct ListNode *<span class="title">reverseList</span><span class="params">(struct ListNode* head)</span></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ListNOde</span> *<span class="title">newHead</span> = <span class="title">NUll</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">node</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="keyword">while</span> (head != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">//1. 对之前的链表做头删</span></span><br><span class="line">        node = head; <span class="comment">// node始终指向head的前驱</span></span><br><span class="line">        head = head-&gt;next;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2. 对新链表做头插</span></span><br><span class="line">        node-&gt;next = newHead;</span><br><span class="line">        newHead = node;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <a id="more"></a>
@@ -26,13 +26,8 @@
       </tags>
   </entry>
   <entry>
-    <title>test</title>
-    <url>/posts/d87f7e0c.html</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>Testbench</title>
-    <url>/posts/bc753b52.html</url>
+    <url>/posts/bc753b52/</url>
     <content><![CDATA[<p>在hexo的第一篇博客</p>
 ]]></content>
       <categories>
@@ -41,5 +36,10 @@
       <tags>
         <tag>verilog</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>test</title>
+    <url>/posts/d87f7e0c/</url>
+    <content><![CDATA[]]></content>
   </entry>
 </search>

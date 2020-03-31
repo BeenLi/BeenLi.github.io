@@ -6,24 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://blog.beenli.com">
-  <title>Category: Data Structure | BeenLi&#39;s blog</title>
+  <title>单链表翻转 | BeenLi&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="平常爱打球, 听歌, 看书.吉林大学17级微电子, 辅修CS">
-<meta property="og:type" content="website">
-<meta property="og:title" content="BeenLi&#39;s blog">
-<meta property="og:url" content="http://blog.beenli.com/categories/Data-Structure/">
+  <meta name="description" content="单链表翻转解法一、拆卸+拼接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单链表翻转">
+<meta property="og:url" content="http://blog.beenli.com/posts/39c22857/">
 <meta property="og:site_name" content="BeenLi&#39;s blog">
-<meta property="og:description" content="平常爱打球, 听歌, 看书.吉林大学17级微电子, 辅修CS">
+<meta property="og:description" content="单链表翻转解法一、拆卸+拼接">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://blog.beenli.com/assets/photoes/reverse_linked_list.jpg">
+<meta property="og:image" content="http://blog.beenli.com/assets/photoes/three_pointer.jpg">
+<meta property="article:published_time" content="2020-03-31T15:51:58.000Z">
+<meta property="article:modified_time" content="2020-03-31T16:14:49.347Z">
 <meta property="article:author" content="Wan Li">
-<meta property="article:tag" content="digital IC">
-<meta property="article:tag" content=" ASIC">
-<meta property="article:tag" content=" Linux">
-<meta property="article:tag" content=" Vim">
-<meta property="article:tag" content=" python">
-<meta property="article:tag" content=" 电子狗">
-<meta property="article:tag" content=" 程序猿">
+<meta property="article:tag" content="C">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://blog.beenli.com/assets/photoes/reverse_linked_list.jpg">
   
     <link rel="alternative" href="/atom.xml" title="BeenLi&#39;s blog" type="application/atom+xml">
   
@@ -161,36 +160,48 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-单链表翻转" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/posts/39c22857/" class="archive-article-date">
-  	<time datetime="2020-03-31T15:51:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-31</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/posts/39c22857/">单链表翻转</a>
+    <h1 class="article-title" itemprop="name">
+      单链表翻转
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/posts/39c22857/" class="archive-article-date">
+  	<time datetime="2020-03-31T15:51:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-31</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a>单链表翻转</h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">struct ListNode *<span class="title">reverseList</span><span class="params">(struct ListNode* head)</span></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ListNOde</span> *<span class="title">newHead</span> = <span class="title">NUll</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">node</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="keyword">while</span> (head != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">//1. 对之前的链表做头删</span></span><br><span class="line">        node = head; <span class="comment">// node始终指向head的前驱</span></span><br><span class="line">        head = head-&gt;next;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2. 对新链表做头插</span></span><br><span class="line">        node-&gt;next = newHead;</span><br><span class="line">        newHead = node;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<img src="/assets/photoes/reverse_linked_list.jpg" style="zoom:80%;" />
+
+<hr>
+<h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">struct ListNode *<span class="title">reverseList</span><span class="params">(struct ListNode* head)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (head == <span class="literal">NULL</span>) &#123; <span class="comment">// 如果为NULL，那么后指针越界。</span></span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">p0</span> = <span class="title">NULL</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">p1</span> = <span class="title">head</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">p2</span> = <span class="title">head</span>-&gt;<span class="title">next</span>;</span></span><br><span class="line">	<span class="keyword">while</span> (p1 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">		p1-&gt;next = p0;</span><br><span class="line"></span><br><span class="line">		p0 = p1; </span><br><span class="line">		p1 = p2;</span><br><span class="line">		<span class="keyword">if</span> (p2 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">			p2 = p2-&gt;next;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> p0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<img src="/assets/photoes/three_pointer.jpg" style="zoom:80%;" />
+
+<blockquote>
+<p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387" rel="external nofollow noreferrer">参考博客</a></p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -202,7 +213,7 @@
 		</ul>
 	</div>
 
-          
+      
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
@@ -215,17 +226,114 @@
 	</div>
 
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" rel="external nofollow noreferrer" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" rel="external nofollow noreferrer" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" rel="external nofollow noreferrer" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;" rel="external nofollow noreferrer"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://blog.beenli.com/posts/39c22857/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/posts/bc753b52/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Testbench</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" rel="external nofollow noreferrer" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+  <div id="SOHUCS" sid="单链表翻转" ></div> 
+<script charset="utf-8" type="text/javascript" src="//changyan.sohu.com/upload/changyan.js" ></script>
+<script type="text/javascript">
+    window.changyan.api.config({
+        appid: "cyuLjs1cz",
+        conf: "37131d34d938cdad86f7a4733601d006"
+    });
+</script>
+</script>
+  
+
+  
+
+  
 
 
           </div>
@@ -248,10 +356,10 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
-		isCategory: true,
+		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
 		root: "/",
