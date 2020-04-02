@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.beenli.com/"/>
-  <updated>2020-04-02T10:53:57.255Z</updated>
+  <updated>2020-04-02T08:55:46.940Z</updated>
   <id>http://blog.beenli.com/</id>
   
   <author>
@@ -15,31 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>asset-image</title>
-    <link href="http://blog.beenli.com/posts/168c86d2/"/>
-    <id>http://blog.beenli.com/posts/168c86d2/</id>
-    <published>2020-04-02T09:42:03.000Z</published>
-    <updated>2020-04-02T10:53:57.255Z</updated>
-    
-    <summary type="html">
-    
-      
-      
-        
-        
-          &lt;p&gt;&lt;img src=&quot;ASCII.jpg&quot;
-        
-      
-    
-    </summary>
-    
-    
-    
-      <category term="C" scheme="http://blog.beenli.com/tags/C/"/>
-    
-  </entry>
   
   <entry>
     <title>单链表翻转</title>
@@ -87,25 +62,6 @@
     
     
       <category term="verilog" scheme="http://blog.beenli.com/tags/verilog/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>test</title>
-    <link href="http://blog.beenli.com/posts/d87f7e0c/"/>
-    <id>http://blog.beenli.com/posts/d87f7e0c/</id>
-    <published>2020-03-30T15:28:04.000Z</published>
-    <updated>2020-04-02T08:53:43.146Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-      <category term="verilog" scheme="http://blog.beenli.com/categories/verilog/"/>
-    
-      <category term="C" scheme="http://blog.beenli.com/categories/verilog/C/"/>
-    
     
   </entry>
   
