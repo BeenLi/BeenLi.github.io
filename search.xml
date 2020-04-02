@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>asset-image</title>
+    <url>/posts/168c86d2/</url>
+    <content><![CDATA[<p><img src="/.com//ASCII.jpg" alt="图片"></p>
+]]></content>
+      <tags>
+        <tag>C</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>单链表翻转</title>
     <url>/posts/39c22857/</url>
     <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a>单链表翻转</h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">struct ListNode *<span class="title">reverseList</span><span class="params">(struct ListNode* head)</span></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ListNOde</span> *<span class="title">newHead</span> = <span class="title">NUll</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">node</span> = <span class="title">NULL</span>;</span></span><br><span class="line">    <span class="keyword">while</span> (head != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">//1. 对之前的链表做头删</span></span><br><span class="line">        node = head; <span class="comment">// node始终指向head的前驱</span></span><br><span class="line">        head = head-&gt;next;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//2. 对新链表做头插</span></span><br><span class="line">        node-&gt;next = newHead;</span><br><span class="line">        newHead = node;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newHead;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <a id="more"></a>
 
-<img src="/assets/photoes/reverse_linked_list.jpg" style="zoom:80%;" />
+<img src="/.com//photoes/reverse_linked_list.jpg" style="zoom:80%;">
 
 <hr>
 <h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function">struct ListNode *<span class="title">reverseList</span><span class="params">(struct ListNode* head)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (head == <span class="literal">NULL</span>) &#123; <span class="comment">// 如果为NULL，那么后指针越界。</span></span><br><span class="line">		<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">p0</span> = <span class="title">NULL</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">p1</span> = <span class="title">head</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">ListNode</span> *<span class="title">p2</span> = <span class="title">head</span>-&gt;<span class="title">next</span>;</span></span><br><span class="line">	<span class="keyword">while</span> (p1 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">		p1-&gt;next = p0;</span><br><span class="line"></span><br><span class="line">		p0 = p1; </span><br><span class="line">		p1 = p2;</span><br><span class="line">		<span class="keyword">if</span> (p2 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">			p2 = p2-&gt;next;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> p0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<img src="/assets/photoes/three_pointer.jpg" style="zoom:80%;" />
+<img src="/.com//photoes/three_pointer.jpg" style="zoom:80%;">
 
 <blockquote>
 <p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387" rel="external nofollow noreferrer">参考博客</a></p>
@@ -41,5 +50,9 @@
     <title>test</title>
     <url>/posts/d87f7e0c/</url>
     <content><![CDATA[]]></content>
+      <categories>
+        <category>verilog</category>
+        <category>C</category>
+      </categories>
   </entry>
 </search>

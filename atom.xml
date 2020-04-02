@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.beenli.com/"/>
-  <updated>2020-03-31T16:14:49.347Z</updated>
+  <updated>2020-04-02T10:53:57.255Z</updated>
   <id>http://blog.beenli.com/</id>
   
   <author>
@@ -17,15 +17,40 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>asset-image</title>
+    <link href="http://blog.beenli.com/posts/168c86d2/"/>
+    <id>http://blog.beenli.com/posts/168c86d2/</id>
+    <published>2020-04-02T09:42:03.000Z</published>
+    <updated>2020-04-02T10:53:57.255Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;img src=&quot;/.com//ASCII.jpg&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="C" scheme="http://blog.beenli.com/tags/C/"/>
+    
+  </entry>
+  
+  <entry>
     <title>单链表翻转</title>
     <link href="http://blog.beenli.com/posts/39c22857/"/>
     <id>http://blog.beenli.com/posts/39c22857/</id>
     <published>2020-03-31T15:51:58.000Z</published>
-    <updated>2020-03-31T16:14:49.347Z</updated>
+    <updated>2020-04-02T08:55:46.940Z</updated>
     
     <summary type="html">
     
-      &lt;h5 id=&quot;单链表翻转&quot;&gt;&lt;a href=&quot;#单链表翻转&quot; class=&quot;headerlink&quot; title=&quot;单链表翻转&quot;&gt;&lt;/a&gt;单链表翻转&lt;/h5&gt;&lt;h6 id=&quot;解法一、拆卸-拼接&quot;&gt;&lt;a href=&quot;#解法一、拆卸-拼接&quot; class=&quot;headerlink&quot; title=&quot;解法一、拆卸+拼接&quot;&gt;&lt;/a&gt;&lt;code&gt;解法一&lt;/code&gt;、拆卸+拼接&lt;/h6&gt;&lt;!--�0--&gt;
+      &lt;h5 id=&quot;单链表翻转&quot;&gt;&lt;a href=&quot;#单链表翻转&quot; class=&quot;headerlink&quot; title=&quot;单链表翻转&quot;&gt;&lt;/a&gt;单链表翻转&lt;/h5&gt;&lt;h6 id=&quot;解法一、拆卸-拼接&quot;&gt;&lt;a href=&quot;#解法一、拆卸-拼接&quot; class=&quot;headerlink&quot; title=&quot;解法一、拆卸+拼接&quot;&gt;&lt;/a&gt;&lt;code&gt;解法一&lt;/code&gt;、拆卸+拼接&lt;/h6&gt;&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;struct ListNode *&lt;span class=&quot;title&quot;&gt;reverseList&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(struct ListNode* head)&lt;/span&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ListNOde&lt;/span&gt; *&lt;span class=&quot;title&quot;&gt;newHead&lt;/span&gt; = &lt;span class=&quot;title&quot;&gt;NUll&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ListNode&lt;/span&gt; *&lt;span class=&quot;title&quot;&gt;node&lt;/span&gt; = &lt;span class=&quot;title&quot;&gt;NULL&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt; (head != &lt;span class=&quot;literal&quot;&gt;NULL&lt;/span&gt;) &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;comment&quot;&gt;//1. 对之前的链表做头删&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        node = head; &lt;span class=&quot;comment&quot;&gt;// node始终指向head的前驱&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        head = head-&amp;gt;next;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;comment&quot;&gt;//2. 对新链表做头插&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        node-&amp;gt;next = newHead;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        newHead = node;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; newHead;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
     
     </summary>
     
@@ -70,12 +95,16 @@
     <link href="http://blog.beenli.com/posts/d87f7e0c/"/>
     <id>http://blog.beenli.com/posts/d87f7e0c/</id>
     <published>2020-03-30T15:28:04.000Z</published>
-    <updated>2020-03-31T16:14:12.380Z</updated>
+    <updated>2020-04-02T08:53:43.146Z</updated>
     
     <summary type="html">
     
     </summary>
     
+    
+      <category term="verilog" scheme="http://blog.beenli.com/categories/verilog/"/>
+    
+      <category term="C" scheme="http://blog.beenli.com/categories/verilog/C/"/>
     
     
   </entry>
