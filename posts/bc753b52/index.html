@@ -7,8 +7,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/images/3_32px_1168272_easyicon.net.icon">
+  <link rel="icon" type="image/png" href="/assets/images/3_32px_1168272_easyicon.net.icon%20%E7%BD%91%E7%AB%99%E6%A0%87%E7%AD%BE%E9%A1%B5%E7%9A%84%20icon">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -112,7 +112,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/default.png') no-repeat center center;
+         style="background: url('/img/post.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask rgba-black-light flex-center">
@@ -134,7 +134,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    748 字
+                    765 字
                   </span>
                 
 
@@ -189,21 +189,35 @@
 <blockquote>
 <p>终端主要记住几个命令即可: (<a href="">后面很会详细说明</a>)</p>
 </blockquote>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iverilog -o filename filename.v   	<span class="comment">// 编译源文件 【-o 指定生成的文件名称】</span></span><br><span class="line">vvp filename						<span class="comment">// 仿真testbench</span></span><br><span class="line">gtkwave filename.vcd				<span class="comment">// 查看仿真的波形图</span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="c">iverilog -o filename filename.v       // 编译源文件 【-o 指定生成的文件名称】
+vvp filename                        // 仿真testbench
+gtkwave filename.vcd                // 查看仿真的波形图</code></pre>
 </li>
 </ol>
 <h3 id="4、Instance-case"><a href="#4、Instance-case" class="headerlink" title="4、Instance case"></a>4、Instance case</h3><ol>
 <li><blockquote>
 <p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)</p>
 </blockquote>
-<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 模8计数器。存储为count8.v</span></span><br><span class="line"><span class="keyword">module</span> count8(clk, rst_n, cnt);</span><br><span class="line">    <span class="keyword">input</span> clk, rst_n;</span><br><span class="line">    <span class="keyword">output</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line">    <span class="keyword">reg</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line">    <span class="keyword">always</span> @ (<span class="keyword">posedge</span> clk <span class="keyword">or</span> <span class="keyword">negedge</span> rst_n)</span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span>(!rst_n)</span><br><span class="line">	    cnt &lt;= <span class="number">4'b0000</span>;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cnt[<span class="number">3</span>])</span><br><span class="line">	    cnt &lt;=<span class="number">4'b0000</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	    cnt &lt;= cnt + <span class="number">1'b1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<pre><code class="verilog">// 模8计数器。存储为count8.v
+module count8(clk, rst_n, cnt);
+   input clk, rst_n;
+   output[3:0] cnt;
+   reg[3:0] cnt;
+   always @ (posedge clk or negedge rst_n)
+   begin
+   if(!rst_n)
+       cnt &lt;= 4&#39;b0000;
+   else if(cnt[3])
+       cnt &lt;=4&#39;b0000;
+   else
+       cnt &lt;= cnt + 1&#39;b1;
+   end
+endmodule</code></pre>
 </li>
 <li><blockquote>
 <p>编译一下</p>
 </blockquote>
- <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iverilog  -o counter8 counter8.v</span><br></pre></td></tr></table></figure>
-
+<pre><code class="bash"> iverilog  -o counter8 counter8.v</code></pre>
 <p>​        <img src="synthesize.png" srcset="/img/loading.gif" alt="image-20200403162524369"></p>
 <p>​    可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p>
 </li>
@@ -215,13 +229,43 @@
 <li><blockquote>
 <p>编写测试代码</p>
 </blockquote>
-<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">`<span class="meta-keyword">include</span> "count8.v"</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">timescale</span> 1ns/1ns</span></span><br><span class="line"><span class="keyword">module</span> count8_tb;</span><br><span class="line">    <span class="comment">// 数据结构声明</span></span><br><span class="line">    <span class="keyword">reg</span> clk;</span><br><span class="line">    <span class="keyword">reg</span> rst_n;</span><br><span class="line">    <span class="keyword">wire</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实例化待测试模块</span></span><br><span class="line">    count8 U1(clk, rst_n, cnt);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试激励信号</span></span><br><span class="line">    <span class="keyword">always</span></span><br><span class="line">	#<span class="number">50</span> clk = ~ clk;</span><br><span class="line">    <span class="keyword">initial</span></span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	clk = <span class="number">1'b0</span>;</span><br><span class="line">	rst_n = <span class="number">1'b0</span>;</span><br><span class="line">	#<span class="number">20</span> rst_n = <span class="number">1'b0</span>;</span><br><span class="line">	#<span class="number">200</span> rst_n = <span class="number">1'b1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出响应</span></span><br><span class="line">    <span class="keyword">initial</span></span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">wait</span>(cnt == <span class="number">4'b1000</span>)</span><br><span class="line">	<span class="built_in">$display</span>(<span class="built_in">$time</span>,,,<span class="string">"cnt = %b"</span>, cnt);</span><br><span class="line">    <span class="built_in">$dumpfile</span>(<span class="string">"count8_tb.vcd"</span>); 	<span class="comment">// 很关键，把仿真的数据存储到文件,待会波形图要用</span></span><br><span class="line">    <span class="built_in">$dumpvars</span>(<span class="number">0</span>, count8_tb); 		<span class="comment">// 设置要观察的变量</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<pre><code class="verilog">`include &quot;count8.v&quot;
+`timescale 1ns/1ns
+module count8_tb;
+    // 数据结构声明
+    reg clk;
+    reg rst_n;
+    wire[3:0] cnt;
+
+    // 实例化待测试模块
+    count8 U1(clk, rst_n, cnt);
+
+    // 测试激励信号
+    always
+    #50 clk = ~ clk;
+    initial
+    begin
+    clk = 1&#39;b0;
+    rst_n = 1&#39;b0;
+    #20 rst_n = 1&#39;b0;
+    #200 rst_n = 1&#39;b1;
+    end
+
+    // 输出响应
+    initial
+    begin
+    wait(cnt == 4&#39;b1000)
+    $display($time,,,&quot;cnt = %b&quot;, cnt);
+    $dumpfile(&quot;count8_tb.vcd&quot;);     // 很关键，把仿真的数据存储到文件,待会波形图要用
+    $dumpvars(0, count8_tb);         // 设置要观察的变量
+    end
+endmodule
+</code></pre>
 </li>
 <li><blockquote>
 <p>编译，仿真，生成波形图</p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</span><br></pre></td></tr></table></figure>
-
+<pre><code class="bash">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</code></pre>
 <p><img src="simulate.png" srcset="/img/loading.gif" alt="image-20200403170800780"></p>
 <p>注意:</p>
 <ol>
@@ -357,8 +401,31 @@
       <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
     </div>
     
+  <div>
+    
+      <!-- 不蒜子统计PV -->
+      
+      <span id="busuanzi_container_site_pv" style="display: none">
+      总访问量 <span id="busuanzi_value_site_pv"></span> 次
+    </span>
+    
+    
+      <!-- 不蒜子统计UV -->
+      
+      <span id="busuanzi_container_site_uv" style="display: none">
+      总访客数 <span id="busuanzi_value_site_uv"></span> 人
+    </span>
+    
+  </div>
+
 
     
+  <!-- 备案信息 -->
+  <div>
+    <a href="http://beian.miit.gov.cn/" target="_blank"
+       rel="nofollow noopener">鄂ICP备20001266号</a>
+    
+
 
     
   </div>
@@ -437,6 +504,8 @@
 
 
 
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
 
 
 
@@ -519,6 +588,57 @@
 
 
 
+
+  
+  
+    <script>
+      !function (e, t, a) {
+        function r() {
+          for (var e = 0; e < s.length; e++) s[e].alpha <= 0 ? (t.body.removeChild(s[e].el), s.splice(e, 1)) : (s[e].y--, s[e].scale += .004, s[e].alpha -= .013, s[e].el.style.cssText = "left:" + s[e].x + "px;top:" + s[e].y + "px;opacity:" + s[e].alpha + ";transform:scale(" + s[e].scale + "," + s[e].scale + ") rotate(45deg);background:" + s[e].color + ";z-index:99999");
+          requestAnimationFrame(r)
+        }
+
+        function n() {
+          var t = "function" == typeof e.onclick && e.onclick;
+          e.onclick = function (e) {
+            t && t(), o(e)
+          }
+        }
+
+        function o(e) {
+          var a = t.createElement("div");
+          a.className = "heart", s.push({
+            el: a,
+            x: e.clientX - 5,
+            y: e.clientY - 5,
+            scale: 1,
+            alpha: 1,
+            color: c()
+          }), t.body.appendChild(a)
+        }
+
+        function i(e) {
+          var a = t.createElement("style");
+          a.type = "text/css";
+          try {
+            a.appendChild(t.createTextNode(e))
+          } catch (t) {
+            a.styleSheet.cssText = e
+          }
+          t.getElementsByTagName("head")[0].appendChild(a)
+        }
+
+        function c() {
+          return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+        }
+
+        var s = [];
+        e.requestAnimationFrame = e.requestAnimationFrame || e.webkitRequestAnimationFrame || e.mozRequestAnimationFrame || e.oRequestAnimationFrame || e.msRequestAnimationFrame || function (e) {
+          setTimeout(e, 1e3 / 60)
+        }, i(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: fixed;}.heart:after{top: -5px;}.heart:before{left: -5px;}"), n(), r()
+      }(window, document);
+    </script>
+  
 
 
 

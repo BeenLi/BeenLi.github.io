@@ -25,7 +25,20 @@
     
     <summary type="html">
     
-      &lt;h5 id=&quot;单链表翻转&quot;&gt;&lt;a href=&quot;#单链表翻转&quot; class=&quot;headerlink&quot; title=&quot;单链表翻转&quot;&gt;&lt;/a&gt;单链表翻转&lt;/h5&gt;&lt;h6 id=&quot;解法一、拆卸-拼接&quot;&gt;&lt;a href=&quot;#解法一、拆卸-拼接&quot; class=&quot;headerlink&quot; title=&quot;解法一、拆卸+拼接&quot;&gt;&lt;/a&gt;&lt;code&gt;解法一&lt;/code&gt;、拆卸+拼接&lt;/h6&gt;&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;struct ListNode *&lt;span class=&quot;title&quot;&gt;reverseList&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(struct ListNode* head)&lt;/span&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ListNOde&lt;/span&gt; *&lt;span class=&quot;title&quot;&gt;newHead&lt;/span&gt; = &lt;span class=&quot;title&quot;&gt;NUll&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;ListNode&lt;/span&gt; *&lt;span class=&quot;title&quot;&gt;node&lt;/span&gt; = &lt;span class=&quot;title&quot;&gt;NULL&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt; (head != &lt;span class=&quot;literal&quot;&gt;NULL&lt;/span&gt;) &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;comment&quot;&gt;//1. 对之前的链表做头删&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        node = head; &lt;span class=&quot;comment&quot;&gt;// node始终指向head的前驱&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        head = head-&amp;gt;next;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;comment&quot;&gt;//2. 对新链表做头插&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        node-&amp;gt;next = newHead;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        newHead = node;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; newHead;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+      &lt;h5 id=&quot;单链表翻转&quot;&gt;&lt;a href=&quot;#单链表翻转&quot; class=&quot;headerlink&quot; title=&quot;单链表翻转&quot;&gt;&lt;/a&gt;单链表翻转&lt;/h5&gt;&lt;h6 id=&quot;解法一、拆卸-拼接&quot;&gt;&lt;a href=&quot;#解法一、拆卸-拼接&quot; class=&quot;headerlink&quot; title=&quot;解法一、拆卸+拼接&quot;&gt;&lt;/a&gt;&lt;code&gt;解法一&lt;/code&gt;、拆卸+拼接&lt;/h6&gt;&lt;pre&gt;&lt;code class=&quot;c&quot;&gt;struct ListNode *reverseList(struct ListNode* head){
+    struct ListNOde *newHead = NUll;
+    struct ListNode *node = NULL;
+    while (head != NULL) {
+        //1. 对之前的链表做头删
+        node = head; // node始终指向head的前驱
+        head = head-&amp;gt;next;
+
+        //2. 对新链表做头插
+        node-&amp;gt;next = newHead;
+        newHead = node;
+    }
+    return newHead;
+}&lt;/code&gt;&lt;/pre&gt;
     
     </summary>
     
@@ -42,7 +55,7 @@
     <link href="http://blog.beenli.com/posts/bc753b52/"/>
     <id>http://blog.beenli.com/posts/bc753b52/</id>
     <published>2020-03-31T11:57:08.000Z</published>
-    <updated>2020-04-03T10:20:42.334Z</updated>
+    <updated>2020-04-03T11:48:17.749Z</updated>
     
     <summary type="html">
     
