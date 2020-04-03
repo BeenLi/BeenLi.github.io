@@ -31,9 +31,9 @@
     <content><![CDATA[<h1 id="vim-iverilog-gtkwave"><a href="#vim-iverilog-gtkwave" class="headerlink" title="vim + iverilog + gtkwave "></a><center>vim + iverilog + gtkwave </center></h1><h3 id="1、What-is-Icarus-Verilog"><a href="#1、What-is-Icarus-Verilog" class="headerlink" title="1、What is Icarus Verilog"></a>1、What is Icarus Verilog</h3><blockquote>
 <p><em>Icarus Verilog</em> is a <strong>Verilog simulation and synthesis</strong> tool. It operates as a compiler, compiling source code written in Verilog (IEEE-1364) into some target format. For batch simulation, the compiler can generate an intermediate form called <em>vvp assembly</em>. This intermediate form is executed by the <code>vvp</code>command. For synthesis, the compiler generates netlists in the desired format.<a href="http://iverilog.icarus.com/" rel="external nofollow noreferrer">^iverilog</a></p>
 </blockquote>
-<p>从官网的描述我们可以看到: 它是一个<code>仿真器</code>和<code>综合器</code>。</p>
-<p>有趣的是：开发者是一名软件工程师</p>
-<p>a software engineer specializing in device drivers and embedded systems</p>
+<p>​    从官网的描述我们可以看到: 它是一个<code>仿真器</code>和<code>综合器</code>。</p>
+<p>​    有趣的是：开发者是一名软件工程师</p>
+<p>​    a software engineer specializing in device drivers and embedded systems</p>
 <h3 id="2、Why-we-choose-Icarus-Verilog"><a href="#2、Why-we-choose-Icarus-Verilog" class="headerlink" title="2、Why we choose Icarus Verilog"></a>2、Why we choose Icarus Verilog</h3><ol>
 <li>软件非常小，没有图形界面。跑跑小的程序足够了</li>
 <li>软件扩展性特别好。我现在还没有去探索。<a href="http://iverilog.icarus.com/page/plug-ins" rel="external nofollow noreferrer">详情见</a></li>
@@ -52,27 +52,31 @@
 </li>
 </ol>
 <h3 id="4、Instance-case"><a href="#4、Instance-case" class="headerlink" title="4、Instance case"></a>4、Instance case</h3><ol>
-<li><p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)    </p>
-<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 模8计数器。存储为count8.v</span></span><br><span class="line"><span class="keyword">module</span> count8(clk, rst_n, cnt);</span><br><span class="line">    <span class="keyword">input</span> clk, rst_n;</span><br><span class="line">    <span class="keyword">output</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line">    <span class="keyword">reg</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line">    <span class="keyword">always</span> @ (<span class="keyword">posedge</span> clk <span class="keyword">or</span> <span class="keyword">negedge</span> rst_n)</span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span>(!rst_n)</span><br><span class="line">	    cnt &lt;= <span class="number">4'b0000</span>;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cnt[<span class="number">3</span>])</span><br><span class="line">	    cnt &lt;=<span class="number">4'b0000</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	    cnt &lt;= cnt + <span class="number">1'b1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
-
-</li>
-</ol>
-<blockquote>
-<p>2、编译一下</p>
+<li><blockquote>
+<p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)</p>
 </blockquote>
-<pre><code><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iverilog  -o counter8 counter8.v</span><br></pre></td></tr></table></figure></code></pre><p>   ​        <img src="synthesize.png" alt="image-20200403162524369"></p>
-<p>   ​    可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p>
-<blockquote>
-<p>3、如果想查看电路图。好像只能在quarter II里面viewer一下了。还没发现专门从netlist生成电路图的程序。</p>
+<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 模8计数器。存储为count8.v</span></span><br><span class="line"><span class="keyword">module</span> count8(clk, rst_n, cnt);</span><br><span class="line">    <span class="keyword">input</span> clk, rst_n;</span><br><span class="line">    <span class="keyword">output</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line">    <span class="keyword">reg</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line">    <span class="keyword">always</span> @ (<span class="keyword">posedge</span> clk <span class="keyword">or</span> <span class="keyword">negedge</span> rst_n)</span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">if</span>(!rst_n)</span><br><span class="line">	    cnt &lt;= <span class="number">4'b0000</span>;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span>(cnt[<span class="number">3</span>])</span><br><span class="line">	    cnt &lt;=<span class="number">4'b0000</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	    cnt &lt;= cnt + <span class="number">1'b1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><blockquote>
+<p>编译一下</p>
+</blockquote>
+ <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iverilog  -o counter8 counter8.v</span><br></pre></td></tr></table></figure>
+
+<p>​        <img src="synthesize.png" alt="image-20200403162524369"></p>
+<p>​    可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p>
+</li>
+<li><blockquote>
+<p>如果想查看电路图。好像只能在quarter II里面viewer一下了。还没发现专门从netlist生成电路图的程序。</p>
 </blockquote>
 <p><img src="RTLviewer.png" alt="image-20200403163232250"></p>
-<blockquote>
-<p>4、编写测试代码</p>
+</li>
+<li><blockquote>
+<p>编写测试代码</p>
 </blockquote>
 <figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="meta">`<span class="meta-keyword">include</span> "count8.v"</span></span><br><span class="line"><span class="meta">`<span class="meta-keyword">timescale</span> 1ns/1ns</span></span><br><span class="line"><span class="keyword">module</span> count8_tb;</span><br><span class="line">    <span class="comment">// 数据结构声明</span></span><br><span class="line">    <span class="keyword">reg</span> clk;</span><br><span class="line">    <span class="keyword">reg</span> rst_n;</span><br><span class="line">    <span class="keyword">wire</span>[<span class="number">3</span>:<span class="number">0</span>] cnt;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实例化待测试模块</span></span><br><span class="line">    count8 U1(clk, rst_n, cnt);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试激励信号</span></span><br><span class="line">    <span class="keyword">always</span></span><br><span class="line">	#<span class="number">50</span> clk = ~ clk;</span><br><span class="line">    <span class="keyword">initial</span></span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	clk = <span class="number">1'b0</span>;</span><br><span class="line">	rst_n = <span class="number">1'b0</span>;</span><br><span class="line">	#<span class="number">20</span> rst_n = <span class="number">1'b0</span>;</span><br><span class="line">	#<span class="number">200</span> rst_n = <span class="number">1'b1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出响应</span></span><br><span class="line">    <span class="keyword">initial</span></span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">	<span class="keyword">wait</span>(cnt == <span class="number">4'b1000</span>)</span><br><span class="line">	<span class="built_in">$display</span>(<span class="built_in">$time</span>,,,<span class="string">"cnt = %b"</span>, cnt);</span><br><span class="line">    <span class="built_in">$dumpfile</span>(<span class="string">"count8_tb.vcd"</span>); 	<span class="comment">// 很关键，把仿真的数据存储到文件,待会波形图要用</span></span><br><span class="line">    <span class="built_in">$dumpvars</span>(<span class="number">0</span>, count8_tb); 		<span class="comment">// 设置要观察的变量</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>5、编译，仿真，生成波形图</p>
+</li>
+<li><blockquote>
+<p>编译，仿真，生成波形图</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</span><br></pre></td></tr></table></figure>
 
@@ -90,12 +94,15 @@
 </li>
 </ol>
 <p><img src="gtkwave.png" alt="image-20200403171326769"></p>
-<blockquote>
-<p>6、如果你喜欢用<code>modelsim</code>也可以。</p>
+</li>
+<li><blockquote>
+<p>如果你喜欢用<code>modelsim</code>也可以。</p>
 </blockquote>
 <p>也很简单，只需要建个项目，把你写的源文件放进去编译，仿真一下就可以了。</p>
 <p><a href="https://wenku.baidu.com/view/cd93f34ecf84b9d528ea7a95.html" rel="external nofollow noreferrer">具体教程见</a></p>
 <p><img src="modelsim.png" alt="image-20200403171721915"></p>
+</li>
+</ol>
 ]]></content>
       <categories>
         <category>Digital IC</category>
