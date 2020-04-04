@@ -32,7 +32,35 @@
   <entry>
     <title>testbench(1)</title>
     <url>/posts/26241a85/</url>
-    <content><![CDATA[<script>
+    <content><![CDATA[<h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="verilog">第一种: initial 初始化
+initial a = 0;
+
+第二种: 定义信号时初始化
+reg[3:0] cnt = 4'b1010;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="verilog">initial #5 a = b;(等待5tick后计算右端的值并赋值给左边👈)
+
+等价于:
+initial
+begin
+    #5;
+    a=b;
+end</code></pre></li><li><p>内部时间控制</p><pre><code class="verilog">initial a = #5 b;(先计算右端的值，等待5tick后再把值赋给左边👈)
+
+等价于
+initial
+begin
+    temp = b;
+    #5;
+    a = temp;
+end</code></pre><blockquote><p>验证程序如下：</p></blockquote><center><img src="http://image.beenli.cn/global/20200404/X3hFItEUrx99.jpg?imageslim" srcset="/img/loading.gif" alt="测试" style="zoom:33%"></center><center><img src="http://image.beenli.cn/global/20200404/SJSV1lqyRQJe.jpg?imageslim" srcset="/img/loading.gif" alt="2" style="zoom:33%"></center><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="verilog">initial
+begin
+    # 10
+    @(posedge en) in = ~in; //en的👆上升沿到来时,in取反
+end</code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="verilog">always
+    #5 cnt=cnt+1'b1;
+initial
+    wait(cnt == 4'b1111) 
+    $display($time,,,"cnt = %b", cnt);
+end</code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
