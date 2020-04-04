@@ -22,6 +22,12 @@
             document.body.appendChild(img);
           });
       </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+      </categories>
+      <tags>
+        <tag>verilog</tag>
+      </tags>
   </entry>
   <entry>
     <title>单链表翻转</title>
