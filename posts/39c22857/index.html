@@ -19,7 +19,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar_apple.png">
   <link rel="icon" type="image/png" href="/img/avatar.png">
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
@@ -146,7 +146,7 @@
                   
                   <span class="post-meta">
                     <i class="far fa-chart-bar"></i>
-                    136 字
+                    188 字
                   </span>
                 
 
@@ -198,7 +198,7 @@
 }</code></pre>
 <a id="more"></a>
 
-<img src="/assets/photoes/reverse_linked_list.jpg" srcset="/img/loading.gif" style="zoom:80%;" />
+<img src="/assets/photoes/reverse_linked_list.jpg" srcset="/img/loading.gif" style="zoom:80%;">
 
 <hr>
 <h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head) {
@@ -219,12 +219,30 @@
     }
     return p0;
 }</code></pre>
-<img src="/assets/photoes/three_pointer.jpg" srcset="/img/loading.gif" style="zoom:80%;" />
+<img src="/assets/photoes/three_pointer.jpg" srcset="/img/loading.gif" style="zoom:80%;">
 
 <blockquote>
 <p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387" rel="external nofollow noreferrer">参考博客</a></p>
 </blockquote>
-
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
             </div>
             <hr>
             <div>
