@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.beenli.com/"/>
-  <updated>2020-04-03T12:21:04.484Z</updated>
+  <updated>2020-04-04T02:39:08.955Z</updated>
   <id>http://blog.beenli.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>testbench(1)</title>
+    <link href="http://blog.beenli.com/posts/26241a85/"/>
+    <id>http://blog.beenli.com/posts/26241a85/</id>
+    <published>2020-04-04T02:38:11.000Z</published>
+    <updated>2020-04-04T02:39:08.955Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;script&gt;
+        document.querySelectorAll(&#39;.github-emoji&#39;)
+          .forEach(el =&gt; {
+            if (!el.dataset.src) { return; }
+       
+        
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
   
   <entry>
     <title>单链表翻转</title>
