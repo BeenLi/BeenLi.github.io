@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://blog.beenli.com/"/>
-  <updated>2020-04-04T09:04:56.639Z</updated>
+  <updated>2020-04-04T12:23:05.201Z</updated>
   <id>http://blog.beenli.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>图床+评论</title>
+    <link href="http://blog.beenli.com/posts/7928fb24/"/>
+    <id>http://blog.beenli.com/posts/7928fb24/</id>
+    <published>2020-04-04T10:11:31.000Z</published>
+    <updated>2020-04-04T12:23:05.201Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="1、什么是图床"><a href="#1、什么是图床" class="headerlink" title="1、什么是图床"></a>1、什么是图床</h2><blockquote><p>图床一般是指储存图片的服务器；就跟百度网盘差不多。只不过它是专门存储图片的。</p><p>有的也可以存储文件。有很多免费的图床。会赠送10G存储空间</p></blockquote><h2 id="2、为什么要用图床"><a href="#2、为什么要用图床" class="headerlink" title="2、为什么要用图床"></a>2、为什么要用图床</h2><ol><li>用图床很方便。服务器会生成一个外链。在互联网任何地方都能访问到</li><li>用图床访问速度很快。服务商会使用cdn加速</li><li>用图床可以节省本地空间。</li></ol><h2 id="3、七牛云图床的使用"><a href="#3、七牛云图床的使用" class="headerlink" title="3、七牛云图床的使用"></a>3、<a href="https://www.qiniu.com" rel="external nofollow noreferrer">七牛云</a>图床的使用</h2><ol><li>注册一个账号（需要身份认证）</li><li>创建一个存储空间</li></ol><center><img src="http://image.beenli.cn/img/20200404/vzoF3Gv83OLc.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol start="3"><li><p>注意空间名称是唯一。</p><p><code>访问控制</code>：选择私有：别人无法访问。如果是写博客或者公众号还是选择公开吧！</p><p>这样外链别人是可以看得到的。</p></li></ol><center><img src="http://image.beenli.cn/img/20200404/powS6CQubT69.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol start="4"><li>绑定备案的<code>域名</code></li></ol><p><img src="http://image.beenli.cn/img/20200404/YHkGJVGQk87W.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>​ 可以看到：如果不绑定自己的域名；系统30天后回收回。那么你之前的外链都失效了</p><p>​ 所以最好绑定自己的域名才上线。</p><ol start="5"><li><p>如果你只想试试，那么到这里你就可以结束了。开始体验图床。</p><p><img src="http://image.beenli.cn/img/20200404/uo7Np1Vojilw.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><hr><p>上传完文件，然后返回。你就可以点击<code>操作</code>—&gt;<code>更多</code>—–&gt;<code>复制外链</code></p><p>这时候你就可以直接从浏览器输入这个外链访问到你刚刚上传的文件。</p></li><li><p>这里推荐一个Windows平台<a href="http://mpic.lzhaofu.cn/" rel="external nofollow noreferrer">图床神器</a>；大概长这样。登陆上你之前注册的七牛云账号就可以使用了。</p><p><img src="http://image.beenli.cn/img/20200404/TdnAh5RKQ2V8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h4 id="用图床上传图片遇到的坑："><a href="#用图床上传图片遇到的坑：" class="headerlink" title="用图床上传图片遇到的坑："></a>用图床上传图片遇到的坑：</h4><ol><li><p>由于七牛云默认生成的外链的是http的，有些浏览器会阻塞这种不安全资源。</p><p>我只好去修改协议。</p></li><li><p>这时遇到第二个坑。要使用https协议，你绑定的域名必须有证书。</p><p>我在网上到处找，买的证书太贵，划不来。免费的证书授权又太慢。</p><p>最后终于找到了一款免费证书ssl发放机构。<a href="https://freessl.cn/" rel="external nofollow noreferrer">freessl</a></p><p>其间要下载一个软件（keymanager)最后生成证书的过程很快几分钟就搞定。</p></li></ol><h2 id="4、Valine评论系统"><a href="#4、Valine评论系统" class="headerlink" title="4、Valine评论系统"></a>4、<a href="https://valine.js.org/" rel="external nofollow noreferrer">Valine</a>评论系统</h2><ol><li><p>hexo的很多主题都内嵌了这个系统，你只需要去<a href="https://www.leancloud.cn/" rel="external nofollow noreferrer">cleancloud</a>注册个账号获取id和key填入配置文件里面就能用</p></li><li><p>如果你想要邮件通知或者后台评论管理可以用这个插件<a href="https://github.com/panjunwen/Valine-Admin" rel="external nofollow noreferrer">Valine-Admin</a></p></li><li><p>项目部署的一定要注意smtp_pass是授权码或者QQ独立密码，不是登陆密码。</p></li><li><p>部署完成效果如下。</p><p><img src="http://image.beenli.cn/img/20200404/2DWW9TYEy7ih.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><center><img src="http://image.beenli.cn/img/20200404/CLyDSF8dzvEd.png?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;1、什么是图床&quot;&gt;&lt;a href=&quot;#1、什么是图床&quot; class=&quot;headerlink&quot; title=&quot;1、什么是图床&quot;&gt;&lt;/a&gt;1、什么是图床&lt;/h2&gt;&lt;blockquote&gt;&lt;p&gt;图床一般是指储存图片的服务器；就跟百度网盘差不多。只不过它是专门存储图片的。
+      
+    
+    </summary>
+    
+    
+      <category term="Software skills" scheme="http://blog.beenli.com/categories/Software-skills/"/>
+    
+    
+      <category term="Hexo" scheme="http://blog.beenli.com/tags/Hexo/"/>
+    
+  </entry>
   
   <entry>
     <title>testbench(1)</title>
