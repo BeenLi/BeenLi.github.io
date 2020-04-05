@@ -1,9 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Gate-and-switch-level modeling</title>
+    <url>/posts/aff089ac/</url>
+    <content><![CDATA[<h1 id="Gate-and-switch-level-modeling"><a href="#Gate-and-switch-level-modeling" class="headerlink" title="Gate-and-switch-level modeling"></a><center>Gate-and-switch-level modeling</center></h1><h2 id="1、verilog-std-1364-20051"><a href="#1、verilog-std-1364-20051" class="headerlink" title="1、verilog-std-1364-20051"></a>1、verilog-std-1364-2005<a href="#link"><sup>1</sup></a></h2><blockquote><p>There are <code>14 logic gates</code> and <code>12 switches</code> predefined in the Verilog HDL to provide the gate- and switch-level modeling facility. Modeling with logic gates and switches has the following advantages:</p></blockquote><p>— Gates provide a much closer one-to-one <code>mapping</code> between the actual circuit and the model.<br>— There is no <code>continuous assignment</code> equivalent to the <code>bidirectional transfer gate</code>.</p><p>Verilog1364-2005标准规定了26个基本原件，其中14个门级原件，12个开关级原件。</p><p>对于这些原件不需要定义直接调用。</p><h2 id="2、门级建模2"><a href="#2、门级建模2" class="headerlink" title="2、门级建模2"></a>2、门级建模<a href="#link"><sup>2</sup></a></h2><p><img src="http://image.beenli.cn/global/20200405/86dMFOGFTOna.png?imageslim" srcset="/img/loading.gif" alt="内置门级元件"></p><ol><li><p>多输入门：</p><pre><code class="verilog">n_input_gate_instance ::= [ name_of_gate_instance ] 
+( output_terminal , input_terminal { , input_terminal } ) 
+
+and A1(out1, in1, in2);
+or  O1(outa, inb, inc, ind);
+xor X1(outx, inx, iny, inz, inw);</code></pre></li><li><p>多输出门调用:</p><pre><code class="verilog">n_output_gate_instance ::= [ name_of_gate_instance ] 
+( output_terminal { , output_terminal } , input_terminal ) 
+
+buf BUF_1(bufout1, bufout2, bufout3, bufin);
+not NOT_1(out1, out2, in);</code></pre></li><li><p>三态门调用:</p><pre><code class="verilog">enable_gate_instance ::= [ name_of_gate_instance ] 
+( output_terminal , input_terminal , enable_terminal )
+
+bufif1 BF1(data_bus, data, enable);</code></pre></li><li><p>二个电阻</p><p>The instance declaration of a pullup or a pulldown source shall begin with one of the following keywords: <code>pullup</code> , <code>pulldown</code></p><pre><code class="verilog">pull_gate_instance ::= [ name_of_gate_instance ] ( output_terminal )  
+
+pullup   (strong1)  p1 (neta), p2 (netb);
+
+In this example, the  p1  instance drives  neta  and the  p2  instance drives netb  with strong strength.</code></pre></li><li><p>注意: 门级原件的端口列表都固定好了，可以不用定义中间连接信号类型(wire)</p><hr></li></ol><h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><pre><code class="verilog">// 门级建模实现最小项表达式
+// F(a, b, c) = m1 + m2 + m3 + m6 + m7 = (!a)c + b
+module zuixiaoxiang(out, a, b, c);
+    input a, b, c;
+    output out;
+    wire s1, s2;
+    not U1(s1, a);
+    and U2(s2, s1, c);
+    or U3(out, s2, b);
+endmodule
+</code></pre><img src="http://image.beenli.cn/global/20200405/ADk6SPgKBGVt.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"><h2 id="3、开关级建模"><a href="#3、开关级建模" class="headerlink" title="3、开关级建模"></a>3、开关级建模</h2><ol><li><p>MOS switches</p><table><thead><tr><th><strong>cmos</strong></th><th><strong>pmos</strong></th><th><strong>nmos</strong></th></tr></thead><tbody><tr><td><strong>rcmos</strong></td><td><strong>rnmos</strong></td><td><strong>rpmos</strong></td></tr></tbody></table><blockquote><p>rmos : 代表晶体管导通时源漏有较高的阻抗(<code>impedance</code>)</p></blockquote><pre><code class="verilog">The following example declares a pmos switch:
+
+pmos  p1 (out, data, control);
+
+The output is  out , the data input is  data , and the control input is 
+control.The instance name is  p1 .</code></pre></li><li><p>Bidirectional pass switches(双向开关)</p><table><thead><tr><th><strong>tran</strong></th><th><strong>tranif1</strong></th><th><strong>tranif0</strong></th></tr></thead><tbody><tr><td><strong>rtran</strong></td><td><strong>rtranif1</strong></td><td><strong>rtranif0</strong></td></tr></tbody></table><blockquote><p>The bidirectional pass switches shall not delay signals propagating through them. When tranif0, tranif1,rtranif0, or rtranif1 devices are turned off, they shall block signals; and when they are turned on, they shall pass signals. The tran and rtran devices cannot be turned off, and they shall always pass signals.(双向开关没有传播延时)</p></blockquote><pre><code class="verilog">The following example declares an instance of tranif1:
+
+tranif1  t1 (inout1,inout2,control);
+
+The bidirectional terminals are  inout1  and  inout2 . The control input is  control . The instance name is t1 .</code></pre><hr><h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><pre><code class="verilog">// 2输入与门
+// time:2020-04-05
+module and2_1(out, a, b);
+    input a,b;
+    output out;
+    wire s1, s2;
+    supply0 Gnd;
+    supply1 Vdd;
+    pmos U1(s1, Vdd, a);
+    pmos U2(s1, Vdd, b);
+    nmos U3(s1, s2, a);
+    nmos U4(s2, Gnd, b);
+    pmos U5(out, Vdd, s1);
+    nmos U6(out, Gnd, s1);
+endmodule</code></pre><img src="http://image.beenli.cn/global/20200405/iHaJAtKTeIck.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></li></ol><p>quarter II 综合不了，没办法直接看viewer。只能把书上的图扒来了。</p><hr><h4 id="终于找到了一款RTL级，gate级，开关级debugger和viewer的软件"><a href="#终于找到了一款RTL级，gate级，开关级debugger和viewer的软件" class="headerlink" title="终于找到了一款RTL级，gate级，开关级debugger和viewer的软件"></a>终于找到了一款RTL级，gate级，开关级debugger和viewer的软件</h4><p><a href="http://www.concept.de/SpiceVision.html" rel="external nofollow noreferrer">trainsistor-level debugger and viewer</a></p><p>但是目前下载不了，得找客服联系。不知有人有用过这款软件没有。有的话请你一定告诉我。</p><h2 id="Renference"><a href="#Renference" class="headerlink" title="Renference"></a>Renference</h2><div id="link"></div><p>[1] <a href="https://standards.ieee.org/standard/1364-2005.html" rel="external nofollow noreferrer">verilog-std-1364-2005</a></p><p>[2] <a href="">蔡觉平.2015.Verilog HDL 数字集成电路高级程序设计 31P</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+      </categories>
+      <tags>
+        <tag>verilog</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>图床+评论</title>
     <url>/posts/7928fb24/</url>
-    <content><![CDATA[<h2 id="1、什么是图床"><a href="#1、什么是图床" class="headerlink" title="1、什么是图床"></a>1、什么是图床</h2><blockquote><p>图床一般是指储存图片的服务器；就跟百度网盘差不多。只不过它是专门存储图片的。</p><p>有的也可以存储文件。有很多免费的图床。会赠送10G存储空间</p></blockquote><h2 id="2、为什么要用图床"><a href="#2、为什么要用图床" class="headerlink" title="2、为什么要用图床"></a>2、为什么要用图床</h2><ol><li>用图床很方便。服务器会生成一个外链。在互联网任何地方都能访问到</li><li>用图床访问速度很快。服务商会使用cdn加速</li><li>用图床可以节省本地空间。</li></ol><h2 id="3、七牛云图床的使用"><a href="#3、七牛云图床的使用" class="headerlink" title="3、七牛云图床的使用"></a>3、<a href="https://www.qiniu.com" rel="external nofollow noreferrer">七牛云</a>图床的使用</h2><ol><li>注册一个账号（需要身份认证）</li><li>创建一个存储空间</li></ol><center><img src="http://image.beenli.cn/img/20200404/vzoF3Gv83OLc.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol start="3"><li><p>注意空间名称是唯一。</p><p><code>访问控制</code>：选择私有：别人无法访问。如果是写博客或者公众号还是选择公开吧！</p><p>这样外链别人是可以看得到的。</p></li></ol><center><img src="http://image.beenli.cn/img/20200404/powS6CQubT69.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol start="4"><li>绑定备案的<code>域名</code></li></ol><p><img src="http://image.beenli.cn/img/20200404/YHkGJVGQk87W.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>​ 可以看到：如果不绑定自己的域名；系统30天后回收回。那么你之前的外链都失效了</p><p>​ 所以最好绑定自己的域名才上线。</p><ol start="5"><li><p>如果你只想试试，那么到这里你就可以结束了。开始体验图床。</p><p><img src="http://image.beenli.cn/img/20200404/uo7Np1Vojilw.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><hr><p>上传完文件，然后返回。你就可以点击<code>操作</code>—&gt;<code>更多</code>—–&gt;<code>复制外链</code></p><p>这时候你就可以直接从浏览器输入这个外链访问到你刚刚上传的文件。</p></li><li><p>这里推荐一个Windows平台<a href="http://mpic.lzhaofu.cn/" rel="external nofollow noreferrer">图床神器</a>；大概长这样。登陆上你之前注册的七牛云账号就可以使用了。</p><p><img src="http://image.beenli.cn/img/20200404/TdnAh5RKQ2V8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h4 id="用图床上传图片遇到的坑："><a href="#用图床上传图片遇到的坑：" class="headerlink" title="用图床上传图片遇到的坑："></a>用图床上传图片遇到的坑：</h4><ol><li><p>由于七牛云默认生成的外链的是http的，有些浏览器会阻塞这种不安全资源。</p><p>我只好去修改协议。</p></li><li><p>这时遇到第二个坑。要使用https协议，你绑定的域名必须有证书。</p><p>我在网上到处找，买的证书太贵，划不来。免费的证书授权又太慢。</p><p>最后终于找到了一款免费证书ssl发放机构。<a href="https://freessl.cn/" rel="external nofollow noreferrer">freessl</a></p><p>其间要下载一个软件（keymanager)最后生成证书的过程很快几分钟就搞定。</p></li></ol><h2 id="4、Valine评论系统"><a href="#4、Valine评论系统" class="headerlink" title="4、Valine评论系统"></a>4、<a href="https://valine.js.org/" rel="external nofollow noreferrer">Valine</a>评论系统</h2><ol><li><p>hexo的很多主题都内嵌了这个系统，你只需要去<a href="https://www.leancloud.cn/" rel="external nofollow noreferrer">cleancloud</a>注册个账号获取id和key填入配置文件里面就能用</p></li><li><p>如果你想要邮件通知或者后台评论管理可以用这个插件<a href="https://github.com/panjunwen/Valine-Admin" rel="external nofollow noreferrer">Valine-Admin</a></p></li><li><p>项目部署的一定要注意smtp_pass是授权码或者QQ独立密码，不是登陆密码。</p></li><li><p>部署完成效果如下。</p><p><img src="http://image.beenli.cn/img/20200404/2DWW9TYEy7ih.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><center><img src="http://image.beenli.cn/img/20200404/CLyDSF8dzvEd.png?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><script>
+    <content><![CDATA[<h2 id="图床-评论"><a href="#图床-评论" class="headerlink" title="图床+评论"></a><center>图床+评论</center></h2><h2 id="1、什么是图床"><a href="#1、什么是图床" class="headerlink" title="1、什么是图床"></a>1、什么是图床</h2><blockquote><p>图床一般是指储存图片的服务器；就跟百度网盘差不多。只不过它是专门存储图片的。</p><p>有的也可以存储文件。有很多免费的图床。会赠送10G存储空间</p></blockquote><h2 id="2、为什么要用图床"><a href="#2、为什么要用图床" class="headerlink" title="2、为什么要用图床"></a>2、为什么要用图床</h2><ol><li>用图床很方便。服务器会生成一个外链。在互联网任何地方都能访问到</li><li>用图床访问速度很快。服务商会使用cdn加速</li><li>用图床可以节省本地空间。</li></ol><h2 id="3、七牛云图床的使用"><a href="#3、七牛云图床的使用" class="headerlink" title="3、七牛云图床的使用"></a>3、<a href="https://www.qiniu.com" rel="external nofollow noreferrer">七牛云</a>图床的使用</h2><ol><li>注册一个账号（需要身份认证）</li><li>创建一个存储空间</li></ol><center><img src="http://image.beenli.cn/img/20200404/vzoF3Gv83OLc.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol start="3"><li><p>注意空间名称是唯一。</p><p><code>访问控制</code>：选择私有：别人无法访问。如果是写博客或者公众号还是选择公开吧！</p><p>这样外链别人是可以看得到的。</p></li></ol><center><img src="http://image.beenli.cn/img/20200404/powS6CQubT69.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol start="4"><li>绑定备案的<code>域名</code></li></ol><p><img src="http://image.beenli.cn/img/20200404/YHkGJVGQk87W.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>​ 可以看到：如果不绑定自己的域名；系统30天后回收回。那么你之前的外链都失效了</p><p>​ 所以最好绑定自己的域名才上线。</p><ol start="5"><li><p>如果你只想试试，那么到这里你就可以结束了。开始体验图床。</p><p><img src="http://image.beenli.cn/img/20200404/uo7Np1Vojilw.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><hr><p>上传完文件，然后返回。你就可以点击<code>操作</code>—&gt;<code>更多</code>—–&gt;<code>复制外链</code></p><p>这时候你就可以直接从浏览器输入这个外链访问到你刚刚上传的文件。</p></li><li><p>这里推荐一个Windows平台<a href="http://mpic.lzhaofu.cn/" rel="external nofollow noreferrer">图床神器</a>；大概长这样。登陆上你之前注册的七牛云账号就可以使用了。</p><p><img src="http://image.beenli.cn/img/20200404/TdnAh5RKQ2V8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h4 id="用图床上传图片遇到的坑："><a href="#用图床上传图片遇到的坑：" class="headerlink" title="用图床上传图片遇到的坑："></a>用图床上传图片遇到的坑：</h4><ol><li><p>由于七牛云默认生成的外链的是http的，有些浏览器会阻塞这种不安全资源。</p><p>我只好去修改协议。</p></li><li><p>这时遇到第二个坑。要使用https协议，你绑定的域名必须有证书。</p><p>我在网上到处找，买的证书太贵，划不来。免费的证书授权又太慢。</p><p>最后终于找到了一款免费证书ssl发放机构。<a href="https://freessl.cn/" rel="external nofollow noreferrer">freessl</a></p><p>其间要下载一个软件（keymanager)最后生成证书的过程很快几分钟就搞定。</p></li></ol><h2 id="4、Valine评论系统"><a href="#4、Valine评论系统" class="headerlink" title="4、Valine评论系统"></a>4、<a href="https://valine.js.org/" rel="external nofollow noreferrer">Valine</a>评论系统</h2><ol><li><p>hexo的很多主题都内嵌了这个系统，你只需要去<a href="https://www.leancloud.cn/" rel="external nofollow noreferrer">cleancloud</a>注册个账号获取id和key填入配置文件里面就能用</p></li><li><p>如果你想要邮件通知或者后台评论管理可以用这个插件<a href="https://github.com/panjunwen/Valine-Admin" rel="external nofollow noreferrer">Valine-Admin</a></p></li><li><p>项目部署的一定要注意smtp_pass是授权码或者QQ独立密码，不是登陆密码。</p></li><li><p>部署完成效果如下。</p><p><img src="http://image.beenli.cn/img/20200404/2DWW9TYEy7ih.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><center><img src="http://image.beenli.cn/img/20200404/CLyDSF8dzvEd.png?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -32,7 +110,7 @@
   <entry>
     <title>testbench(1)</title>
     <url>/posts/26241a85/</url>
-    <content><![CDATA[<h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="verilog">第一种: initial 初始化
+    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="verilog">第一种: initial 初始化
 initial a = 0;
 
 第二种: 定义信号时初始化
@@ -89,7 +167,7 @@ end</code></pre><p>等待语句只有条件为真时才执行。</p><p><img src=
   <entry>
     <title>单链表翻转</title>
     <url>/posts/39c22857/</url>
-    <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a>单链表翻转</h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head){
+    <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a><center>单链表翻转</center></h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head){
     struct ListNOde *newHead = NUll;
     struct ListNode *node = NULL;
     while (head != NULL) {
@@ -102,13 +180,7 @@ end</code></pre><p>等待语句只有条件为真时才执行。</p><p><img src=
         newHead = node;
     }
     return newHead;
-}</code></pre>
-<a id="more"></a>
-
-<img src="/assets/photoes/reverse_linked_list.jpg" srcset="/img/loading.gif" style="zoom:80%;">
-
-<hr>
-<h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head) {
+}</code></pre><a id="more"></a> <img src="/assets/photoes/reverse_linked_list.jpg" srcset="/img/loading.gif" style="zoom:80%"><hr><h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head) {
     if (head == NULL) { // 如果为NULL，那么后指针越界。
         return NULL;
     }
@@ -125,13 +197,7 @@ end</code></pre><p>等待语句只有条件为真时才执行。</p><p><img src=
         }
     }
     return p0;
-}</code></pre>
-<img src="/assets/photoes/three_pointer.jpg" srcset="/img/loading.gif" style="zoom:80%;">
-
-<blockquote>
-<p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387" rel="external nofollow noreferrer">参考博客</a></p>
-</blockquote>
-<script>
+}</code></pre><img src="/assets/photoes/three_pointer.jpg" srcset="/img/loading.gif" style="zoom:80%"><blockquote><p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387" rel="external nofollow noreferrer">参考博客</a></p></blockquote><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -160,35 +226,9 @@ end</code></pre><p>等待语句只有条件为真时才执行。</p><p><img src=
   <entry>
     <title>开发工具</title>
     <url>/posts/bc753b52/</url>
-    <content><![CDATA[<h1 id="vim-iverilog-gtkwave"><a href="#vim-iverilog-gtkwave" class="headerlink" title="vim + iverilog + gtkwave "></a><center>vim + iverilog + gtkwave </center></h1><h3 id="1、What-is-Icarus-Verilog"><a href="#1、What-is-Icarus-Verilog" class="headerlink" title="1、What is Icarus Verilog"></a>1、What is Icarus Verilog</h3><blockquote>
-<p><em>Icarus Verilog</em> is a <strong>Verilog simulation and synthesis</strong> tool. It operates as a compiler, compiling source code written in Verilog (IEEE-1364) into some target format. For batch simulation, the compiler can generate an intermediate form called <em>vvp assembly</em>. This intermediate form is executed by the <code>vvp</code>command. For synthesis, the compiler generates netlists in the desired format.<a href="http://iverilog.icarus.com/" rel="external nofollow noreferrer">^iverilog</a></p>
-</blockquote>
-<p>​    从官网的描述我们可以看到: 它是一个<code>仿真器</code>和<code>综合器</code>。</p>
-<p>​    有趣的是：开发者是一名软件工程师</p>
-<p>​    a software engineer specializing in device drivers and embedded systems</p>
-<h3 id="2、Why-we-choose-Icarus-Verilog"><a href="#2、Why-we-choose-Icarus-Verilog" class="headerlink" title="2、Why we choose Icarus Verilog"></a>2、Why we choose Icarus Verilog</h3><ol>
-<li>软件非常小，没有图形界面。跑跑小的程序足够了</li>
-<li>软件扩展性特别好。我现在还没有去探索。<a href="http://iverilog.icarus.com/page/plug-ins" rel="external nofollow noreferrer">详情见</a></li>
-<li>软件完全开源。如果有兴趣可以探索是如何把RTL代码转换为netlist的</li>
-</ol>
-<h3 id="3、How-to-use-it"><a href="#3、How-to-use-it" class="headerlink" title="3、How to  use it"></a>3、How to  use it</h3><ol>
-<li><p>像在quarter II 或者其他IDE一样，你可以在任意一款编辑器上编写Verilog源代码</p>
-<p><img src="vim_iverilog.jpg" srcset="/img/loading.gif" alt="Verilog"></p>
-</li>
-<li><p>然后在编辑器里一键运行脚本，或者在终端运行。</p>
-<blockquote>
-<p>终端主要记住几个命令即可: (<a href="">后面很会详细说明</a>)</p>
-</blockquote>
-<pre><code class="c">iverilog -o filename filename.v       // 编译源文件 【-o 指定生成的文件名称】
+    <content><![CDATA[<h1 id="vim-iverilog-gtkwave"><a href="#vim-iverilog-gtkwave" class="headerlink" title="vim + iverilog + gtkwave "></a><center>vim + iverilog + gtkwave</center></h1><h3 id="1、What-is-Icarus-Verilog"><a href="#1、What-is-Icarus-Verilog" class="headerlink" title="1、What is Icarus Verilog"></a>1、What is Icarus Verilog</h3><blockquote><p><em>Icarus Verilog</em> is a <strong>Verilog simulation and synthesis</strong> tool. It operates as a compiler, compiling source code written in Verilog (IEEE-1364) into some target format. For batch simulation, the compiler can generate an intermediate form called <em>vvp assembly</em>. This intermediate form is executed by the <code>vvp</code>command. For synthesis, the compiler generates netlists in the desired format.<a href="#refer-anchor"><sup>1</sup></a></p></blockquote><p>​ 从官网的描述我们可以看到: 它是一个<code>仿真器</code>和<code>综合器</code>。</p><p>​ 有趣的是：开发者是一名软件工程师</p><p>​ a software engineer specializing in device drivers and embedded systems</p><h3 id="2、Why-we-choose-Icarus-Verilog"><a href="#2、Why-we-choose-Icarus-Verilog" class="headerlink" title="2、Why we choose Icarus Verilog"></a>2、Why we choose Icarus Verilog</h3><ol><li>软件非常小，没有图形界面。跑跑小的程序足够了</li><li>软件扩展性特别好。我现在还没有去探索。<a href="http://iverilog.icarus.com/page/plug-ins" rel="external nofollow noreferrer">详情见</a></li><li>软件完全开源。如果有兴趣可以探索是如何把RTL代码转换为netlist的</li></ol><h3 id="3、How-to-use-it"><a href="#3、How-to-use-it" class="headerlink" title="3、How to  use it"></a>3、How to use it</h3><ol><li><p>像在quarter II 或者其他IDE一样，你可以在任意一款编辑器上编写Verilog源代码</p><p><img src="vim_iverilog.jpg" srcset="/img/loading.gif" alt="Verilog"></p></li><li><p>然后在编辑器里一键运行脚本，或者在终端运行。</p><blockquote><p>终端主要记住几个命令即可: (<a href="">后面很会详细说明</a>)</p></blockquote><pre><code class="c">iverilog -o filename filename.v       // 编译源文件 【-o 指定生成的文件名称】
 vvp filename                        // 仿真testbench
-gtkwave filename.vcd                // 查看仿真的波形图</code></pre>
-</li>
-</ol>
-<h3 id="4、Instance-case"><a href="#4、Instance-case" class="headerlink" title="4、Instance case"></a>4、Instance case</h3><ol>
-<li><blockquote>
-<p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)</p>
-</blockquote>
-<pre><code class="verilog">// 模8计数器。存储为count8.v
+gtkwave filename.vcd                // 查看仿真的波形图</code></pre></li></ol><h3 id="4、Instance-case"><a href="#4、Instance-case" class="headerlink" title="4、Instance case"></a>4、Instance case</h3><ol><li><blockquote><p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)</p></blockquote><pre><code class="verilog">// 模8计数器。存储为count8.v
 module count8(clk, rst_n, cnt);
    input clk, rst_n;
    output[3:0] cnt;
@@ -202,24 +242,7 @@ module count8(clk, rst_n, cnt);
    else
        cnt &lt;= cnt + 1'b1;
    end
-endmodule</code></pre>
-</li>
-<li><blockquote>
-<p>编译一下</p>
-</blockquote>
-<pre><code class="bash"> iverilog  -o counter8 counter8.v</code></pre>
-<p>​        <img src="synthesize.png" srcset="/img/loading.gif" alt="image-20200403162524369"></p>
-<p>​    可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p>
-</li>
-<li><blockquote>
-<p>如果想查看电路图。好像只能在quarter II里面viewer一下了。还没发现专门从netlist生成电路图的程序。</p>
-</blockquote>
-<p><img src="RTLviewer.png" srcset="/img/loading.gif" alt="image-20200403163232250"></p>
-</li>
-<li><blockquote>
-<p>编写测试代码</p>
-</blockquote>
-<pre><code class="verilog">`include "count8.v"
+endmodule</code></pre></li><li><blockquote><p>编译一下</p></blockquote><pre><code class="bash"> iverilog  -o counter8 counter8.v</code></pre><p>​ <img src="synthesize.png" srcset="/img/loading.gif" alt="image-20200403162524369"></p><p>​ 可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p></li><li><blockquote><p>如果想查看电路图。好像只能在quarter II里面viewer一下了。还没发现专门从netlist生成电路图的程序。</p></blockquote><p><img src="RTLviewer.png" srcset="/img/loading.gif" alt="image-20200403163232250"></p></li><li><blockquote><p>编写测试代码</p></blockquote><pre><code class="verilog">`include "count8.v"
 `timescale 1ns/1ns
 module count8_tb;
     // 数据结构声明
@@ -250,36 +273,7 @@ module count8_tb;
     $dumpvars(0, count8_tb);         // 设置要观察的变量
     end
 endmodule
-</code></pre>
-</li>
-<li><blockquote>
-<p>编译，仿真，生成波形图</p>
-</blockquote>
-<pre><code class="bash">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</code></pre>
-<p><img src="simulate.png" srcset="/img/loading.gif" alt="image-20200403170800780"></p>
-<p>注意:</p>
-<ol>
-<li><p>由于仿真程序没有设定停止时间。程序会一直执行。</p>
-</li>
-<li><p>如果你想自动停止（可以在testbench上加上<code># 500$stop</code>,那么程序仿真500个tick就停止)</p>
-</li>
-<li><p>如果你没有加停止指令。只能手动停止<code>ctrl+c</code>然后你可以打印当前仿真的时间。如果不够</p>
-<p>你可以继续仿真。如果可以了就<code>finish</code></p>
-</li>
-<li><p>最后用<code>gtkwave</code> 查看你刚刚仿真生成的<code>count8_tb.vcd</code>文件。</p>
-</li>
-</ol>
-<p><img src="gtkwave.png" srcset="/img/loading.gif" alt="image-20200403171326769"></p>
-</li>
-<li><blockquote>
-<p>如果你喜欢用<code>modelsim</code>也可以。</p>
-</blockquote>
-<p>也很简单，只需要建个项目，把你写的源文件放进去编译，仿真一下就可以了。</p>
-<p><a href="https://wenku.baidu.com/view/cd93f34ecf84b9d528ea7a95.html" rel="external nofollow noreferrer">具体教程见</a></p>
-<p><img src="modelsim.png" srcset="/img/loading.gif" alt="image-20200403171721915"></p>
-</li>
-</ol>
-<script>
+</code></pre></li><li><blockquote><p>编译，仿真，生成波形图</p></blockquote><pre><code class="bash">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</code></pre><p><img src="simulate.png" srcset="/img/loading.gif" alt="image-20200403170800780"></p><p>注意:</p><ol><li><p>由于仿真程序没有设定停止时间。程序会一直执行。</p></li><li><p>如果你想自动停止（可以在testbench上加上<code># 500$stop</code>,那么程序仿真500个tick就停止)</p></li><li><p>如果你没有加停止指令。只能手动停止<code>ctrl+c</code>然后你可以打印当前仿真的时间。如果不够</p><p>你可以继续仿真。如果可以了就<code>finish</code></p></li><li><p>最后用<code>gtkwave</code> 查看你刚刚仿真生成的<code>count8_tb.vcd</code>文件。</p></li></ol><p><img src="gtkwave.png" srcset="/img/loading.gif" alt="image-20200403171326769"></p></li><li><blockquote><p>如果你喜欢用<code>modelsim</code>也可以。</p></blockquote><p>也很简单，只需要建个项目，把你写的源文件放进去编译，仿真一下就可以了。</p><p><a href="https://wenku.baidu.com/view/cd93f34ecf84b9d528ea7a95.html" rel="external nofollow noreferrer">具体教程见</a></p><p><img src="modelsim.png" srcset="/img/loading.gif" alt="image-20200403171721915"></p></li></ol><div id="refer-anchor"></div><h2 id="references"><a href="#references" class="headerlink" title="references"></a>references</h2><p>[1] <a href="http://iverilog.icarus.com/" rel="external nofollow noreferrer">iverilog</a></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
