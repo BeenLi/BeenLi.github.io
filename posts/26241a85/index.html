@@ -29,7 +29,7 @@ begin
     temp = b;
     #5;
     a = temp;
-end</code></pre><blockquote><p>验证程序如下：</p></blockquote><center><img src="http://image.beenli.cn/global/20200404/X3hFItEUrx99.jpg?imageslim" srcset="/img/loading.gif" alt="测试" style="zoom:33%"></center><center><img src="http://image.beenli.cn/global/20200404/SJSV1lqyRQJe.jpg?imageslim" srcset="/img/loading.gif" alt="2" style="zoom:33%"></center><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="verilog">initial
+end</code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="verilog">initial
 begin
     # 10
     @(posedge en) in = ~in; //en的👆上升沿到来时,in取反
