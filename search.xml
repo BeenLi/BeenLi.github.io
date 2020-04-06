@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>VIM-Plugs</title>
+    <url>/posts/b71407e8/</url>
+    <content><![CDATA[<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>VIM</category>
+      </categories>
+      <tags>
+        <tag>Plugs</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Gate-and-switch-level modeling</title>
     <url>/posts/aff089ac/</url>
     <content><![CDATA[<h1 id="Gate-and-switch-level-modeling"><a href="#Gate-and-switch-level-modeling" class="headerlink" title="Gate-and-switch-level modeling"></a><center>Gate-and-switch-level modeling</center></h1><h2 id="1、verilog-std-1364-20051"><a href="#1、verilog-std-1364-20051" class="headerlink" title="1、verilog-std-1364-20051"></a>1、verilog-std-1364-2005<a href="#link"><sup>1</sup></a></h2><blockquote><p>There are <code>14 logic gates</code> and <code>12 switches</code> predefined in the Verilog HDL to provide the gate- and switch-level modeling facility. Modeling with logic gates and switches has the following advantages:</p></blockquote><p>— Gates provide a much closer one-to-one <code>mapping</code> between the actual circuit and the model.<br>— There is no <code>continuous assignment</code> equivalent to the <code>bidirectional transfer gate</code>.</p><p>Verilog1364-2005标准规定了26个基本原件，其中14个门级原件，12个开关级原件。</p><p>对于这些原件不需要定义直接调用。</p><h2 id="2、门级建模2"><a href="#2、门级建模2" class="headerlink" title="2、门级建模2"></a>2、门级建模<a href="#link"><sup>2</sup></a></h2><p><img src="http://image.beenli.cn/global/20200405/86dMFOGFTOna.png?imageslim" srcset="/img/loading.gif" alt="内置门级元件"></p><ol><li><p>多输入门：</p><pre><code class="verilog">n_input_gate_instance ::= [ name_of_gate_instance ] 
