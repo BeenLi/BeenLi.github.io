@@ -5,9 +5,9 @@
   <subtitle>趁还年轻, 多折腾几下</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://blog.beenli.com/"/>
+  <link href="https://blog.beenli.com/"/>
   <updated>2020-04-06T12:11:27.386Z</updated>
-  <id>http://blog.beenli.com/</id>
+  <id>https://blog.beenli.com/</id>
   
   <author>
     <name>Wan Li</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>VIM-Plugs</title>
-    <link href="http://blog.beenli.com/posts/b71407e8/"/>
-    <id>http://blog.beenli.com/posts/b71407e8/</id>
+    <link href="https://blog.beenli.com/posts/b71407e8/"/>
+    <id>https://blog.beenli.com/posts/b71407e8/</id>
     <published>2020-04-06T09:11:58.000Z</published>
     <updated>2020-04-06T12:11:27.386Z</updated>
     
@@ -35,17 +35,17 @@
     </summary>
     
     
-      <category term="VIM" scheme="http://blog.beenli.com/categories/VIM/"/>
+      <category term="VIM" scheme="https://blog.beenli.com/categories/VIM/"/>
     
     
-      <category term="Plugs" scheme="http://blog.beenli.com/tags/Plugs/"/>
+      <category term="Plugs" scheme="https://blog.beenli.com/tags/Plugs/"/>
     
   </entry>
   
   <entry>
     <title>Gate-and-switch-level modeling</title>
-    <link href="http://blog.beenli.com/posts/aff089ac/"/>
-    <id>http://blog.beenli.com/posts/aff089ac/</id>
+    <link href="https://blog.beenli.com/posts/aff089ac/"/>
+    <id>https://blog.beenli.com/posts/aff089ac/</id>
     <published>2020-04-05T01:54:38.000Z</published>
     <updated>2020-04-06T09:54:07.483Z</updated>
     
@@ -61,17 +61,17 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="http://blog.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://blog.beenli.com/categories/Digital-IC/"/>
     
     
-      <category term="verilog" scheme="http://blog.beenli.com/tags/verilog/"/>
+      <category term="verilog" scheme="https://blog.beenli.com/tags/verilog/"/>
     
   </entry>
   
   <entry>
     <title>图床+评论</title>
-    <link href="http://blog.beenli.com/posts/7928fb24/"/>
-    <id>http://blog.beenli.com/posts/7928fb24/</id>
+    <link href="https://blog.beenli.com/posts/7928fb24/"/>
+    <id>https://blog.beenli.com/posts/7928fb24/</id>
     <published>2020-04-04T10:11:31.000Z</published>
     <updated>2020-04-05T07:48:10.443Z</updated>
     
@@ -87,17 +87,17 @@
     </summary>
     
     
-      <category term="Software skills" scheme="http://blog.beenli.com/categories/Software-skills/"/>
+      <category term="Software skills" scheme="https://blog.beenli.com/categories/Software-skills/"/>
     
     
-      <category term="Hexo" scheme="http://blog.beenli.com/tags/Hexo/"/>
+      <category term="Hexo" scheme="https://blog.beenli.com/tags/Hexo/"/>
     
   </entry>
   
   <entry>
     <title>testbench(1)</title>
-    <link href="http://blog.beenli.com/posts/26241a85/"/>
-    <id>http://blog.beenli.com/posts/26241a85/</id>
+    <link href="https://blog.beenli.com/posts/26241a85/"/>
+    <id>https://blog.beenli.com/posts/26241a85/</id>
     <published>2020-04-04T02:38:11.000Z</published>
     <updated>2020-04-05T07:51:32.253Z</updated>
     
@@ -113,17 +113,17 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="http://blog.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://blog.beenli.com/categories/Digital-IC/"/>
     
     
-      <category term="verilog" scheme="http://blog.beenli.com/tags/verilog/"/>
+      <category term="verilog" scheme="https://blog.beenli.com/tags/verilog/"/>
     
   </entry>
   
   <entry>
     <title>单链表翻转</title>
-    <link href="http://blog.beenli.com/posts/39c22857/"/>
-    <id>http://blog.beenli.com/posts/39c22857/</id>
+    <link href="https://blog.beenli.com/posts/39c22857/"/>
+    <id>https://blog.beenli.com/posts/39c22857/</id>
     <published>2020-03-31T15:51:58.000Z</published>
     <updated>2020-04-06T09:52:39.025Z</updated>
     
@@ -149,17 +149,17 @@
     </summary>
     
     
-      <category term="Data Structure" scheme="http://blog.beenli.com/categories/Data-Structure/"/>
+      <category term="Data Structure" scheme="https://blog.beenli.com/categories/Data-Structure/"/>
     
     
-      <category term="C" scheme="http://blog.beenli.com/tags/C/"/>
+      <category term="C" scheme="https://blog.beenli.com/tags/C/"/>
     
   </entry>
   
   <entry>
     <title>开发工具</title>
-    <link href="http://blog.beenli.com/posts/bc753b52/"/>
-    <id>http://blog.beenli.com/posts/bc753b52/</id>
+    <link href="https://blog.beenli.com/posts/bc753b52/"/>
+    <id>https://blog.beenli.com/posts/bc753b52/</id>
     <published>2020-03-31T11:57:08.000Z</published>
     <updated>2020-04-06T09:51:22.586Z</updated>
     
@@ -175,10 +175,10 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="http://blog.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://blog.beenli.com/categories/Digital-IC/"/>
     
     
-      <category term="verilog" scheme="http://blog.beenli.com/tags/verilog/"/>
+      <category term="verilog" scheme="https://blog.beenli.com/tags/verilog/"/>
     
   </entry>
   
