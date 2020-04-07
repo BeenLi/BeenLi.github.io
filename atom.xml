@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.beenli.com/"/>
-  <updated>2020-04-06T12:11:27.386Z</updated>
+  <updated>2020-04-07T05:11:00.231Z</updated>
   <id>https://blog.beenli.com/</id>
   
   <author>
@@ -15,6 +15,64 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>操作系统(1)</title>
+    <link href="https://blog.beenli.com/posts/9cf5ff72/"/>
+    <id>https://blog.beenli.com/posts/9cf5ff72/</id>
+    <published>2020-04-07T05:07:15.000Z</published>
+    <updated>2020-04-07T05:11:00.231Z</updated>
+    
+    <content type="html"><![CDATA[<script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;script&gt;
+        document.querySelectorAll(&#39;.github-emoji&#39;)
+          .forEach(el =&gt; {
+            if (!el.dataset.src) { return; }
+        
+      
+    
+    </summary>
+    
+    
+      <category term="计算机" scheme="https://blog.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="OS" scheme="https://blog.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/OS/"/>
+    
+    
+      <category term="网易云网课" scheme="https://blog.beenli.com/tags/%E7%BD%91%E6%98%93%E4%BA%91%E7%BD%91%E8%AF%BE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux常用命令</title>
+    <link href="https://blog.beenli.com/posts/d0edc1ed/"/>
+    <id>https://blog.beenli.com/posts/d0edc1ed/</id>
+    <published>2020-04-07T04:03:20.000Z</published>
+    <updated>2020-04-07T05:04:01.376Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol><li><p>建立软链接<a href="https://man.linuxde.net/ln:link" rel="external nofollow noreferrer">ln</a></p><pre><code class="bash">ln -s [源文件] [链接文件] (创建软链接)</code></pre><p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p><pre><code class="bash">ln -s ~/oslab/gdb /usr/local/bin/gdb</code></pre><p class="note-primary">ln -snf ~/oslab/xxx /usr/local/bin/gdb(修改)</p><hr></li><li><p>移动文件<a href="https://man.linuxde.net/mv" rel="external nofollow noreferrer">mv</a></p><pre><code class="bash">mv [source] [target]</code></pre><p>例如：</p><ol><li>​ <code>mv ~/oslab/oslab/* ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li><li><code>mv a.txt b.tax</code> 把文件名a.txt改为b.txt</li></ol><hr></li></ol><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;Linux常用命令&quot;&gt;&lt;a href=&quot;#Linux常用命令&quot; class=&quot;headerlink&quot; title=&quot;Linux常用命令&quot;&gt;&lt;/a&gt;&lt;center&gt;Linux常用命令&lt;/center&gt;&lt;/h2&gt;&lt;ol&gt;&lt;li&gt;&lt;p&gt;建立软链接&lt;a href=&quot;htt
+      
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="https://blog.beenli.com/categories/Linux/"/>
+    
+    
+      <category term="Basic Use" scheme="https://blog.beenli.com/tags/Basic-Use/"/>
+    
+  </entry>
   
   <entry>
     <title>VIM-Plugs</title>
@@ -125,7 +183,7 @@
     <link href="https://blog.beenli.com/posts/39c22857/"/>
     <id>https://blog.beenli.com/posts/39c22857/</id>
     <published>2020-03-31T15:51:58.000Z</published>
-    <updated>2020-04-06T09:52:39.025Z</updated>
+    <updated>2020-04-07T05:12:29.899Z</updated>
     
     <content type="html"><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a><center>单链表翻转</center></h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head){    struct ListNOde *newHead = NUll;    struct ListNode *node = NULL;    while (head != NULL) {        //1. 对之前的链表做头删        node = head; // node始终指向head的前驱        head = head-&gt;next;        //2. 对新链表做头插        node-&gt;next = newHead;        newHead = node;    }    return newHead;}</code></pre><a id="more"></a> <img src="/assets/photoes/reverse_linked_list.jpg" srcset="/img/loading.gif" style="zoom:80%"><hr><h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><pre><code class="c">struct ListNode *reverseList(struct ListNode* head) {    if (head == NULL) { // 如果为NULL，那么后指针越界。        return NULL;    }    struct ListNode *p0 = NULL;    struct ListNode *p1 = head;    struct ListNode *p2 = head-&gt;next;    while (p1 != NULL) {        p1-&gt;next = p0;        p0 = p1;         p1 = p2;        if (p2 != NULL) {            p2 = p2-&gt;next;        }    }    return p0;}</code></pre><img src="/assets/photoes/three_pointer.jpg" srcset="/img/loading.gif" style="zoom:80%"><blockquote><p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387" rel="external nofollow noreferrer">参考博客</a></p></blockquote><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
     
@@ -149,7 +207,9 @@
     </summary>
     
     
-      <category term="Data Structure" scheme="https://blog.beenli.com/categories/Data-Structure/"/>
+      <category term="计算机" scheme="https://blog.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+    
+      <category term="Data Structure" scheme="https://blog.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Data-Structure/"/>
     
     
       <category term="C" scheme="https://blog.beenli.com/tags/C/"/>

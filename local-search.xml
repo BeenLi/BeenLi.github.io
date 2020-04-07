@@ -4,6 +4,58 @@
   
   
   <entry>
+    <title>操作系统(1)</title>
+    <link href="/posts/9cf5ff72/"/>
+    <url>/posts/9cf5ff72/</url>
+    
+    <content type="html"><![CDATA[<script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机</category>
+      
+      <category>OS</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>网易云网课</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux常用命令</title>
+    <link href="/posts/d0edc1ed/"/>
+    <url>/posts/d0edc1ed/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol><li><p>建立软链接<a href="https://man.linuxde.net/ln:link" rel="external nofollow noreferrer">ln</a></p><pre><code class="bash">ln -s [源文件] [链接文件] (创建软链接)</code></pre><p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p><pre><code class="bash">ln -s ~/oslab/gdb /usr/local/bin/gdb</code></pre><p class="note-primary">ln -snf ~/oslab/xxx /usr/local/bin/gdb(修改)</p><hr></li><li><p>移动文件<a href="https://man.linuxde.net/mv" rel="external nofollow noreferrer">mv</a></p><pre><code class="bash">mv [source] [target]</code></pre><p>例如：</p><ol><li>​ <code>mv ~/oslab/oslab/* ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li><li><code>mv a.txt b.tax</code> 把文件名a.txt改为b.txt</li></ol><hr></li></ol><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>Linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Basic Use</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>VIM-Plugs</title>
     <link href="/posts/b71407e8/"/>
     <url>/posts/b71407e8/</url>
@@ -112,6 +164,8 @@
     
     
     <categories>
+      
+      <category>计算机</category>
       
       <category>Data Structure</category>
       
