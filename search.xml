@@ -1,6 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>git hooks自动部署hexo</title>
+    <url>/posts/fb29ac9a/</url>
+    <content><![CDATA[<h2 id="git-hooks-自动部署hexo于服务器"><a href="#git-hooks-自动部署hexo于服务器" class="headerlink" title="git hooks 自动部署hexo于服务器"></a><center>git hooks 自动部署hexo于服务器</center></h2><h3 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h3><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><p><code>chmod 740 /etc/sudoers</code></p><p><code>vim /etc/sudoer</code></p><p><code>给git用户添加命令权限如下</code></p><p>保存后退出，修改回文件权限<code>chmod 440 /etc/sudoers</code></p><p><img src="http://image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol></li><li><p>初始化git仓库</p><pre><code class="bash">su git                //切换至git用户
+mkdir blog.git        //创建仓库文件夹
+cd blog.git            //进入文件夹
+git init --bare        //使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</code></pre></li><li><p>创建网站目录</p><pre><code class="bash">sudo mkdir /var/www/blog                //创建网站根目录
+sudo chown -R git.git /var/www/blog        //把blog目录以及子目录属组改为git
+(这一步很重要，否者后续提交没有权限)</code></pre></li><li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/" rel="external nofollow noreferrer">https://www.beenli.cn/posts/782a8ece/</a></p><pre><code class="bash">mkdir .ssh                //创建.ssh目录(默认你在git用户的~目录下)
+cd .ssh
+touch authorized_keys    //把你本地生成的公钥拷贝到此文件夹种</code></pre></li><li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p><pre><code class="bash">cd ~/blog.git/hooks                //切换到hooks目录
+touch post-receive                //创建post-receive文件
+chmod +x post-receive            //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code>#!/bin/bash
+echo "post-receive hook is running..."
+
+GIT_REPO=/home/git/blog.git
+TMP_GIT_CLONE=/tmp/blog
+PUBLIC_WWW=/var/www/blog
+
+rm -rf ${TMP_GIT_CLONE}
+git clone $GIT_REPO $TMP_GIT_CLONE
+rm -rf ${PUBLIC_WWW}/*
+cp -rf ${TMP_GIT_CLONE}/* ${PUBLIC_WWW}</code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="bash">deploy:
+    type: git
+    repository: git@VPS IP:/~/blog.git  # 默认22端口
+    branch: master</code></pre></li></ol><hr><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://tding.top/archives/12a4e7e6.html" rel="external nofollow noreferrer">Hexo 博客部署到 VPS</a></p><p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" rel="external nofollow noreferrer">git hooks</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Software skills</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>SSH</title>
     <url>/posts/782a8ece/</url>
     <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h4 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h4><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h4 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h4><ol><li><p>本地生成密钥对</p><pre><code class="bash">"Git Bash Hear"
