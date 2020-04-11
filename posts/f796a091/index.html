@@ -3,26 +3,37 @@
     var now = new Date();
     var dayStr = 'Sat Apr 04 2020 08:00:00 GMT+0800 (GMT+08:00)';
     var day = dayStr ? new Date(dayStr) : new Date();
-    var isMemorialDay = now.getFullYear() === day.getFullYear() && now.getMonth() === day.getMonth() && now.getDay()  === day.getDay();
+    var isMemorialDay = now.getFullYear() === day.getFullYear() && now.getMonth() === day.getMonth() && now.getDate()  === day.getDate();
     if (isMemorialDay) {
       var html = document.getElementsByTagName('html')[0];
       html.style.setProperty('-webkit-filter', 'grayscale(100%)');
       html.style.setProperty('filter', 'progid:DXImageTransform.Microsoft.BasicImage(grayscale=1)')
     }
   </script>
-  <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/avatar_apple.png"><link rel="icon" type="image/png" href="/img/avatar.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><meta name="theme-color" content="#2f4154"><meta name="description" content="平常爱打球, 听歌, 看书.&lt;br&gt;吉林大学17级微电子, 辅修CS"><meta name="author" content="Wan Li"><meta name="keywords" content="digital IC, ASIC, Linux, Vim, python, 电子狗, 程序猿"><title>数据结构——树 - BeenLi&#39;s blog</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="BeenLi's blog" type="application/atom+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>BeenLi's blog</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(http://image.beenli.cn/global/20200404/Vhp491ESi8O1.jpg?imageslim) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期四, 四月 9日 2020, 1:43 下午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 1.2k 字 </span><span class="post-meta"><i class="far fa-clock"></i> 4 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><p class="note note-warning">本文最后更新于：星期五, 四月 10日 2020, 6:50 晚上</p><div class="markdown-body"><h2 id="1、树的相关术语"><a href="#1、树的相关术语" class="headerlink" title="1、树的相关术语"></a>1、树的相关术语</h2><ol><li><p><strong>度</strong>：一个结点的子结点数目。树的度指度数最大的那个结点的度<br>$$<br>TD = max_{i=1…n}D(i)\quad D(i)表示第i个结点的度<br>$$</p></li><li><p><strong>叶结点，分支结点</strong></p><p>度为0的结点——<code>叶结点</code>；度大于0的结点——<code>分支结点</code></p></li><li><p><strong>结点的层数</strong></p><p>(1) root(T)——层数为0</p><p>(2)其余结点层数为前驱结点层数 + 1</p></li><li><p><strong>路径</strong><br>$$<br>V_m——&gt;V_{m+1}——&gt;…——&gt;V_{m+k} \quad1 &lt;= k &lt;= T最大层数<br>$$<br>同时满足$V_{i+1} $是$V_i$ （m &lt;=i&lt;=m+k-1)的子结点,则称结点序列为$V_m$ 到 $V_m+1$ 的路径。该路径经历的边数<code>k</code>称为<code>路径长度</code></p></li><li><p><strong>子孙结点、祖先结点</strong></p><p>一棵树中若存在结点$V_m$ 到$V_n$的路径，则称为$V_n$$是$$V_m$的<code>子孙结点</code>,为$V_n$是$V_m$的<code>祖先结点</code>。</p></li><li><p><strong>树的高度</strong></p><p>树中结点的最大层数。</p></li></ol><h2 id="2、二叉树引理"><a href="#2、二叉树引理" class="headerlink" title="2、二叉树引理"></a>2、二叉树引理</h2><ol><li><p><strong>设T为n个结点构成的二叉树，其中叶子节点个数为n<del>0</del>，度为2的结点个数为n<del>2</del>,则有:</strong><br>$$<br>n_0 = n_2 +1<br>$$<br>证明：<br>$$<br>设总的边数为e,度为1的结点树n_1\<br>则:n = n_0 + n_1 + n_2\<br>e = n - 1(除了根没有父节点没算在内)\<br>e = 2n_2 + n_1\<br>则有：2n_2 + n_1 = n_0 + n_1 + n_2 - 1\<br>$$</p></li><li><p><code>满二叉树</code>和<code>完全二叉树</code></p><p>满二叉树：每一层都充满了结点，一颗非空高度为k的满二叉树，有$2^{k+1}+1$个结点。</p><p>完全二叉树：只有最后一层不满，其余层全是满的。且最后一层从最左边开始填充。</p><p><img src="http://image.beenli.cn/img/20200410/HISXRvqtBFGy.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p><strong>若将n个结点的完全二叉树按<code>层次顺序</code>从1开始编号，则对编号为i(1 &lt;= i &lt;= n)的结点</strong>有：</p><ol><li>若 i $\neq$ = 1,则编号为i的结点父节点编号为$\left \lfloor i/2 \right \rfloor$</li><li>若 2i $\leq$ n, 则编号为i的结点左孩子编号为2i,否则无左孩子</li><li>若 2i+1 $\leq$ n, 则编号为i的右孩子编号为2i + 1,否者无有孩子。</li><li><code>推论</code>：一棵具有n个结点的完全二叉树，分支结点个数为$\left \lfloor n/2 \right \rfloor$。(最后一个结点n的父节点为$\left \lfloor n/2 \right \rfloor$)</li></ol><p><img src="http://image.beenli.cn/img/20200410/5LKoRUbNYOH0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>具有n个结点的完全二叉树高度为$\left \lfloor log_2n \right \rfloor$</p><p>证明：<br>$$<br>设高度为k\<br>二叉树结点个数介于高度为k-1和高度为k的满二叉树结点之间。\<br>2^k-1&lt; n \leq 2^{k+1}-1\<br>所有log_2n-1&lt;k\leq log_2n\<br>k取整数：k =\left \lfloor log_2n \right \rfloor<br>$$</p></li></ol><h2 id="3、二叉树递归遍历"><a href="#3、二叉树递归遍历" class="headerlink" title="3、二叉树递归遍历"></a>3、二叉树递归遍历</h2><ol><li><p>先根遍历(Preorder Traversal)</p><pre><code>Preorder(t)
+  <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><link rel="apple-touch-icon" sizes="76x76" href="/img/avatar_apple.png"><link rel="icon" type="image/png" href="/img/avatar.png"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><meta name="theme-color" content="#2f4154"><meta name="description" content="平常爱打球, 听歌, 看书.&lt;br&gt;吉林大学17级微电子, 辅修CS"><meta name="author" content="Wan Li"><meta name="keywords" content="digital IC, ASIC, Linux, Vim, python, 电子狗, 程序猿"><title>数据结构——树 - BeenLi&#39;s blog</title><link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/5.12.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/mdbootstrap/4.13.0/css/mdb.min.css"><link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/3.0.1/github-markdown.min.css"><link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css"><link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"><link rel="stylesheet" href="/css/main.css"><link defer rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css"><meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="BeenLi's blog" type="application/atom+xml"></head><body><header style="height:70vh"><nav id="navbar" class="navbar fixed-top navbar-expand-lg navbar-dark scrolling-navbar"><div class="container"><a class="navbar-brand" href="/">&nbsp;<strong>BeenLi's blog</strong>&nbsp;</a> <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><div class="animated-icon"><span></span><span></span><span></span></div></button><div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto text-center"><li class="nav-item"><a class="nav-link" href="/">首页</a></li><li class="nav-item"><a class="nav-link" href="/archives/">归档</a></li><li class="nav-item"><a class="nav-link" href="/categories/">分类</a></li><li class="nav-item"><a class="nav-link" href="/tags/">标签</a></li><li class="nav-item"><a class="nav-link" href="/about/">关于</a></li><li class="nav-item" id="search-btn"><a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i class="iconfont icon-search"></i>&nbsp;&nbsp;</a></li></ul></div></div></nav><div class="view intro-2" id="background" parallax="true" style="background:url(http://image.beenli.cn/global/20200404/Vhp491ESi8O1.jpg?imageslim) no-repeat center center;background-size:cover"><div class="full-bg-img"><div class="mask rgba-black-light flex-center"><div class="container text-center white-text fadeInUp"><span class="h2" id="subtitle"></span><p class="mt-3 post-meta"><i class="fas fa-calendar-alt" aria-hidden="true"></i> 星期四, 四月 9日 2020, 1:43 下午</p><p class="mt-1"><span class="post-meta"><i class="far fa-chart-bar"></i> 115 字 </span><span class="post-meta"><i class="far fa-clock"></i> 1 分钟</span></p></div></div></div></div></header><main><div class="container-fluid"><div class="row"><div class="d-none d-lg-block col-lg-2"></div><div class="col-lg-8 nopadding-md"><div class="container nopadding-md" id="board-ctn"><div class="py-5 z-depth-3" id="board"><div class="post-content mx-auto" id="post"><p class="note note-warning">本文最后更新于：星期五, 四月 10日 2020, 10:12 晚上</p><div class="markdown-body"><h2 id="1、树的相关术语"><a href="#1、树的相关术语" class="headerlink" title="1、树的相关术语"></a>1、树的相关术语</h2><ol><li><p><strong>度</strong>：一个结点的子结点数目。树的度指度数最大的那个结点的度</p><script type="math/tex;mode=display">TD = max_{i=1...n}D(i)\quad D(i)表示第i个结点的度</script></li><li><p><strong>叶结点，分支结点</strong></p><p>度为0的结点——<code>叶结点</code>；度大于0的结点——<code>分支结点</code></p></li><li><p><strong>结点的层数</strong></p><p>(1) root(T)——层数为0</p><p>(2)其余结点层数为前驱结点层数 + 1</p></li><li><p><strong>路径</strong></p><script type="math/tex;mode=display">V_m——>V_{m+1}——>...——>V_{m+k} \quad1 <= k <= T最大层数</script><p>同时满足$V_{i+1} $是$V_i$ （m &lt;=i&lt;=m+k-1)的子结点,则称结点序列为$V_m$ 到 $V_m+1$ 的路径。该路径经历的边数<code>k</code>称为<code>路径长度</code></p></li><li><p><strong>子孙结点、祖先结点</strong></p><p>一棵树中若存在结点$V_m$ 到$V_n$的路径，则称为$V_n<script type="math/tex">是</script>V_m$的<code>子孙结点</code>,为$V_n$是$V_m$的<code>祖先结点</code>。</p></li><li><p><strong>树的高度</strong></p><p>树中结点的最大层数。</p></li></ol><h2 id="2、二叉树引理"><a href="#2、二叉树引理" class="headerlink" title="2、二叉树引理"></a>2、二叉树引理</h2><ol><li><p><strong>设T为n个结点构成的二叉树，其中叶子节点个数为n~0~，度为2的结点个数为n~2~,则有:</strong></p><script type="math/tex;mode=display">n_0 = n_2 +1</script><p>证明：</p><script type="math/tex;mode=display">设总的边数为e,度为1的结点树n_1\\
+则:n = n_0 + n_1 + n_2\\
+e = n - 1(除了根没有父节点没算在内)\\
+e = 2n_2 + n_1\\
+则有：2n_2 + n_1 = n_0 + n_1 + n_2 - 1\\</script></li><li><p><code>满二叉树</code>和<code>完全二叉树</code></p><p>满二叉树：每一层都充满了结点，一颗非空高度为k的满二叉树，有$2^{k+1}+1$个结点。</p><p>完全二叉树：只有最后一层不满，其余层全是满的。且最后一层从最左边开始填充。</p><p><img src="http://image.beenli.cn/img/20200410/HISXRvqtBFGy.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p><strong>若将n个结点的完全二叉树按<code>层次顺序</code>从1开始编号，则对编号为i(1 &lt;= i &lt;= n)的结点</strong>有：</p><ol><li>若 i $\neq$ = 1,则编号为i的结点父节点编号为$\left \lfloor i/2 \right \rfloor$</li><li>若 2i $\leq$ n, 则编号为i的结点左孩子编号为2i,否则无左孩子</li><li>若 2i+1 $\leq$ n, 则编号为i的右孩子编号为2i + 1,否者无有孩子。</li><li><code>推论</code>：一棵具有n个结点的完全二叉树，分支结点个数为$\left \lfloor n/2 \right \rfloor$。(最后一个结点n的父节点为$\left \lfloor n/2 \right \rfloor$)</li></ol><p><img src="http://image.beenli.cn/img/20200410/5LKoRUbNYOH0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>具有n个结点的完全二叉树高度为$\left \lfloor log_2n \right \rfloor$</p><p>证明：</p><script type="math/tex;mode=display">设高度为k\\
+二叉树结点个数介于高度为k-1和高度为k的满二叉树结点之间。\\
+2^k-1< n \leq 2^{k+1}-1\\ 
+所有log_2n-1<k\leq log_2n\\
+k取整数：k =\left \lfloor log_2n \right \rfloor</script></li></ol><h2 id="3、二叉树递归遍历"><a href="#3、二叉树递归遍历" class="headerlink" title="3、二叉树递归遍历"></a>3、二叉树递归遍历</h2><ol><li><p>先根遍历(Preorder Traversal)</p><pre><code>Preorder(t)
 IF t = NULL Then return.
 print(data(t)).                // 直接打印出根，然后往左找
 Preorder(left(t))
-Preorder(right(t))</code></pre></li><li><p>中根遍历(Inorder Traversal)</p><pre><code>Inorder( t )
+Preorder(right(t))
+</code></pre></li><li><p>中根遍历(Inorder Traversal)</p><pre><code>Inorder( t )
 IF t = NULL Then return.
 INorder(left(t))
 print(data(t))
-INorder(right(t))</code></pre></li><li><p>后根遍历(Postorder Traversal)</p><pre><code>Postorder( t )
+INorder(right(t))
+</code></pre></li><li><p>后根遍历(Postorder Traversal)</p><pre><code>Postorder( t )
 IF t = NULL Then return.
 Postorder(left(t))
 Postorder(right(t))
-print(data(t))</code></pre></li></ol><h2 id="4、二叉树非递归遍历"><a href="#4、二叉树非递归遍历" class="headerlink" title="4、二叉树非递归遍历"></a>4、二叉树非递归遍历</h2><ol><li><p>先根遍历</p><p>策略：</p><ol><li>一直往左走，只要不为空就访问，访问完进栈。当为空时弹栈，访问右子树。</li><li>进栈的是访问结点的右子树。</li></ol><pre><code class="c">create(S);p = root(t)         // 创建一个辅助栈,辅助指针p指向根t。
+print(data(t))
+</code></pre></li></ol><h2 id="4、二叉树非递归遍历"><a href="#4、二叉树非递归遍历" class="headerlink" title="4、二叉树非递归遍历"></a>4、二叉树非递归遍历</h2><h5 id="1、先根遍历"><a href="#1、先根遍历" class="headerlink" title="1、先根遍历"></a>1、先根遍历</h5><p>策略：</p><ol><li>一直往左走，只要不为空就访问，访问完进栈。当为空时弹栈，访问右子树。</li><li>进栈的是访问结点的右子树。</li></ol><pre><code class="lang-c">create(S);p = root(t)         // 创建一个辅助栈,辅助指针p指向根t。
 while(true)                 // 一直循环，直到栈为空
 {
     while(p)                // 当p不为空，访问它，把它压栈或者它右子树压栈
@@ -34,7 +45,8 @@ while(true)                 // 一直循环，直到栈为空
     if(S.empty()) return;     // 循环出口。
     p = S.pop();            // 出栈
     p = p.right;            // 如果是压的右子树，这一步省略
-}</code></pre></li><li><p>中根遍历</p><p>策略：一直往走，中途结点全部压入栈。直到左子树为空，出栈访问，把右子树压栈。然后继续。</p><pre><code class="c">creat(S);p=root(T);
+}
+</code></pre><h5 id="2、中根遍历"><a href="#2、中根遍历" class="headerlink" title="2、中根遍历"></a>2、中根遍历</h5><p>策略：一直往走，中途结点全部压入栈。直到左子树为空，出栈访问，把右子树压栈。然后继续。</p><pre><code class="lang-c">creat(S);p=root(T);
 while(true)
 {
  while(p)
@@ -46,8 +58,95 @@ while(true)
     p = S.pop();
     process(p);                // 处理出栈的最左边结点
     p = p.right;            // 续上开头，现在p.right相当于root
-}</code></pre></li><li><p>n个结点的二叉树有多少种形态？</p><p>中根和先根算法进出栈的顺序是一样的。<code>进栈序列</code>：<code>先根序列</code>;<code>出栈序列</code>:<code>中根序列</code></p><p>假设先根序列为1…n时，有多少种中跟序列就有多少种二叉树形态。(中根+先根唯一确定一棵树)</p><p>即n个数有多少种出栈方式:<br>$$<br>Catalan(n) = \frac{1}{n+1}C_{2n}^{n}<br>$$</p></li></ol><ol start="4"><li><p>后根遍历</p><p>策略：</p><ol><li>往左一直走到头，不弹栈(因为右子树没访问还不能出来，后续要访问它)。只取栈顶的值。</li><li>允许结点多次出栈。即弹栈后让其马上进来。</li></ol><pre><code>Create(S); p = root(T);
-</code></pre></li></ol><p>V<del>1</del></p><script>document.querySelectorAll('.github-emoji')
+}
+</code></pre><h5 id="3、二叉树的形态"><a href="#3、二叉树的形态" class="headerlink" title="3、二叉树的形态"></a>3、二叉树的形态</h5><p>中根和先根算法进出栈的顺序是一样的。<code>进栈序列</code>：<code>先根序列</code>;<code>出栈序列</code>:<code>中根序列</code></p><p>假设先根序列为1…n时，有多少种中跟序列就有多少种二叉树形态。(中根+先根唯一确定一棵树)</p><p>即n个数有多少种出栈方式:</p><script type="math/tex;mode=display">Catalan(n) = \frac{1}{n+1}C_{2n}^{n}</script><h5 id="4、后根遍历"><a href="#4、后根遍历" class="headerlink" title="4、后根遍历"></a>4、后根遍历</h5><p>策略：</p><ol><li><p>一直往左走，压栈。如果遇到右子树为空或者右子树已经遍历过了就出栈访问它。否者就访问右子树。开始新的遍历。</p><pre><code> Create(S); p = root(T);pre=NULL        //pre存储p之前访问过的结点。
+   while(true)
+   {
+       while(p)
+       {
+           S.push(p);
+           p = p.left;
+       }
+       if(S.empty) return;
+       p = peak(S);
+       if(p.right == NULL or p.right == pre)
+       {
+           S.pop();
+           process(p.data);
+           pre = p;                    //始终记录上一次访问过的结点
+           p = NULL;                    //为了下一个循环中去父节点的右结点。
+       }
+       else p = p.right;
+   }
+</code></pre><p><img src="http://image.beenli.cn/img/20200410/3NxPuxxmqoTP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>允许多次进出栈。栈元素为二元组（结点，标号i)</p><p>i = 1 ：没有访问结点的任何子树。准备遍历其左子树</p><p>i = 2 ：遍历完左子树，准备遍历右子树</p><p>i = 3：遍历完右子树</p><p>初始化：（root(T), 1)压入栈。弹栈，判断出栈元素标号：</p><p>i = 1, 则将(p, 2) 压栈，准备遍历左子树。把（left(p), 1)压栈</p><p>i = 2, 则将(p, 3)压栈，准备遍历右子树，即把（right(p),1)压栈</p><p>i = 3, 访问结点p</p><pre><code>create(S);S.push((root(T),1));
+while(!S.isempty())
+{
+    (p,i) = S.pop();
+    if(p)                    // 防止空指针
+    {
+        if(i == 1)
+        {
+            S.push((p,2));
+            S.push((p.left, 1));
+        }
+        if(i == 2)
+        {
+            S.push((p,3));
+            S.push((p.right,1));
+        }
+        else
+        {
+            process(p.data)
+        }
+    }
+}
+</code></pre></li></ol><h5 id="5、层次遍历"><a href="#5、层次遍历" class="headerlink" title="5、层次遍历"></a>5、层次遍历</h5><pre><code class="lang-c">create(Q);
+if(root(T)) Q.enqueue(T);            //先将头结点入队
+while(!Q.empty)
+{
+    p = Q.dequeue();
+    process(p.data);                //取头结点访问
+    if(p.left) Q.enqueue(p.left);     //如果左节点不空，加入(先进先出)
+    if(p.right) Q.enqueue(p.right);
+}
+</code></pre><blockquote><p>由中根遍历 + （层次/先根/后根）唯一确定一棵树</p></blockquote><h2 id="5、二叉树相关应用"><a href="#5、二叉树相关应用" class="headerlink" title="5、二叉树相关应用"></a>5、二叉树相关应用</h2><h5 id="1、搜索给定结点的父节点"><a href="#1、搜索给定结点的父节点" class="headerlink" title="1、搜索给定结点的父节点"></a>1、搜索给定结点的父节点</h5><pre><code class="lang-c">Father(t,p.q)
+
+if(p == NULL or p==t) return NULL;
+if(t.left ==p or t.right == p) return t;
+// return Father(t.left, p) || Fathre(t.right, p)
+q = Father(t.left,p);
+if(q) return q;
+else return Father(t.right, p)
+</code></pre><h5 id="2、释放二叉树"><a href="#2、释放二叉树" class="headerlink" title="2、释放二叉树"></a>2、释放二叉树</h5><pre><code>Del(p)
+
+if(p == NULL) return;
+Del(p.left);
+Del(p.right);
+free(p);            // 后续遍历删除，从后往前删。
+</code></pre><h5 id="3、从二叉树中删除给定结点及其左右子树-即删除一颗小树"><a href="#3、从二叉树中删除给定结点及其左右子树-即删除一颗小树" class="headerlink" title="3、从二叉树中删除给定结点及其左右子树(即删除一颗小树)"></a>3、从二叉树中删除给定结点及其左右子树(即删除一颗小树)</h5><pre><code class="lang-c">DILR(t,p)
+
+if(!p) return;        // 为空
+if(p == t)
+{
+    Del(p);
+    t = NULL        //删除整棵树 t还有定义，可以再赋值。
+}
+q = Father(t,p);
+if(q.left == p) q.left = NULL;        //修改原来指向p的指针为空
+if(q.right == p) q.right == NULL;
+Del(p);
+</code></pre><h5 id="4、创建二叉树"><a href="#4、创建二叉树" class="headerlink" title="4、创建二叉树"></a>4、创建二叉树</h5><p>由于先根序列不能体现左右子树为空的情况，所有用<code>#</code>表示空子结点。则可以唯一表示一课树。</p><p><img src="http://image.beenli.cn/img/20200410/XEtAcvEkUge8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><pre><code>递归算法（CreateBinTree)(简称为CBT)
+输入：包含空指针的先根序列
+输出：根指针t
+
+算法CBT(.t)
+read(ch);        //顺序读入序列中每一个符号
+if(ch == "#")
+{
+    t = NULL;
+    return t;
+}
+</code></pre><script>document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
             const img = document.createElement('img');
