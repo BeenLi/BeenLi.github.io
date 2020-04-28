@@ -5,9 +5,9 @@
   <subtitle>趁还年轻, 多折腾几下</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="https://www.beenli.com/"/>
+  <link href="https://www.beenli.cn/"/>
   <updated>2020-04-27T17:19:39.073Z</updated>
-  <id>https://www.beenli.com/</id>
+  <id>https://www.beenli.cn/</id>
   
   <author>
     <name>Wan Li</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>Git for novice</title>
-    <link href="https://www.beenli.com/posts/f05478c5/"/>
-    <id>https://www.beenli.com/posts/f05478c5/</id>
+    <link href="https://www.beenli.cn/posts/f05478c5/"/>
+    <id>https://www.beenli.cn/posts/f05478c5/</id>
     <published>2020-04-27T10:09:18.000Z</published>
     <updated>2020-04-27T17:19:39.073Z</updated>
     
@@ -35,17 +35,17 @@
     </summary>
     
     
-      <category term="Software skills" scheme="https://www.beenli.com/categories/Software-skills/"/>
+      <category term="Software skills" scheme="https://www.beenli.cn/categories/Software-skills/"/>
     
     
-      <category term="git" scheme="https://www.beenli.com/tags/git/"/>
+      <category term="git" scheme="https://www.beenli.cn/tags/git/"/>
     
   </entry>
   
   <entry>
     <title>数据结构——树</title>
-    <link href="https://www.beenli.com/posts/f796a091/"/>
-    <id>https://www.beenli.com/posts/f796a091/</id>
+    <link href="https://www.beenli.cn/posts/f796a091/"/>
+    <id>https://www.beenli.cn/posts/f796a091/</id>
     <published>2020-04-09T05:43:31.000Z</published>
     <updated>2020-04-25T15:52:20.014Z</updated>
     
@@ -61,19 +61,19 @@
     </summary>
     
     
-      <category term="计算机" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+      <category term="计算机" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
     
-      <category term="Data Structure" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Data-Structure/"/>
+      <category term="Data Structure" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Data-Structure/"/>
     
     
-      <category term="C" scheme="https://www.beenli.com/tags/C/"/>
+      <category term="C" scheme="https://www.beenli.cn/tags/C/"/>
     
   </entry>
   
   <entry>
     <title>Tasks and Functions</title>
-    <link href="https://www.beenli.com/posts/71407778/"/>
-    <id>https://www.beenli.com/posts/71407778/</id>
+    <link href="https://www.beenli.cn/posts/71407778/"/>
+    <id>https://www.beenli.cn/posts/71407778/</id>
     <published>2020-04-08T14:20:43.000Z</published>
     <updated>2020-04-25T16:07:54.821Z</updated>
     
@@ -89,19 +89,19 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="https://www.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://www.beenli.cn/categories/Digital-IC/"/>
     
-      <category term="verilog" scheme="https://www.beenli.com/categories/Digital-IC/verilog/"/>
+      <category term="verilog" scheme="https://www.beenli.cn/categories/Digital-IC/verilog/"/>
     
     
-      <category term="syntax" scheme="https://www.beenli.com/tags/syntax/"/>
+      <category term="syntax" scheme="https://www.beenli.cn/tags/syntax/"/>
     
   </entry>
   
   <entry>
     <title>git hooks自动部署hexo</title>
-    <link href="https://www.beenli.com/posts/fb29ac9a/"/>
-    <id>https://www.beenli.com/posts/fb29ac9a/</id>
+    <link href="https://www.beenli.cn/posts/fb29ac9a/"/>
+    <id>https://www.beenli.cn/posts/fb29ac9a/</id>
     <published>2020-04-08T01:17:29.000Z</published>
     <updated>2020-04-25T16:11:04.739Z</updated>
     
@@ -117,19 +117,19 @@
     </summary>
     
     
-      <category term="Software skills" scheme="https://www.beenli.com/categories/Software-skills/"/>
+      <category term="Software skills" scheme="https://www.beenli.cn/categories/Software-skills/"/>
     
     
-      <category term="git" scheme="https://www.beenli.com/tags/git/"/>
+      <category term="git" scheme="https://www.beenli.cn/tags/git/"/>
     
-      <category term="Hexo" scheme="https://www.beenli.com/tags/Hexo/"/>
+      <category term="Hexo" scheme="https://www.beenli.cn/tags/Hexo/"/>
     
   </entry>
   
   <entry>
     <title>SSH</title>
-    <link href="https://www.beenli.com/posts/782a8ece/"/>
-    <id>https://www.beenli.com/posts/782a8ece/</id>
+    <link href="https://www.beenli.cn/posts/782a8ece/"/>
+    <id>https://www.beenli.cn/posts/782a8ece/</id>
     <published>2020-04-07T16:25:51.000Z</published>
     <updated>2020-04-25T16:12:52.228Z</updated>
     
@@ -145,19 +145,19 @@
     </summary>
     
     
-      <category term="计算机" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+      <category term="计算机" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
     
-      <category term="Computer Network" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Computer-Network/"/>
+      <category term="Computer Network" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Computer-Network/"/>
     
     
-      <category term="协议" scheme="https://www.beenli.com/tags/%E5%8D%8F%E8%AE%AE/"/>
+      <category term="协议" scheme="https://www.beenli.cn/tags/%E5%8D%8F%E8%AE%AE/"/>
     
   </entry>
   
   <entry>
     <title>操作系统-熟悉实验环境(1)</title>
-    <link href="https://www.beenli.com/posts/9cf5ff72/"/>
-    <id>https://www.beenli.com/posts/9cf5ff72/</id>
+    <link href="https://www.beenli.cn/posts/9cf5ff72/"/>
+    <id>https://www.beenli.cn/posts/9cf5ff72/</id>
     <published>2020-04-07T05:07:15.000Z</published>
     <updated>2020-04-25T13:59:11.670Z</updated>
     
@@ -173,19 +173,19 @@
     </summary>
     
     
-      <category term="计算机" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+      <category term="计算机" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
     
-      <category term="OS" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/OS/"/>
+      <category term="OS" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/OS/"/>
     
     
-      <category term="网易云网课" scheme="https://www.beenli.com/tags/%E7%BD%91%E6%98%93%E4%BA%91%E7%BD%91%E8%AF%BE/"/>
+      <category term="网易云网课" scheme="https://www.beenli.cn/tags/%E7%BD%91%E6%98%93%E4%BA%91%E7%BD%91%E8%AF%BE/"/>
     
   </entry>
   
   <entry>
     <title>Linux常用命令</title>
-    <link href="https://www.beenli.com/posts/d0edc1ed/"/>
-    <id>https://www.beenli.com/posts/d0edc1ed/</id>
+    <link href="https://www.beenli.cn/posts/d0edc1ed/"/>
+    <id>https://www.beenli.cn/posts/d0edc1ed/</id>
     <published>2020-04-07T04:03:20.000Z</published>
     <updated>2020-04-25T15:55:02.011Z</updated>
     
@@ -201,17 +201,17 @@
     </summary>
     
     
-      <category term="Linux" scheme="https://www.beenli.com/categories/Linux/"/>
+      <category term="Linux" scheme="https://www.beenli.cn/categories/Linux/"/>
     
     
-      <category term="Basic Use" scheme="https://www.beenli.com/tags/Basic-Use/"/>
+      <category term="Basic Use" scheme="https://www.beenli.cn/tags/Basic-Use/"/>
     
   </entry>
   
   <entry>
     <title>VIM-Plugs</title>
-    <link href="https://www.beenli.com/posts/b71407e8/"/>
-    <id>https://www.beenli.com/posts/b71407e8/</id>
+    <link href="https://www.beenli.cn/posts/b71407e8/"/>
+    <id>https://www.beenli.cn/posts/b71407e8/</id>
     <published>2020-04-06T09:11:58.000Z</published>
     <updated>2020-04-25T15:09:36.786Z</updated>
     
@@ -227,17 +227,17 @@
     </summary>
     
     
-      <category term="VIM" scheme="https://www.beenli.com/categories/VIM/"/>
+      <category term="VIM" scheme="https://www.beenli.cn/categories/VIM/"/>
     
     
-      <category term="Plugs" scheme="https://www.beenli.com/tags/Plugs/"/>
+      <category term="Plugs" scheme="https://www.beenli.cn/tags/Plugs/"/>
     
   </entry>
   
   <entry>
     <title>Gate-and-switch-level modeling</title>
-    <link href="https://www.beenli.com/posts/aff089ac/"/>
-    <id>https://www.beenli.com/posts/aff089ac/</id>
+    <link href="https://www.beenli.cn/posts/aff089ac/"/>
+    <id>https://www.beenli.cn/posts/aff089ac/</id>
     <published>2020-04-05T01:54:38.000Z</published>
     <updated>2020-04-25T15:47:08.865Z</updated>
     
@@ -253,17 +253,17 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="https://www.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://www.beenli.cn/categories/Digital-IC/"/>
     
     
-      <category term="verilog" scheme="https://www.beenli.com/tags/verilog/"/>
+      <category term="verilog" scheme="https://www.beenli.cn/tags/verilog/"/>
     
   </entry>
   
   <entry>
     <title>图床+评论</title>
-    <link href="https://www.beenli.com/posts/7928fb24/"/>
-    <id>https://www.beenli.com/posts/7928fb24/</id>
+    <link href="https://www.beenli.cn/posts/7928fb24/"/>
+    <id>https://www.beenli.cn/posts/7928fb24/</id>
     <published>2020-04-04T10:11:31.000Z</published>
     <updated>2020-04-25T15:15:06.206Z</updated>
     
@@ -279,17 +279,17 @@
     </summary>
     
     
-      <category term="Software skills" scheme="https://www.beenli.com/categories/Software-skills/"/>
+      <category term="Software skills" scheme="https://www.beenli.cn/categories/Software-skills/"/>
     
     
-      <category term="Hexo" scheme="https://www.beenli.com/tags/Hexo/"/>
+      <category term="Hexo" scheme="https://www.beenli.cn/tags/Hexo/"/>
     
   </entry>
   
   <entry>
     <title>testbench(1)</title>
-    <link href="https://www.beenli.com/posts/26241a85/"/>
-    <id>https://www.beenli.com/posts/26241a85/</id>
+    <link href="https://www.beenli.cn/posts/26241a85/"/>
+    <id>https://www.beenli.cn/posts/26241a85/</id>
     <published>2020-04-04T02:38:11.000Z</published>
     <updated>2020-04-25T15:18:18.695Z</updated>
     
@@ -305,19 +305,19 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="https://www.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://www.beenli.cn/categories/Digital-IC/"/>
     
-      <category term="verilog" scheme="https://www.beenli.com/categories/Digital-IC/verilog/"/>
+      <category term="verilog" scheme="https://www.beenli.cn/categories/Digital-IC/verilog/"/>
     
     
-      <category term="testbench" scheme="https://www.beenli.com/tags/testbench/"/>
+      <category term="testbench" scheme="https://www.beenli.cn/tags/testbench/"/>
     
   </entry>
   
   <entry>
     <title>单链表翻转</title>
-    <link href="https://www.beenli.com/posts/39c22857/"/>
-    <id>https://www.beenli.com/posts/39c22857/</id>
+    <link href="https://www.beenli.cn/posts/39c22857/"/>
+    <id>https://www.beenli.cn/posts/39c22857/</id>
     <published>2020-03-31T15:51:58.000Z</published>
     <updated>2020-04-25T15:23:37.806Z</updated>
     
@@ -343,19 +343,19 @@
     </summary>
     
     
-      <category term="计算机" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
+      <category term="计算机" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/"/>
     
-      <category term="Data Structure" scheme="https://www.beenli.com/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Data-Structure/"/>
+      <category term="Data Structure" scheme="https://www.beenli.cn/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA/Data-Structure/"/>
     
     
-      <category term="C" scheme="https://www.beenli.com/tags/C/"/>
+      <category term="C" scheme="https://www.beenli.cn/tags/C/"/>
     
   </entry>
   
   <entry>
     <title>开发工具</title>
-    <link href="https://www.beenli.com/posts/bc753b52/"/>
-    <id>https://www.beenli.com/posts/bc753b52/</id>
+    <link href="https://www.beenli.cn/posts/bc753b52/"/>
+    <id>https://www.beenli.cn/posts/bc753b52/</id>
     <published>2020-03-31T11:57:08.000Z</published>
     <updated>2020-04-25T16:14:37.607Z</updated>
     
@@ -371,10 +371,10 @@
     </summary>
     
     
-      <category term="Digital IC" scheme="https://www.beenli.com/categories/Digital-IC/"/>
+      <category term="Digital IC" scheme="https://www.beenli.cn/categories/Digital-IC/"/>
     
     
-      <category term="verilog" scheme="https://www.beenli.com/tags/verilog/"/>
+      <category term="verilog" scheme="https://www.beenli.cn/tags/verilog/"/>
     
   </entry>
   
