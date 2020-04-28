@@ -997,7 +997,32 @@ $ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class=
   <entry>
     <title>超前进位加法器</title>
     <url>/posts/1aa82b80/</url>
-    <content><![CDATA[<script>
+    <content><![CDATA[<h2 id="1、1bit全加器"><a href="#1、1bit全加器" class="headerlink" title="1、1bit全加器"></a>1、1bit全加器</h2><script type="math/tex;mode=display">S = A\oplus B \oplus C_{in}</script><script type="math/tex;mode=display">C_{out} = AB + (A \oplus B)C_{in}</script><p><img src="http://image.beenli.cn/img/20200428/N0IQvruhWdNO.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="2、4bit行波加法器"><a href="#2、4bit行波加法器" class="headerlink" title="2、4bit行波加法器"></a>2、4bit行波加法器</h2><p><img src="http://image.beenli.cn/img/20200428/MPLTV6H2PHyh.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到要得到最后的进位要经过9个门的延时。</p></blockquote><h2 id="3、4bit超前进位加法器"><a href="#3、4bit超前进位加法器" class="headerlink" title="3、4bit超前进位加法器"></a>3、4bit超前进位加法器</h2><script type="math/tex;mode=display">进位产生信号:g_i = A_iB_i</script><script type="math/tex;mode=display">进位传输信号:p_i = A_i\oplus B_i</script><script type="math/tex;mode=display">则：S_i = p_i \oplus c_i</script><script type="math/tex;mode=display">C_{i+1} = p_ic_i + g_i\quad(c_o = c_{in})</script><p class="note note-primary">判断进位的步骤:</p><ol><li>如果 $g_i$=1 (其他不用看肯定会进位)</li><li>如果 $g_i$=0；看传输信号$p_i$。</li><li>如果 $p_i$=0; 那不用看，已经否决了进位</li><li>如果 $p_i$=1; 那么用同样的方法看下一位是否有进位</li></ol><p></p><p class="note note-primary">判断结果的步骤: 只需把传输信号与进位信号异或。</p><p><img src="http://image.beenli.cn/img/20200428/Lih1DmjLOgFB.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>化简得到：</p><script type="math/tex;mode=display">c_1 = g_0 + p_oc_0(3个门延时)</script><script type="math/tex;mode=display">c_2 = g_1 + g_0p_1 + p_1p_0c_0(3个门延时)</script><script type="math/tex;mode=display">c_3 = g_2 + p_2g_1 + p_2p_1g_0 + p_2p_1p_0c_0(3个延时)</script><script type="math/tex;mode=display">c_4 = g_3 + p_3g_2 + p_3p_2g_1 + p_3p_2p_1g_0 + p_3p_2p_1p_0c_0</script><blockquote><p>👇下面是经过综合器优化门个数后的图。可以明显看到虽然门个数减少但是延时变长。</p></blockquote><p><img src="http://image.beenli.cn/img/20200428/abseSUENAM06.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="4、超前进位加法器级联"><a href="#4、超前进位加法器级联" class="headerlink" title="4、超前进位加法器级联"></a>4、超前进位加法器级联</h2><script type="math/tex;mode=display">pp = p[0] \& p[1] \& p[2] \& p[3](传输信号)</script><script type="math/tex;mode=display">gg = c_4(进位信号)</script><p><code>pp</code>： 代表相加结果为1111的时候。那么低一级要是有进位，传到我这一级，会产生想上一级的进位。</p><pre><code class="hljs verilog"><span class="hljs-comment">// Author: Wan Li</span>
+<span class="hljs-comment">// time: 2020-04-28</span>
+<span class="hljs-comment">// function: 把4个超前进位组成16位的</span>
+<span class="hljs-comment">// ---------------------------------------------------</span>
+
+<span class="hljs-comment">/* `include "adder4.v" */</span>
+
+<span class="hljs-keyword">module</span> adder_16(a, b, c_in, sum, c_out);
+    <span class="hljs-keyword">input</span>[<span class="hljs-number">15</span>:<span class="hljs-number">0</span>] a, b;
+    <span class="hljs-keyword">input</span> c_in;
+    <span class="hljs-keyword">output</span>[<span class="hljs-number">15</span>:<span class="hljs-number">0</span>] sum;
+    <span class="hljs-keyword">output</span> c_out;
+
+    <span class="hljs-keyword">wire</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] p, g, c;
+	
+    <span class="hljs-keyword">assign</span> c[<span class="hljs-number">0</span>] = c_in;
+    add4_head add1(<span class="hljs-variable">.a</span>(a[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]),   <span class="hljs-variable">.b</span>(b[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]),   <span class="hljs-variable">.ci</span>(c[<span class="hljs-number">0</span>]), <span class="hljs-variable">.s</span>(sum[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]), <span class="hljs-variable">.pp</span>(p[<span class="hljs-number">0</span>]), <span class="hljs-variable">.gg</span>(g[<span class="hljs-number">0</span>]));
+    <span class="hljs-keyword">assign</span> c[<span class="hljs-number">1</span>] = g[<span class="hljs-number">0</span>] | (p[<span class="hljs-number">0</span>] &amp; c[<span class="hljs-number">0</span>]);
+    add4_head add2(<span class="hljs-variable">.a</span>(a[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]),   <span class="hljs-variable">.b</span>(b[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]),   <span class="hljs-variable">.ci</span>(c[<span class="hljs-number">1</span>]), <span class="hljs-variable">.s</span>(sum[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]), <span class="hljs-variable">.pp</span>(p[<span class="hljs-number">1</span>]), <span class="hljs-variable">.gg</span>(g[<span class="hljs-number">1</span>]));
+    <span class="hljs-keyword">assign</span> c[<span class="hljs-number">2</span>] = g[<span class="hljs-number">1</span>] | (p[<span class="hljs-number">1</span>] &amp; c[<span class="hljs-number">1</span>]);
+    add4_head add3(<span class="hljs-variable">.a</span>(a[<span class="hljs-number">11</span>:<span class="hljs-number">8</span>]),  <span class="hljs-variable">.b</span>(b[<span class="hljs-number">11</span>:<span class="hljs-number">8</span>]),  <span class="hljs-variable">.ci</span>(c[<span class="hljs-number">2</span>]), <span class="hljs-variable">.s</span>(sum[<span class="hljs-number">11</span>:<span class="hljs-number">8</span>]), <span class="hljs-variable">.pp</span>(p[<span class="hljs-number">2</span>]), <span class="hljs-variable">.gg</span>(g[<span class="hljs-number">2</span>]));
+    <span class="hljs-keyword">assign</span> c[<span class="hljs-number">3</span>] = g[<span class="hljs-number">2</span>] | (p[<span class="hljs-number">2</span>] &amp; c[<span class="hljs-number">2</span>]);
+    add4_head add4(<span class="hljs-variable">.a</span>(a[<span class="hljs-number">15</span>:<span class="hljs-number">12</span>]), <span class="hljs-variable">.b</span>(b[<span class="hljs-number">15</span>:<span class="hljs-number">12</span>]), <span class="hljs-variable">.ci</span>(c[<span class="hljs-number">3</span>]), <span class="hljs-variable">.s</span>(sum[<span class="hljs-number">15</span>:<span class="hljs-number">12</span>]), <span class="hljs-variable">.pp</span>(p[<span class="hljs-number">3</span>]), <span class="hljs-variable">.gg</span>(g[<span class="hljs-number">3</span>]));
+    <span class="hljs-keyword">assign</span> c_out = g[<span class="hljs-number">3</span>] | (p[<span class="hljs-number">3</span>] &amp; c[<span class="hljs-number">3</span>]);
+
+<span class="hljs-keyword">endmodule</span></code></pre><p><img src="http://image.beenli.cn/img/20200428/REkvohU89K88.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -1016,5 +1041,12 @@ $ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class=
             document.body.appendChild(img);
           });
       </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>verilog</category>
+      </categories>
+      <tags>
+        <tag>verilog</tag>
+      </tags>
   </entry>
 </search>
