@@ -21,17 +21,17 @@ sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为g
 <span class="hljs-built_in">cd</span> .ssh
 touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种</code></pre></li><li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录
 touch post-receive				 //创建post-receive文件
-chmod +x post-receive			 //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code class="hljs plain">#!/bin/bash
-echo "post-receive hook is running..."
+chmod +x post-receive			 //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span>
 
 GIT_REPO=/home/git/blog.git
 TMP_GIT_CLONE=/tmp/blog
 PUBLIC_WWW=/var/www/blog
 
-rm -rf ${TMP_GIT_CLONE}
-git clone $GIT_REPO $TMP_GIT_CLONE
-rm -rf ${PUBLIC_WWW}/*
-cp -rf ${TMP_GIT_CLONE}/* ${PUBLIC_WWW}</code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="hljs bash">deploy:
+rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>
+git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span>
+rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*
+cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span></code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="hljs bash">deploy:
     <span class="hljs-built_in">type</span>: git
     repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span>
     branch: master</code></pre></li></ol><hr><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://tding.top/archives/12a4e7e6.html" rel="external nofollow noreferrer">Hexo 博客部署到 VPS</a></p><p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" rel="external nofollow noreferrer">git hooks</a></p><script>document.querySelectorAll('.github-emoji')
