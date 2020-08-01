@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>riscv-gnu-toolchain 下载、编译</title>
+    <link href="/posts/6c0abcd9/"/>
+    <url>/posts/6c0abcd9/</url>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://hub.fastgit.org/riscv/riscv-gnu-toolchain" rel="external nofollow noreferrer">riscv-gnu-toolchain</a> 是学习 <code>risc-v</code> 的前提，但是网上对这方面的介绍很少，并且工具链种类繁多，很可能让我们摸不清头脑。</p><h2 id="下载篇"><a href="#下载篇" class="headerlink" title="下载篇"></a>下载篇</h2><blockquote><p>由于<code>riscv-gnu-toolchain</code>包含有好多第三方库，整个项目文件很大[官方说的是6.65GB]，加上国内GitHub堪比🐢速，你多半是不可能按官方教程下下来。</p></blockquote><div class="table-container"><table><thead><tr><th>项目名称</th><th>项目描述</th><th>项目用途</th></tr></thead><tbody><tr><td><a href="https://git.qemu.org/git/qemu.git" rel="external nofollow noreferrer">qemu</a></td><td>模拟器（类似bochs,PearPC)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-binutils-gdb.git" rel="external nofollow noreferrer">riscv-binutils</a></td><td></td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-dejagnu.git" rel="external nofollow noreferrer">riscv-dejagnu</a></td><td></td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-gcc.git" rel="external nofollow noreferrer">riscv-gcc</a></td><td></td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-binutils-gdb.git" rel="external nofollow noreferrer">riscv-gdb</a></td><td></td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-glibc" rel="external nofollow noreferrer">riscv-glibc</a></td><td></td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-newlib.git" rel="external nofollow noreferrer">riscv-newlib</a></td><td></td></tr></tbody></table></div><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>RISC-V</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>toolchain</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>jupyter notebook</title>
     <link href="/posts/2641cf45/"/>
     <url>/posts/2641cf45/</url>
