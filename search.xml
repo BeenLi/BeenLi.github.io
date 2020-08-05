@@ -205,7 +205,8 @@ git fetch 不会修改当前工作区的文件。它只会获取数据然后让�
           });
       </script>]]></content>
       <categories>
-        <category>Software skills</category>
+        <category>Software</category>
+        <category>Git</category>
       </categories>
       <tags>
         <tag>git</tag>
@@ -214,12 +215,20 @@ git fetch 不会修改当前工作区的文件。它只会获取数据然后让�
   <entry>
     <title>git hooks自动部署hexo</title>
     <url>/posts/fb29ac9a/</url>
-    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers
+    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers</code></pre></li></ol></li></ol><p>vim /etc/sudoer<br></p><pre><code class="hljs stata">
+      `给git用户添加命令权限如下`
+    
+      保存后退出，修改回文件权限`chmod 440 /etc/sudoers`
       
-vim  /etc/sudoer</code></pre><p><code>给git用户添加命令权限如下</code></p><p>保存后退出，修改回文件权限<code>chmod 440 /etc/sudoers</code></p><p><img src="http://image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol></li><li><p>初始化git仓库</p><pre><code class="hljs bash">su git				//切换至git用户
-mkdir blog.git		//创建仓库文件夹
-<span class="hljs-built_in">cd</span> blog.git			//进入文件夹
-git init --bare		//使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</code></pre></li><li><p>创建网站目录</p><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录
+      ![<span class="hljs-keyword">mark</span>](http:<span class="hljs-comment">//image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim)</span>
+
+2. 初始化git仓库
+
+   ```bash
+   <span class="hljs-keyword">su</span> git				<span class="hljs-comment">//切换至git用户</span>
+   <span class="hljs-keyword">mkdir</span> blog.git		<span class="hljs-comment">//创建仓库文件夹</span>
+   <span class="hljs-keyword">cd</span> blog.git			<span class="hljs-comment">//进入文件夹</span>
+   git init --bare		<span class="hljs-comment">//使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</span></code></pre><p></p><ol><li><p>创建网站目录</p><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录
 sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git
 (这一步很重要，否者后续提交没有权限)</code></pre></li><li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)
 <span class="hljs-built_in">cd</span> .ssh
@@ -258,7 +267,8 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
           });
       </script>]]></content>
       <categories>
-        <category>Software skills</category>
+        <category>Software</category>
+        <category>Git</category>
       </categories>
       <tags>
         <tag>git</tag>
@@ -675,7 +685,7 @@ conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id
           });
       </script>]]></content>
       <categories>
-        <category>Software skills</category>
+        <category>Software</category>
       </categories>
   </entry>
   <entry>
@@ -1058,6 +1068,7 @@ snippet test
           });
       </script>]]></content>
       <categories>
+        <category>Software</category>
         <category>VIM</category>
       </categories>
       <tags>
