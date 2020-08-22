@@ -4,6 +4,60 @@
   
   
   <entry>
+    <title>数据通路(2)--控制</title>
+    <link href="/posts/f0189490/"/>
+    <url>/posts/f0189490/</url>
+    
+    <content type="html"><![CDATA[<h1 id="1、ALU控制"><a href="#1、ALU控制" class="headerlink" title="1、ALU控制"></a>1、ALU控制</h1><blockquote><p>MIPS ALU在4位控制信号上定义了6种有效的输入组合</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/VGrg5UNVVt4J.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>存储器访问指令：add</li><li>R型指令：根据指令低6位的funct字段<a href="#link"><sup>1</sup></a> ，ALU执行5种操作中的一种(nor暂时没用)</li><li>branch指令：sub(两个操作数相减判断是否为零)</li></ul><ul><li><code>多级译码</code>：输入：6位funct字段和2位ALUOP字段————&gt;输出：4位ALU control lines</li></ul><p><img src="https://image.beenli.cn/img/20200820/xlEg0oIEPQA5.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控制单元生成ALUOP</center><ul><li>真值表——优化后转换为门电路（坑待定）</li></ul><p><img src="https://image.beenli.cn/img/20200820/fBArSknPUEb4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、主控制单元"><a href="#2、主控制单元" class="headerlink" title="2、主控制单元"></a>2、主控制单元</h1><div id="link"></div><ul><li>指令格式</li></ul><p><img src="https://image.beenli.cn/img/20200820/MLWQrvKbTmz4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>R型指令opcode为0；lw为35；sw为43 ; branch为<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8">4⃣</span></li></ul><p><img src="https://image.beenli.cn/img/20200820/w7nhaHnvyrH3.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>7个多选器控制信号的作用</center><p><img src="https://image.beenli.cn/img/20200820/kdnnx95gnWHt.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控单元产生7个一位控制信号+2位ALUOP</center><ul><li><p>控制信号真值表</p><p><img src="https://image.beenli.cn/img/20200820/xa7NDi0PBA7x.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>op[5:0]取至Instruction[31:26]</p></li><li>RegDst: R为1表示目的寄存器为rd; lw为rs; sw和branch不用写回寄存器堆所以没有目的寄存器。</li><li>ALUSrc: R和branch为0表示ALU第二个操作数来自rt; lw和sw表示第二个操作数来自低16位的扩展。</li><li>MemtoReg: sw和branch为x表示不用写回。R为0表示ALU计算结果写回；lw表示数据寄存器取出来的数写回</li><li>Regwirte: R和lw要写回所以为1。</li><li>MenRead: 只要lw要读所以只有lw为1</li><li>MemWrite: 只有sw要写</li><li>Branch: 只有branch才触发</li><li>ALUOP: R为10；存储为00；branch为01</li></ul><ul><li><p>跳转实现（即改变PC的值）</p><p>其OPcode为2.低26位都是offset_address。</p><p><img src="https://image.beenli.cn/img/20200820/PCxbE327wJVr.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>CS</category>
+      
+      <category>Computer Organization &amp; Design</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>processor</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>数据通路(1)--基本逻辑</title>
+    <link href="/posts/74018a17/"/>
+    <url>/posts/74018a17/</url>
+    
+    <content type="html"><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offsetlw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。beq $t3, $zero, loop1  # if($t3==$zero) go to loop1  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>CS</category>
+      
+      <category>Computer Organization &amp; Design</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>processor</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>存储电路</title>
     <link href="/posts/19fa4593/"/>
     <url>/posts/19fa4593/</url>
