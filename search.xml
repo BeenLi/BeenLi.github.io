@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Linux常用命令</title>
-    <url>/posts/d0edc1ed/</url>
-    <content><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol><li><p>建立软链接<a href="https://man.linuxde.net/ln:link" rel="external nofollow noreferrer">ln</a></p><pre><code class="hljs bash">ln -s [源文件] [链接文件] (创建软链接)</code></pre><p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p><pre><code class="hljs bash">ln -s ~/oslab/gdb /usr/<span class="hljs-built_in">local</span>/bin/gdb</code></pre><p class="note note-info">ln -snf ~/oslab/xxx /usr/local/bin/gdb(修改)</p><hr></li><li><p>移动文件<a href="https://man.linuxde.net/mv" rel="external nofollow noreferrer">mv</a></p><pre><code class="hljs bash">mv [<span class="hljs-built_in">source</span>] [target]</code></pre><p>例如：</p><ol><li>​ <code>mv ~/oslab/oslab/* ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li><li><code>mv a.txt b.tax</code> 把文件名a.txt改为b.txt</li></ol><hr></li><li><p>设置权限<a href="https://man.linuxde.net/chmod" rel="external nofollow noreferrer">chmod</a>；<a href="https://man.linuxde.net/chown" rel="external nofollow noreferrer">chown</a></p><p><code>r</code> 读取权限，数字代号为<code>4</code>;<br><code>w</code> 写入权限，数字代号为<code>2</code>；<br><code>x</code> 执行或切换权限，数字代号为<code>1</code>；<br><code>-</code> 不具任何权限，数字代号为<code>0</code>；</p></li></ol><div class="table-container"><table><thead><tr><th style="text-align:center">7</th><th style="text-align:center">rwx</th></tr></thead><tbody><tr><td style="text-align:center"><strong>6</strong></td><td style="text-align:center"><strong>rw-</strong></td></tr><tr><td style="text-align:center"><strong>5</strong></td><td style="text-align:center"><strong>r-x</strong></td></tr><tr><td style="text-align:center"><strong>4</strong></td><td style="text-align:center"><strong>r—</strong></td></tr><tr><td style="text-align:center"><strong>3</strong></td><td style="text-align:center"><strong>-wx</strong></td></tr><tr><td style="text-align:center"><strong>2</strong></td><td style="text-align:center"><strong>-w-</strong></td></tr><tr><td style="text-align:center"><strong>1</strong></td><td style="text-align:center"><strong>—x</strong></td></tr><tr><td style="text-align:center"><strong>0</strong></td><td style="text-align:center"><strong>—-</strong></td></tr></tbody></table></div><pre><code class="hljs bash">chmod u+x,g+w f0　　			 //为文件f0设置自己可以执行，组员可以写入的权限
-chmod u=rwx,g=rw,o=r f0	 	  //为文件f0设置自己可以读写执行，同组可以读写。其他人可以读
-chmod 764 f0				  // 效果同上
-chmod a+x f0				  // 所有人都可以执行
+    <title>Git for novice</title>
+    <url>/posts/f05478c5/</url>
+    <content><![CDATA[<h2 id="1、Git-and-GitHub"><a href="#1、Git-and-GitHub" class="headerlink" title="1、Git and GitHub"></a>1、Git and GitHub</h2><p><code>Github</code> 可以看成是一个基于Git的系统，它提供了仓库的可视化。是一个<code>远程托管仓库</code>。如果是public，其他人可以随意查看，修改。如果是private只有你自己可以查看了。如果为了安全，可以团队自己搭建一个git服务器。</p><p><code>Git</code>大家都已经很熟悉了，分布式版本控制系统(Distributed version control system)</p><h2 id="2、Why-do-we-use-git"><a href="#2、Why-do-we-use-git" class="headerlink" title="2、Why do we use git"></a>2、Why do we use git</h2><ol><li>可以更好地在GitHub上开发，分享啊。</li><li>多人协同开发。</li><li>版本控制，可以任意回滚到之前某个版本。</li></ol><h2 id="3、How-do-we-use-git"><a href="#3、How-do-we-use-git" class="headerlink" title="3、How do we use git"></a>3、How do we use git</h2><p><img src="http://image.beenli.cn/img/20200428/AdQsxqK9vslE.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h3 id="场景1"><a href="#场景1" class="headerlink" title="场景1"></a>场景1</h3><blockquote><p>在GitHub上看到一个不错的项目，想要研究，学习为目的。</p></blockquote><ol><li><p>先fork一份到自己的GitHub上。</p></li><li><p>clone到本地</p><p>-o 指定远程仓库的名字，否则默认为<code>origin</code></p><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> [-b &lt;指定分支名&gt;]&lt;远程仓库地址&gt; [-o booyah]  
+默认是克隆所有分支。</code></pre></li><li><p>进行自己的开发。修改文件后</p><p>此时git status可以看到：修改过的文件红色标处。<code>Untracked files</code><img src="http://image.beenli.cn/img/20200427/3yURcSj2qBqU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs bash">git add ./[filename]			// 把修改过的文件添加到暂存区。</code></pre><p><img src="http://image.beenli.cn/img/20200427/ri8cAxnmujYg.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此时文件变成绿色。即已经添加到了暂存区。</p></li><li><p>提交</p><pre><code class="hljs bash">git commit -m <span class="hljs-string">"添加文件的说明"</span>			// 提交</code></pre><p>提交完成了，工作目录应该显示是空的。</p></li><li><p>推送到远程仓库</p><pre><code class="hljs bash">git pull origin [branch name] 			// 推送到指定仓库的指定分支上。</code></pre><p><img src="http://image.beenli.cn/img/20200427/aTKLfLxC1XUc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h3 id="场景2"><a href="#场景2" class="headerlink" title="场景2"></a>场景2</h3><blockquote><p>自己新建一个仓库。做项目开发。</p></blockquote><ol><li><p>初始化一个本地仓库</p><pre><code class="hljs bash">git init xxx	// 新建一个名为xxx的仓库</code></pre></li><li><p>进入仓库，然后就可以开发了。</p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span>  xxx 		// 此目录就是工程根目录。</code></pre></li><li><p>如果要上传到GitHub上。即远端git服务器</p><ul><li><p>首先在GitHub上新建一个仓库。</p></li><li><p>本地仓库与远程仓库建立联系。</p><pre><code class="hljs axapta">git remote add origin &lt;<span class="hljs-keyword">server</span>&gt;	<span class="hljs-comment">// 与GitHub仓库建立联系. origin 可以换成任意名字。</span></code></pre><p><img src="http://image.beenli.cn/img/20200427/9id7SRqNtn2j.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到我通过origin pull不上去。因为我连接的是remote_name。</p></blockquote></li><li><p>push到远程服务器上</p><pre><code class="hljs bash">git push origin master 			// 推送到远程服务器上</code></pre></li></ul><p>如果是克隆远程仓库的话，那么可以跳过remote（因为本地master已经和远程master联系上了)。直接推送到远程服务器。</p></li></ol><h2 id="4、common-commands1"><a href="#4、common-commands1" class="headerlink" title="4、common commands1"></a>4、common commands<a href="#link"><sup>1</sup></a></h2><h3 id="1、branch（分支"><a href="#1、branch（分支" class="headerlink" title="1、branch（分支)"></a>1、branch（分支)</h3><h4 id="1、新建分支"><a href="#1、新建分支" class="headerlink" title="1、新建分支"></a>1、新建分支</h4><pre><code class="hljs bash">git checkout -b xxx		// 新建分支并切换到xxx
+git branch xxx			// 只是新建一个分支，仍留在本地。（新建的分支复刻目分支)</code></pre><blockquote><p>git branch [-b branchName commitId] 从指定分支和commit号上开始新的分支</p></blockquote><h4 id="2、分支切换"><a href="#2、分支切换" class="headerlink" title="2、分支切换"></a>2、分支切换</h4><pre><code class="hljs bash">git branch [-a]				//查看分支
+git checkout xxx			//切换到xxx分支</code></pre><blockquote><p>git branch 参数-a: 查看所有分支，包括远端的分支。 -v 查看分支指向的commit。 —remote查看远程分支</p></blockquote><h4 id="3、合并分支"><a href="#3、合并分支" class="headerlink" title="3、合并分支"></a>3、合并分支</h4><ol><li><p>先把你次要分支提交完全。</p></li><li><p>切换到你要合并其他分支的主分支上</p></li><li><p>合并</p><pre><code class="hljs bash">git merge <span class="hljs-built_in">test</span>			// 在主分支上合并<span class="hljs-built_in">test</span>分支</code></pre><p><img src="http://image.beenli.cn/img/20200427/GXOtI8DdGor8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p>可以看到已经合并了test1分支。现在它们指向同一个commit。</p><p>如果遇到冲突，手动判断哪一个修改留下。</p></blockquote><h4 id="4、删除分支"><a href="#4、删除分支" class="headerlink" title="4、删除分支"></a>4、删除分支</h4><pre><code class="hljs bash">git branch -d [branch name]
 
-chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子目录的文件属主改成 liu：</code></pre><script>
+git push origin --delete [branch name]  // 删除远程分支
+$ git push origin --delete testing
+To github.com:BeenLi/learn_git.git
+ - [deleted]         testing</code></pre><h4 id="5、远程分支"><a href="#5、远程分支" class="headerlink" title="5、远程分支"></a>5、远程分支</h4><pre><code class="hljs bash">$ git ls-remote		// 查看远程分支
+
+From git@github.com:BeenLi/learn_git.git
+6fc7758ee27a73196a81391efd803dc19541eb88        HEAD
+6fc7758ee27a73196a81391efd803dc19541eb88        refs/heads/master
+807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/heads/testing
+807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/pull/1/head
+998239f25772ea809310d9f92c9e96a67c158b82        refs/pull/1/merge
+
+$ git remote show	// 查看远程仓库名字
+remote_name</code></pre><blockquote><p>“origin” 是当你运行 git clone 时默认的远程仓库名字</p></blockquote><h4 id="6、跟踪分支"><a href="#6、跟踪分支" class="headerlink" title="6、跟踪分支"></a>6、跟踪分支</h4><pre><code class="hljs armasm"><span class="hljs-symbol">git</span> checkout -<span class="hljs-keyword">b </span>[<span class="hljs-keyword">branch] </span>[remotename]/[<span class="hljs-keyword">branch]</span>
+<span class="hljs-keyword"></span>
+<span class="hljs-keyword">git </span>checkout --track origin/serverfix		// 快捷命令
+当克隆一个仓库时，它通常会自动地创建一个跟踪 origin/master 的 master 分支
+
+<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--set-upstream-to origin/remoteBranchName localBranchName 修改远程分支
+<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--unset-upstream					// 撤销跟踪远程分支</code></pre><p><img src="http://image.beenli.cn/img/20200428/4tSisNi0opQ7.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到 设置了分支test3 跟踪 远端的master分支。现在分支与master分支相同。</p><p>现在，本地分支 test 会自动从 remote_name/master 拉取。</p></blockquote><pre><code class="hljs angelscript">$ git branch -vv
+  master <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
+  test1  <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
+  test2  <span class="hljs-number">420f</span>721 第二次本地提交
+  testing e051a6f [remote_name/testing: ahead <span class="hljs-number">1</span>] 测试追踪分支情况
+* test3  <span class="hljs-number">4f</span>db7bd [remote_name/master] 测试本地提交
+
+可以看到test3 是master的跟踪分支。
+testing分支领先<span class="hljs-number">1</span>。表示有本地有一个commit没有push到服务器上。</code></pre><h4 id="7、分支拉取"><a href="#7、分支拉取" class="headerlink" title="7、分支拉取"></a>7、分支拉取</h4><pre><code class="hljs bash">git pull  == git fetch + git merge
+git fetch 不会修改当前工作区的文件。它只会获取数据然后让你自己合并。</code></pre><h4 id="8、上传分支"><a href="#8、上传分支" class="headerlink" title="8、上传分支"></a>8、上传分支</h4><pre><code class="hljs bash">git push origin localbranch:remotebranch
+如果添加了远程分支就直接push了。</code></pre><h3 id="2、reset-撤销"><a href="#2、reset-撤销" class="headerlink" title="2、reset (撤销)"></a>2、reset (撤销)</h3><p><a href="#link">参考🔗</a></p><p><img src="http://image.beenli.cn/img/20200428/CUvCyfwWR8h9.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="1、reset-—hard"><a href="#1、reset-—hard" class="headerlink" title="1、reset —hard"></a>1、reset —hard</h4><p>reset —hard：重置stage区和工作目录(会在重置 <strong>HEAD</strong> 和<strong>branch</strong>的同时，重置stage区和工作目录里的内容)</p><p>即回到上一次commit的位置。，全部清空。</p><h4 id="2、reset-—soft"><a href="#2、reset-—soft" class="headerlink" title="2、reset —soft"></a>2、reset —soft</h4><p>reset —soft：保留工作目录和暂存区中的内容，并把重置 HEAD 所带来的新的差异放进暂存区</p><p>即你之前commit的文件，退回到<code>stage</code>。需要重新提交。</p><h4 id="3、reset-—mixed"><a href="#3、reset-—mixed" class="headerlink" title="3、reset [—mixed]"></a>3、reset [—mixed]</h4><p>reset: 保留工作目录，并清空暂存区</p><p>也就是你要重新add，然后commit。</p><div id="link"></div><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[1] <a href="https://blog.csdn.net/qq_15037231/article/details/79137753" rel="external nofollow noreferrer">分支用法</a></p><p>[2] <a href="https://www.jianshu.com/p/c2ec5f06cf1a" rel="external nofollow noreferrer">reset用法</a></p><p>[3] <a href="https://www.runoob.com/manual/git-guide/" rel="external nofollow noreferrer">简明教程</a></p><p>[4] <a href="https://baijiahao.baidu.com/s?id=1664197276209808372&amp;wfr=spider&amp;for=pc" rel="external nofollow noreferrer">动态过程</a></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -28,10 +57,11 @@ chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子�
           });
       </script>]]></content>
       <categories>
-        <category>Linux</category>
+        <category>Software</category>
+        <category>Git</category>
       </categories>
       <tags>
-        <tag>Basic Use</tag>
+        <tag>git</tag>
       </tags>
   </entry>
   <entry>
@@ -113,15 +143,14 @@ The bidirectional terminals are  inout1  <span class="hljs-keyword">and</span>  
       </tags>
   </entry>
   <entry>
-    <title>SSH</title>
-    <url>/posts/782a8ece/</url>
-    <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
-ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v40J7WztY0xm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以设置密码，也可以为空（既然为了免密那就设置为空吧，不然没意义了）</p><p>文件路径可选。默认放在<code>~/.ssh/</code></p></li><li><p>上传公钥到服务器上<a href="#link"><sup>1</sup></a></p><p>有两种办法：</p><ol><li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p></li><li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p><p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p></li></ol></li><li><p>免密登录服务器</p><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)</code></pre><p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p></li><li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p><ol><li><p>随便选择个文件夹，写一个config文件</p></li><li><pre><code class="lang-bash">Host vps                              # 一个便于你区别这是哪台机器的名字
-    HostName 47.95.247.18               
-    User git                          # 登录主机的用户名称
-    Port 22                                      
-    IdentityFile ~/.ssh/id_rsa        # 密钥所在的文件位置
-</code></pre></li><li><p><code>ssh -F [config file] vps</code>(指定配置文件位置)就可以直接登录你设置的那台主机</p></li></ol></li></ol><hr><h5 id="可能遇到的问题3"><a href="#可能遇到的问题3" class="headerlink" title="可能遇到的问题3"></a>可能遇到的问题<a href="#link"><sup>3</sup></a></h5><ol><li><p>Authentication refused: bad ownership or modes for directory /root/.ssh</p><blockquote><p>ls -l /root/.ssh</p><p>发现改目录的所有者不是root。只用改成root即可</p><p>chown -R root.root /root/.ssh</p></blockquote></li></ol><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://blog.csdn.net/jeikerxiao/article/details/84105529" rel="external nofollow noreferrer">SSH 三步解决免密登录</a></p><p>[2] <a href="https://blog.csdn.net/ky1in93/article/details/83093981" rel="external nofollow noreferrer">ssh配置config快速登录</a></p><p>[3] <a href="https://www.howtogeek.com/168156/fixing-authentication-refused-bad-ownership-or-modes-for-directory/" rel="external nofollow noreferrer">解决权限问题</a></p><script>
+    <title>Linux常用命令</title>
+    <url>/posts/d0edc1ed/</url>
+    <content><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol><li><p>建立软链接<a href="https://man.linuxde.net/ln:link" rel="external nofollow noreferrer">ln</a></p><pre><code class="hljs bash">ln -s [源文件] [链接文件] (创建软链接)</code></pre><p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p><pre><code class="hljs bash">ln -s ~/oslab/gdb /usr/<span class="hljs-built_in">local</span>/bin/gdb</code></pre><p class="note note-info">ln -snf ~/oslab/xxx /usr/local/bin/gdb(修改)</p><hr></li><li><p>移动文件<a href="https://man.linuxde.net/mv" rel="external nofollow noreferrer">mv</a></p><pre><code class="hljs bash">mv [<span class="hljs-built_in">source</span>] [target]</code></pre><p>例如：</p><ol><li>​ <code>mv ~/oslab/oslab/* ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li><li><code>mv a.txt b.tax</code> 把文件名a.txt改为b.txt</li></ol><hr></li><li><p>设置权限<a href="https://man.linuxde.net/chmod" rel="external nofollow noreferrer">chmod</a>；<a href="https://man.linuxde.net/chown" rel="external nofollow noreferrer">chown</a></p><p><code>r</code> 读取权限，数字代号为<code>4</code>;<br><code>w</code> 写入权限，数字代号为<code>2</code>；<br><code>x</code> 执行或切换权限，数字代号为<code>1</code>；<br><code>-</code> 不具任何权限，数字代号为<code>0</code>；</p></li></ol><div class="table-container"><table><thead><tr><th style="text-align:center">7</th><th style="text-align:center">rwx</th></tr></thead><tbody><tr><td style="text-align:center"><strong>6</strong></td><td style="text-align:center"><strong>rw-</strong></td></tr><tr><td style="text-align:center"><strong>5</strong></td><td style="text-align:center"><strong>r-x</strong></td></tr><tr><td style="text-align:center"><strong>4</strong></td><td style="text-align:center"><strong>r—</strong></td></tr><tr><td style="text-align:center"><strong>3</strong></td><td style="text-align:center"><strong>-wx</strong></td></tr><tr><td style="text-align:center"><strong>2</strong></td><td style="text-align:center"><strong>-w-</strong></td></tr><tr><td style="text-align:center"><strong>1</strong></td><td style="text-align:center"><strong>—x</strong></td></tr><tr><td style="text-align:center"><strong>0</strong></td><td style="text-align:center"><strong>—-</strong></td></tr></tbody></table></div><pre><code class="hljs bash">chmod u+x,g+w f0　　			 //为文件f0设置自己可以执行，组员可以写入的权限
+chmod u=rwx,g=rw,o=r f0	 	  //为文件f0设置自己可以读写执行，同组可以读写。其他人可以读
+chmod 764 f0				  // 效果同上
+chmod a+x f0				  // 所有人都可以执行
+
+chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子目录的文件属主改成 liu：</code></pre><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -141,11 +170,10 @@ ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v
           });
       </script>]]></content>
       <categories>
-        <category>CS</category>
-        <category>Computer Network</category>
+        <category>Linux</category>
       </categories>
       <tags>
-        <tag>协议</tag>
+        <tag>Basic Use</tag>
       </tags>
   </entry>
   <entry>
@@ -199,105 +227,6 @@ snippet test
       <tags>
         <tag>Plugs</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>Git for novice</title>
-    <url>/posts/f05478c5/</url>
-    <content><![CDATA[<h2 id="1、Git-and-GitHub"><a href="#1、Git-and-GitHub" class="headerlink" title="1、Git and GitHub"></a>1、Git and GitHub</h2><p><code>Github</code> 可以看成是一个基于Git的系统，它提供了仓库的可视化。是一个<code>远程托管仓库</code>。如果是public，其他人可以随意查看，修改。如果是private只有你自己可以查看了。如果为了安全，可以团队自己搭建一个git服务器。</p><p><code>Git</code>大家都已经很熟悉了，分布式版本控制系统(Distributed version control system)</p><h2 id="2、Why-do-we-use-git"><a href="#2、Why-do-we-use-git" class="headerlink" title="2、Why do we use git"></a>2、Why do we use git</h2><ol><li>可以更好地在GitHub上开发，分享啊。</li><li>多人协同开发。</li><li>版本控制，可以任意回滚到之前某个版本。</li></ol><h2 id="3、How-do-we-use-git"><a href="#3、How-do-we-use-git" class="headerlink" title="3、How do we use git"></a>3、How do we use git</h2><p><img src="http://image.beenli.cn/img/20200428/AdQsxqK9vslE.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h3 id="场景1"><a href="#场景1" class="headerlink" title="场景1"></a>场景1</h3><blockquote><p>在GitHub上看到一个不错的项目，想要研究，学习为目的。</p></blockquote><ol><li><p>先fork一份到自己的GitHub上。</p></li><li><p>clone到本地</p><p>-o 指定远程仓库的名字，否则默认为<code>origin</code></p><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> [-b &lt;指定分支名&gt;]&lt;远程仓库地址&gt; [-o booyah]  
-默认是克隆所有分支。</code></pre></li><li><p>进行自己的开发。修改文件后</p><p>此时git status可以看到：修改过的文件红色标处。<code>Untracked files</code><img src="http://image.beenli.cn/img/20200427/3yURcSj2qBqU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs bash">git add ./[filename]			// 把修改过的文件添加到暂存区。</code></pre><p><img src="http://image.beenli.cn/img/20200427/ri8cAxnmujYg.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此时文件变成绿色。即已经添加到了暂存区。</p></li><li><p>提交</p><pre><code class="hljs bash">git commit -m <span class="hljs-string">"添加文件的说明"</span>			// 提交</code></pre><p>提交完成了，工作目录应该显示是空的。</p></li><li><p>推送到远程仓库</p><pre><code class="hljs bash">git pull origin [branch name] 			// 推送到指定仓库的指定分支上。</code></pre><p><img src="http://image.beenli.cn/img/20200427/aTKLfLxC1XUc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h3 id="场景2"><a href="#场景2" class="headerlink" title="场景2"></a>场景2</h3><blockquote><p>自己新建一个仓库。做项目开发。</p></blockquote><ol><li><p>初始化一个本地仓库</p><pre><code class="hljs bash">git init xxx	// 新建一个名为xxx的仓库</code></pre></li><li><p>进入仓库，然后就可以开发了。</p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span>  xxx 		// 此目录就是工程根目录。</code></pre></li><li><p>如果要上传到GitHub上。即远端git服务器</p><ul><li><p>首先在GitHub上新建一个仓库。</p></li><li><p>本地仓库与远程仓库建立联系。</p><pre><code class="hljs axapta">git remote add origin &lt;<span class="hljs-keyword">server</span>&gt;	<span class="hljs-comment">// 与GitHub仓库建立联系. origin 可以换成任意名字。</span></code></pre><p><img src="http://image.beenli.cn/img/20200427/9id7SRqNtn2j.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到我通过origin pull不上去。因为我连接的是remote_name。</p></blockquote></li><li><p>push到远程服务器上</p><pre><code class="hljs bash">git push origin master 			// 推送到远程服务器上</code></pre></li></ul><p>如果是克隆远程仓库的话，那么可以跳过remote（因为本地master已经和远程master联系上了)。直接推送到远程服务器。</p></li></ol><h2 id="4、common-commands1"><a href="#4、common-commands1" class="headerlink" title="4、common commands1"></a>4、common commands<a href="#link"><sup>1</sup></a></h2><h3 id="1、branch（分支"><a href="#1、branch（分支" class="headerlink" title="1、branch（分支)"></a>1、branch（分支)</h3><h4 id="1、新建分支"><a href="#1、新建分支" class="headerlink" title="1、新建分支"></a>1、新建分支</h4><pre><code class="hljs bash">git checkout -b xxx		// 新建分支并切换到xxx
-git branch xxx			// 只是新建一个分支，仍留在本地。（新建的分支复刻目分支)</code></pre><blockquote><p>git branch [-b branchName commitId] 从指定分支和commit号上开始新的分支</p></blockquote><h4 id="2、分支切换"><a href="#2、分支切换" class="headerlink" title="2、分支切换"></a>2、分支切换</h4><pre><code class="hljs bash">git branch [-a]				//查看分支
-git checkout xxx			//切换到xxx分支</code></pre><blockquote><p>git branch 参数-a: 查看所有分支，包括远端的分支。 -v 查看分支指向的commit。 —remote查看远程分支</p></blockquote><h4 id="3、合并分支"><a href="#3、合并分支" class="headerlink" title="3、合并分支"></a>3、合并分支</h4><ol><li><p>先把你次要分支提交完全。</p></li><li><p>切换到你要合并其他分支的主分支上</p></li><li><p>合并</p><pre><code class="hljs bash">git merge <span class="hljs-built_in">test</span>			// 在主分支上合并<span class="hljs-built_in">test</span>分支</code></pre><p><img src="http://image.beenli.cn/img/20200427/GXOtI8DdGor8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p>可以看到已经合并了test1分支。现在它们指向同一个commit。</p><p>如果遇到冲突，手动判断哪一个修改留下。</p></blockquote><h4 id="4、删除分支"><a href="#4、删除分支" class="headerlink" title="4、删除分支"></a>4、删除分支</h4><pre><code class="hljs bash">git branch -d [branch name]
-
-git push origin --delete [branch name]  // 删除远程分支
-$ git push origin --delete testing
-To github.com:BeenLi/learn_git.git
- - [deleted]         testing</code></pre><h4 id="5、远程分支"><a href="#5、远程分支" class="headerlink" title="5、远程分支"></a>5、远程分支</h4><pre><code class="hljs bash">$ git ls-remote		// 查看远程分支
-
-From git@github.com:BeenLi/learn_git.git
-6fc7758ee27a73196a81391efd803dc19541eb88        HEAD
-6fc7758ee27a73196a81391efd803dc19541eb88        refs/heads/master
-807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/heads/testing
-807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/pull/1/head
-998239f25772ea809310d9f92c9e96a67c158b82        refs/pull/1/merge
-
-$ git remote show	// 查看远程仓库名字
-remote_name</code></pre><blockquote><p>“origin” 是当你运行 git clone 时默认的远程仓库名字</p></blockquote><h4 id="6、跟踪分支"><a href="#6、跟踪分支" class="headerlink" title="6、跟踪分支"></a>6、跟踪分支</h4><pre><code class="hljs armasm"><span class="hljs-symbol">git</span> checkout -<span class="hljs-keyword">b </span>[<span class="hljs-keyword">branch] </span>[remotename]/[<span class="hljs-keyword">branch]</span>
-<span class="hljs-keyword"></span>
-<span class="hljs-keyword">git </span>checkout --track origin/serverfix		// 快捷命令
-当克隆一个仓库时，它通常会自动地创建一个跟踪 origin/master 的 master 分支
-
-<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--set-upstream-to origin/remoteBranchName localBranchName 修改远程分支
-<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--unset-upstream					// 撤销跟踪远程分支</code></pre><p><img src="http://image.beenli.cn/img/20200428/4tSisNi0opQ7.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到 设置了分支test3 跟踪 远端的master分支。现在分支与master分支相同。</p><p>现在，本地分支 test 会自动从 remote_name/master 拉取。</p></blockquote><pre><code class="hljs angelscript">$ git branch -vv
-  master <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
-  test1  <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
-  test2  <span class="hljs-number">420f</span>721 第二次本地提交
-  testing e051a6f [remote_name/testing: ahead <span class="hljs-number">1</span>] 测试追踪分支情况
-* test3  <span class="hljs-number">4f</span>db7bd [remote_name/master] 测试本地提交
-
-可以看到test3 是master的跟踪分支。
-testing分支领先<span class="hljs-number">1</span>。表示有本地有一个commit没有push到服务器上。</code></pre><h4 id="7、分支拉取"><a href="#7、分支拉取" class="headerlink" title="7、分支拉取"></a>7、分支拉取</h4><pre><code class="hljs bash">git pull  == git fetch + git merge
-git fetch 不会修改当前工作区的文件。它只会获取数据然后让你自己合并。</code></pre><h4 id="8、上传分支"><a href="#8、上传分支" class="headerlink" title="8、上传分支"></a>8、上传分支</h4><pre><code class="hljs bash">git push origin localbranch:remotebranch
-如果添加了远程分支就直接push了。</code></pre><h3 id="2、reset-撤销"><a href="#2、reset-撤销" class="headerlink" title="2、reset (撤销)"></a>2、reset (撤销)</h3><p><a href="#link">参考🔗</a></p><p><img src="http://image.beenli.cn/img/20200428/CUvCyfwWR8h9.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="1、reset-—hard"><a href="#1、reset-—hard" class="headerlink" title="1、reset —hard"></a>1、reset —hard</h4><p>reset —hard：重置stage区和工作目录(会在重置 <strong>HEAD</strong> 和<strong>branch</strong>的同时，重置stage区和工作目录里的内容)</p><p>即回到上一次commit的位置。，全部清空。</p><h4 id="2、reset-—soft"><a href="#2、reset-—soft" class="headerlink" title="2、reset —soft"></a>2、reset —soft</h4><p>reset —soft：保留工作目录和暂存区中的内容，并把重置 HEAD 所带来的新的差异放进暂存区</p><p>即你之前commit的文件，退回到<code>stage</code>。需要重新提交。</p><h4 id="3、reset-—mixed"><a href="#3、reset-—mixed" class="headerlink" title="3、reset [—mixed]"></a>3、reset [—mixed]</h4><p>reset: 保留工作目录，并清空暂存区</p><p>也就是你要重新add，然后commit。</p><div id="link"></div><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[1] <a href="https://blog.csdn.net/qq_15037231/article/details/79137753" rel="external nofollow noreferrer">分支用法</a></p><p>[2] <a href="https://www.jianshu.com/p/c2ec5f06cf1a" rel="external nofollow noreferrer">reset用法</a></p><p>[3] <a href="https://www.runoob.com/manual/git-guide/" rel="external nofollow noreferrer">简明教程</a></p><p>[4] <a href="https://baijiahao.baidu.com/s?id=1664197276209808372&amp;wfr=spider&amp;for=pc" rel="external nofollow noreferrer">动态过程</a></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Software</category>
-        <category>Git</category>
-      </categories>
-      <tags>
-        <tag>git</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>jupyter notebook</title>
-    <url>/posts/2641cf45/</url>
-    <content><![CDATA[<center>jupyter notebook</center><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><ul><li>安装python</li><li>安装pip</li><li>（安装ipython）</li><li>安装jupyter notebook(pip install jupyter notebook)</li></ul><h3 id="2、jupyter命令"><a href="#2、jupyter命令" class="headerlink" title="2、jupyter命令"></a>2、jupyter命令</h3><ul><li><p>查看已经安装的核</p><pre><code class="hljs taggerscript">jupyter kernelspec list 
-Available kernels:
-  py38       C:<span class="hljs-symbol">\U</span>sers<span class="hljs-symbol">\w</span>anli<span class="hljs-symbol">\A</span>ppData<span class="hljs-symbol">\R</span>oaming<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>y38
-  python3    C:<span class="hljs-symbol">\P</span>rogramData<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>ython3</code></pre></li><li><p>移除已经安装的核</p><pre><code class="hljs routeros">jupyter kernelspec <span class="hljs-builtin-name">remove</span> [kernelname]</code></pre></li><li><p>安装核</p><pre><code class="hljs brainfuck"><span class="hljs-comment">python</span> <span class="hljs-literal">-</span><span class="hljs-comment">m</span> <span class="hljs-comment">ipykernel</span> <span class="hljs-comment">install</span> <span class="hljs-title">[</span>--<span class="hljs-comment">user</span><span class="hljs-title">]</span> --<span class="hljs-comment">name</span> <span class="hljs-title">[</span><span class="hljs-comment">kernelname</span><span class="hljs-title">]</span></code></pre></li></ul><h3 id="3、conda创建虚拟环境"><a href="#3、conda创建虚拟环境" class="headerlink" title="3、conda创建虚拟环境"></a>3、conda创建虚拟环境</h3><ul><li><p>查看已经有的环境</p><pre><code class="hljs taggerscript">$ conda env list
-# conda environments:
-#
-base                  *  D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda
-py38                     D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda<span class="hljs-symbol">\e</span>nvs<span class="hljs-symbol">\p</span>y38</code></pre></li><li><p>安装新的环境</p><pre><code class="hljs routeros">conda create -n py36 <span class="hljs-attribute">python</span>=3.6</code></pre></li><li><p>激活环境/推出环境</p><pre><code class="hljs maxima">conda <span class="hljs-built_in">activate</span> envname
-conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id="4、遇到的问题"><a href="#4、遇到的问题" class="headerlink" title="4、遇到的问题"></a>4、遇到的问题</h3><ol><li><p>jupyter ImportError: DLL load failed: 找不到指定的程序。(kernel error)</p><ul><li><p>where jupyter</p><p>我发现我有两个jupyter, 两个python</p></li><li><p>试过了网上好多办法都不管用(大多叫你添加环境变量)</p></li><li><p>最终我把其中一个jupyter(有问题的)卸载了，用另外一个就好了。</p></li></ul></li></ol><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Software</category>
-        <category>jupyter</category>
-      </categories>
   </entry>
   <entry>
     <title>Tasks and Functions</title>
@@ -449,41 +378,17 @@ result = factorial(n);
       </tags>
   </entry>
   <entry>
-    <title>git hooks自动部署hexo</title>
-    <url>/posts/fb29ac9a/</url>
-    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers</code></pre></li></ol></li></ol><p>vim /etc/sudoer<br></p><pre><code class="hljs stata">
-      `给git用户添加命令权限如下`
-    
-      保存后退出，修改回文件权限`chmod 440 /etc/sudoers`
-      
-      ![<span class="hljs-keyword">mark</span>](http:<span class="hljs-comment">//image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim)</span>
-
-2. 初始化git仓库
-
-   ```bash
-   <span class="hljs-keyword">su</span> git				<span class="hljs-comment">//切换至git用户</span>
-   <span class="hljs-keyword">mkdir</span> blog.git		<span class="hljs-comment">//创建仓库文件夹</span>
-   <span class="hljs-keyword">cd</span> blog.git			<span class="hljs-comment">//进入文件夹</span>
-   git init --bare		<span class="hljs-comment">//使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</span></code></pre><p></p><ol><li><p>创建网站目录</p><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录
-sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git
-(这一步很重要，否者后续提交没有权限)</code></pre></li><li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)
-<span class="hljs-built_in">cd</span> .ssh
-touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种</code></pre></li><li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录
-touch post-receive				 //创建post-receive文件
-chmod +x post-receive			 //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span>
-
-GIT_REPO=/home/git/blog.git
-TMP_GIT_CLONE=/tmp/blog
-PUBLIC_WWW=/var/www/blog
-
-rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>
-git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span>
-rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*
-cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span></code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="hljs bash">deploy:
-    <span class="hljs-built_in">type</span>: git
-    repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span>
-    branch: master</code></pre></li></ol><hr><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://tding.top/archives/12a4e7e6.html" rel="external nofollow noreferrer">Hexo 博客部署到 VPS</a></p><p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" rel="external nofollow noreferrer">git hooks</a></p><script>
+    <title>jupyter notebook</title>
+    <url>/posts/2641cf45/</url>
+    <content><![CDATA[<center>jupyter notebook</center><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><ul><li>安装python</li><li>安装pip</li><li>（安装ipython）</li><li>安装jupyter notebook(pip install jupyter notebook)</li></ul><h3 id="2、jupyter命令"><a href="#2、jupyter命令" class="headerlink" title="2、jupyter命令"></a>2、jupyter命令</h3><ul><li><p>查看已经安装的核</p><pre><code class="hljs taggerscript">jupyter kernelspec list 
+Available kernels:
+  py38       C:<span class="hljs-symbol">\U</span>sers<span class="hljs-symbol">\w</span>anli<span class="hljs-symbol">\A</span>ppData<span class="hljs-symbol">\R</span>oaming<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>y38
+  python3    C:<span class="hljs-symbol">\P</span>rogramData<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>ython3</code></pre></li><li><p>移除已经安装的核</p><pre><code class="hljs routeros">jupyter kernelspec <span class="hljs-builtin-name">remove</span> [kernelname]</code></pre></li><li><p>安装核</p><pre><code class="hljs brainfuck"><span class="hljs-comment">python</span> <span class="hljs-literal">-</span><span class="hljs-comment">m</span> <span class="hljs-comment">ipykernel</span> <span class="hljs-comment">install</span> <span class="hljs-title">[</span>--<span class="hljs-comment">user</span><span class="hljs-title">]</span> --<span class="hljs-comment">name</span> <span class="hljs-title">[</span><span class="hljs-comment">kernelname</span><span class="hljs-title">]</span></code></pre></li></ul><h3 id="3、conda创建虚拟环境"><a href="#3、conda创建虚拟环境" class="headerlink" title="3、conda创建虚拟环境"></a>3、conda创建虚拟环境</h3><ul><li><p>查看已经有的环境</p><pre><code class="hljs taggerscript">$ conda env list
+# conda environments:
+#
+base                  *  D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda
+py38                     D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda<span class="hljs-symbol">\e</span>nvs<span class="hljs-symbol">\p</span>y38</code></pre></li><li><p>安装新的环境</p><pre><code class="hljs routeros">conda create -n py36 <span class="hljs-attribute">python</span>=3.6</code></pre></li><li><p>激活环境/推出环境</p><pre><code class="hljs maxima">conda <span class="hljs-built_in">activate</span> envname
+conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id="4、遇到的问题"><a href="#4、遇到的问题" class="headerlink" title="4、遇到的问题"></a>4、遇到的问题</h3><ol><li><p>jupyter ImportError: DLL load failed: 找不到指定的程序。(kernel error)</p><ul><li><p>where jupyter</p><p>我发现我有两个jupyter, 两个python</p></li><li><p>试过了网上好多办法都不管用(大多叫你添加环境变量)</p></li><li><p>最终我把其中一个jupyter(有问题的)卸载了，用另外一个就好了。</p></li></ul></li></ol><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -504,12 +409,8 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
       </script>]]></content>
       <categories>
         <category>Software</category>
-        <category>Git</category>
+        <category>jupyter</category>
       </categories>
-      <tags>
-        <tag>git</tag>
-        <tag>Hexo</tag>
-      </tags>
   </entry>
   <entry>
     <title>riscv-gnu-toolchain 下载、编译</title>
@@ -739,74 +640,6 @@ gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</
       </categories>
       <tags>
         <tag>verilog</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>操作系统-熟悉实验环境(1)</title>
-    <url>/posts/9cf5ff72/</url>
-    <content><![CDATA[<h2 id="熟悉实验环境"><a href="#熟悉实验环境" class="headerlink" title="熟悉实验环境"></a><center>熟悉实验环境</center></h2><h3 id="1、x86模拟器Bochs1"><a href="#1、x86模拟器Bochs1" class="headerlink" title="1、x86模拟器Bochs1"></a>1、x86模拟器<a href="http://bochs.sourceforge.net/" rel="external nofollow noreferrer">Bochs</a><a href="#link"><sup>1</sup></a></h3><p class="note note-info">Bochs is a highly portable open source IA-32 (x86) PC emulator written in C++, that runs on most popular platforms. It includes emulation of the Intel x86 CPU, common I/O devices, and a custom BIOS. Bochs can be compiled to emulate many different x86 CPUs, from early 386 to the most recent x86-64 Intel and AMD processors which may even not reached the market yet.</p><p>可以看到<code>Boch</code>可以模拟<code>intel x86 CPU</code></p><p>在它模拟出的环境中可以运行 Linux、DOS 和各种版本的 Windows 等多种操作系统</p><h3 id="2、操作系统Ubuntu"><a href="#2、操作系统Ubuntu" class="headerlink" title="2、操作系统Ubuntu"></a>2、操作系统<a href="https://ubuntu.com/" rel="external nofollow noreferrer">Ubuntu</a></h3><p>因为有些实验内容涉及到在自己改进的 <code>Linux 0.11</code>下，运行自己编的应用程序。被改进的功能都是高 版本 Linux 内核已经具有的，在其上确认自己编写的应用程序无误后，再用之测试自己改进的 Linux 0.11，可以更有信心些。</p><h3 id="3、实验压缩包hit-oslab"><a href="#3、实验压缩包hit-oslab" class="headerlink" title="3、实验压缩包hit-oslab"></a>3、实验压缩包<a href="https://github.com/hoverwinter/HIT-OSLab" rel="external nofollow noreferrer">hit-oslab</a></h3><p>文件结构:</p><pre><code class="hljs bash">.
-..
-└── bocks
-|   	├── BIOS-bochs-latest
-|       ├── bochs-dbg
-|   	├── bochs-gdb
-|   	├── bochsrc.bxrc
-|   	├── bochsrc-gdb.bxrc
-|       └── vgabios.bin
-|
-└── hdc
-|   	└── umounted
-└── Linux-0.11
-|		└── boot
-|		├── kernel
-|		├── fs
-|		├── lib
-|		├── init				
-|		├── mm
-|		├── tools			
-|		├── include
-|		├── tags
-|		└── Makefile
-├── dbg-asm
-├── dbg-c
-├── gdb
-├── gdb-cmd.txt
-├── run
-├── rungdb
-└── mount-hdc</code></pre><ol><li><p>Image文件</p><p>我们在宿主操作系统也就是ubuntu上对Linux 0.11进行开发，修改和编译。</p><p>之后在Linux-0.11目录会生成一个<code>Image</code>的文件。（编译后的目标文件）</p><p><br></p><p>该文件包含引导和所以内核的二进制代码。</p><p class="note note-primary">oslab 采用 bochs 模拟器加载这个 Image 文件，模拟执行 Linux 0.11，这样省却了重新启动计算机的麻烦。</p></li><li><p>bochs目录</p><p>bochs目录是与bochs相关的执行文件、数据文件和配置文件</p></li><li><p>run 脚本</p><p><code>run</code> 是 运行bochs的脚本命令</p><p>运行后bochs会自动在他的</p><p>虚拟软驱——linux-0.11/Image</p><p>虚拟硬盘——hdc-0.11.img</p><p class="note note-primary">在 0.11 下访问文件系统，访问的就是 hdc-0.11.img 文件内虚拟的文件系统。<br>退出bochs之前现存盘，运行sync命令</p></li><li><p>hdc-0.11.img 文件</p><p>文件的格式是 Minix 文件系统的镜像。Linux 所有版本都支持这种格式的文件系统</p><p>所以可以在宿主系统上挂载该文件系统。达到宿主系统和Linux 0.11之间文件交换的效果</p><p>其中包含的文件有：</p><ul><li>Bash shell；</li><li>一些基本的 Linux 命令、工具，比如 cp、rm、mv、tar；</li><li>vi 编辑器；</li><li>gcc 1.4 编译器，可用来编译标准 C 程序；</li><li>as86 和 ld86；</li><li>Linux 0.11 的源代码，可在 0.11 下编译，然后覆盖现有的二进制内核。</li></ul></li><li><p>编译</p><blockquote><p>make all(make 命令会自动跳过未被修改的文件 )</p><p>如果重新编译没有效果可以试试删除中间文件: make clean &amp;&amp; make all</p></blockquote></li><li><p>运行</p><p><code>./run</code></p></li></ol><h3 id="4、调试"><a href="#4、调试" class="headerlink" title="4、调试"></a>4、调试</h3><ol><li><p>汇编级调试</p><p><code>./dbg-asm</code></p></li><li><p>C语言调试</p><ol><li><p><code>./dbg-c</code></p></li><li><p><code>./rungdb</code>(新开一个窗口)</p><blockquote><p>注意：启动的顺序不能交换，否则 gdb 无法连接。</p></blockquote></li></ol></li></ol><h3 id="5、文件交换"><a href="#5、文件交换" class="headerlink" title="5、文件交换"></a>5、文件交换</h3><pre><code class="hljs bash"><span class="hljs-comment"># 启动挂载脚本</span>
-$ <span class="hljs-built_in">cd</span> ~/oslab
-$ sudo ./mount-hdc
-
-<span class="hljs-comment"># 进入文件系统</span>
-$ <span class="hljs-built_in">cd</span> ./mount-hdc/
-
-<span class="hljs-comment"># 读写完毕，卸载文件系统</span>
-$ <span class="hljs-built_in">cd</span> ~/oslab
-$ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><div id="link"></div><p>[1] <a href="https://mooc.study.163.com/course/1000002004?tid=2402971010#/info" rel="external nofollow noreferrer">哈尔滨工业大学.操作系统</a></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>OS</category>
-      </categories>
-      <tags>
-        <tag>网易云网课</tag>
       </tags>
   </entry>
   <entry>
@@ -1078,7 +911,213 @@ p = t;
       </tags>
   </entry>
   <entry>
-    <title>数据通路(1)--基本逻辑</title>
+    <title>git hooks自动部署hexo</title>
+    <url>/posts/fb29ac9a/</url>
+    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers</code></pre></li></ol></li></ol><p>vim /etc/sudoer<br></p><pre><code class="hljs stata">
+      `给git用户添加命令权限如下`
+    
+      保存后退出，修改回文件权限`chmod 440 /etc/sudoers`
+      
+      ![<span class="hljs-keyword">mark</span>](http:<span class="hljs-comment">//image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim)</span>
+
+2. 初始化git仓库
+
+   ```bash
+   <span class="hljs-keyword">su</span> git				<span class="hljs-comment">//切换至git用户</span>
+   <span class="hljs-keyword">mkdir</span> blog.git		<span class="hljs-comment">//创建仓库文件夹</span>
+   <span class="hljs-keyword">cd</span> blog.git			<span class="hljs-comment">//进入文件夹</span>
+   git init --bare		<span class="hljs-comment">//使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</span></code></pre><p></p><ol><li><p>创建网站目录</p><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录
+sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git
+(这一步很重要，否者后续提交没有权限)</code></pre></li><li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)
+<span class="hljs-built_in">cd</span> .ssh
+touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种</code></pre></li><li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录
+touch post-receive				 //创建post-receive文件
+chmod +x post-receive			 //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span>
+
+GIT_REPO=/home/git/blog.git
+TMP_GIT_CLONE=/tmp/blog
+PUBLIC_WWW=/var/www/blog
+
+rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>
+git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span>
+rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*
+cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span></code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="hljs bash">deploy:
+    <span class="hljs-built_in">type</span>: git
+    repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span>
+    branch: master</code></pre></li></ol><hr><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://tding.top/archives/12a4e7e6.html" rel="external nofollow noreferrer">Hexo 博客部署到 VPS</a></p><p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" rel="external nofollow noreferrer">git hooks</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Software</category>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>操作系统-熟悉实验环境(1)</title>
+    <url>/posts/9cf5ff72/</url>
+    <content><![CDATA[<h2 id="熟悉实验环境"><a href="#熟悉实验环境" class="headerlink" title="熟悉实验环境"></a><center>熟悉实验环境</center></h2><h3 id="1、x86模拟器Bochs1"><a href="#1、x86模拟器Bochs1" class="headerlink" title="1、x86模拟器Bochs1"></a>1、x86模拟器<a href="http://bochs.sourceforge.net/" rel="external nofollow noreferrer">Bochs</a><a href="#link"><sup>1</sup></a></h3><p class="note note-info">Bochs is a highly portable open source IA-32 (x86) PC emulator written in C++, that runs on most popular platforms. It includes emulation of the Intel x86 CPU, common I/O devices, and a custom BIOS. Bochs can be compiled to emulate many different x86 CPUs, from early 386 to the most recent x86-64 Intel and AMD processors which may even not reached the market yet.</p><p>可以看到<code>Boch</code>可以模拟<code>intel x86 CPU</code></p><p>在它模拟出的环境中可以运行 Linux、DOS 和各种版本的 Windows 等多种操作系统</p><h3 id="2、操作系统Ubuntu"><a href="#2、操作系统Ubuntu" class="headerlink" title="2、操作系统Ubuntu"></a>2、操作系统<a href="https://ubuntu.com/" rel="external nofollow noreferrer">Ubuntu</a></h3><p>因为有些实验内容涉及到在自己改进的 <code>Linux 0.11</code>下，运行自己编的应用程序。被改进的功能都是高 版本 Linux 内核已经具有的，在其上确认自己编写的应用程序无误后，再用之测试自己改进的 Linux 0.11，可以更有信心些。</p><h3 id="3、实验压缩包hit-oslab"><a href="#3、实验压缩包hit-oslab" class="headerlink" title="3、实验压缩包hit-oslab"></a>3、实验压缩包<a href="https://github.com/hoverwinter/HIT-OSLab" rel="external nofollow noreferrer">hit-oslab</a></h3><p>文件结构:</p><pre><code class="hljs bash">.
+..
+└── bocks
+|   	├── BIOS-bochs-latest
+|       ├── bochs-dbg
+|   	├── bochs-gdb
+|   	├── bochsrc.bxrc
+|   	├── bochsrc-gdb.bxrc
+|       └── vgabios.bin
+|
+└── hdc
+|   	└── umounted
+└── Linux-0.11
+|		└── boot
+|		├── kernel
+|		├── fs
+|		├── lib
+|		├── init				
+|		├── mm
+|		├── tools			
+|		├── include
+|		├── tags
+|		└── Makefile
+├── dbg-asm
+├── dbg-c
+├── gdb
+├── gdb-cmd.txt
+├── run
+├── rungdb
+└── mount-hdc</code></pre><ol><li><p>Image文件</p><p>我们在宿主操作系统也就是ubuntu上对Linux 0.11进行开发，修改和编译。</p><p>之后在Linux-0.11目录会生成一个<code>Image</code>的文件。（编译后的目标文件）</p><p><br></p><p>该文件包含引导和所以内核的二进制代码。</p><p class="note note-primary">oslab 采用 bochs 模拟器加载这个 Image 文件，模拟执行 Linux 0.11，这样省却了重新启动计算机的麻烦。</p></li><li><p>bochs目录</p><p>bochs目录是与bochs相关的执行文件、数据文件和配置文件</p></li><li><p>run 脚本</p><p><code>run</code> 是 运行bochs的脚本命令</p><p>运行后bochs会自动在他的</p><p>虚拟软驱——linux-0.11/Image</p><p>虚拟硬盘——hdc-0.11.img</p><p class="note note-primary">在 0.11 下访问文件系统，访问的就是 hdc-0.11.img 文件内虚拟的文件系统。<br>退出bochs之前现存盘，运行sync命令</p></li><li><p>hdc-0.11.img 文件</p><p>文件的格式是 Minix 文件系统的镜像。Linux 所有版本都支持这种格式的文件系统</p><p>所以可以在宿主系统上挂载该文件系统。达到宿主系统和Linux 0.11之间文件交换的效果</p><p>其中包含的文件有：</p><ul><li>Bash shell；</li><li>一些基本的 Linux 命令、工具，比如 cp、rm、mv、tar；</li><li>vi 编辑器；</li><li>gcc 1.4 编译器，可用来编译标准 C 程序；</li><li>as86 和 ld86；</li><li>Linux 0.11 的源代码，可在 0.11 下编译，然后覆盖现有的二进制内核。</li></ul></li><li><p>编译</p><blockquote><p>make all(make 命令会自动跳过未被修改的文件 )</p><p>如果重新编译没有效果可以试试删除中间文件: make clean &amp;&amp; make all</p></blockquote></li><li><p>运行</p><p><code>./run</code></p></li></ol><h3 id="4、调试"><a href="#4、调试" class="headerlink" title="4、调试"></a>4、调试</h3><ol><li><p>汇编级调试</p><p><code>./dbg-asm</code></p></li><li><p>C语言调试</p><ol><li><p><code>./dbg-c</code></p></li><li><p><code>./rungdb</code>(新开一个窗口)</p><blockquote><p>注意：启动的顺序不能交换，否则 gdb 无法连接。</p></blockquote></li></ol></li></ol><h3 id="5、文件交换"><a href="#5、文件交换" class="headerlink" title="5、文件交换"></a>5、文件交换</h3><pre><code class="hljs bash"><span class="hljs-comment"># 启动挂载脚本</span>
+$ <span class="hljs-built_in">cd</span> ~/oslab
+$ sudo ./mount-hdc
+
+<span class="hljs-comment"># 进入文件系统</span>
+$ <span class="hljs-built_in">cd</span> ./mount-hdc/
+
+<span class="hljs-comment"># 读写完毕，卸载文件系统</span>
+$ <span class="hljs-built_in">cd</span> ~/oslab
+$ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><div id="link"></div><p>[1] <a href="https://mooc.study.163.com/course/1000002004?tid=2402971010#/info" rel="external nofollow noreferrer">哈尔滨工业大学.操作系统</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>OS</category>
+      </categories>
+      <tags>
+        <tag>网易云网课</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SSH</title>
+    <url>/posts/782a8ece/</url>
+    <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
+ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v40J7WztY0xm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以设置密码，也可以为空（既然为了免密那就设置为空吧，不然没意义了）</p><p>文件路径可选。默认放在<code>~/.ssh/</code></p></li><li><p>上传公钥到服务器上<a href="#link"><sup>1</sup></a></p><p>有两种办法：</p><ol><li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p></li><li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p><p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p></li></ol></li><li><p>免密登录服务器</p><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)</code></pre><p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p></li><li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p><ol><li><p>随便选择个文件夹，写一个config文件</p></li><li><pre><code class="lang-bash">Host vps                              # 一个便于你区别这是哪台机器的名字
+    HostName 47.95.247.18               
+    User git                          # 登录主机的用户名称
+    Port 22                                      
+    IdentityFile ~/.ssh/id_rsa        # 密钥所在的文件位置
+</code></pre></li><li><p><code>ssh -F [config file] vps</code>(指定配置文件位置)就可以直接登录你设置的那台主机</p></li></ol></li></ol><hr><h5 id="可能遇到的问题3"><a href="#可能遇到的问题3" class="headerlink" title="可能遇到的问题3"></a>可能遇到的问题<a href="#link"><sup>3</sup></a></h5><ol><li><p>Authentication refused: bad ownership or modes for directory /root/.ssh</p><blockquote><p>ls -l /root/.ssh</p><p>发现改目录的所有者不是root。只用改成root即可</p><p>chown -R root.root /root/.ssh</p></blockquote></li></ol><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://blog.csdn.net/jeikerxiao/article/details/84105529" rel="external nofollow noreferrer">SSH 三步解决免密登录</a></p><p>[2] <a href="https://blog.csdn.net/ky1in93/article/details/83093981" rel="external nofollow noreferrer">ssh配置config快速登录</a></p><p>[3] <a href="https://www.howtogeek.com/168156/fixing-authentication-refused-bad-ownership-or-modes-for-directory/" rel="external nofollow noreferrer">解决权限问题</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Network</category>
+      </categories>
+      <tags>
+        <tag>协议</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据通路(4)--Multiple Issue</title>
+    <url>/posts/a36b1d36/</url>
+    <content><![CDATA[<h1 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h1><blockquote><p><code>指令集并行</code>(instruction-level parallelism)有两种方式</p><p>Ⅰ、<a href="https://www.beenli.cn/posts/d4768fc/">Pipeline</a>——详见数据通路(3)；流水线越深，并行度越高。</p><p>Ⅱ、<code>多发射</code>（multiple issue）: 本节所要讲述的重点。通过复制计算机内部部件的数量，使得每个流水级可以启动多条指令</p></blockquote><ul><li>多发射可以使指令执行速度超过时钟的速度，即CPI小于1。</li><li>实现多发射有两种办法：1、<code>static multiple issue</code>；2、<code>dynamic multiple issue</code>。</li></ul><p>多发射流水线必须处理以下两个问题：</p><ol><li>打包指令到<code>发射槽</code>(issue slots)：在大多数静态多发射实现上：在一个时钟周期发射多少条指令，哪些指令被发射这个过程至少很大一部分由编译器来完成。而在动态发射处理器中，这个问题一般由处理器在运行时来处理。（尽管编译器已经优化了指令顺序来尽可能多发射）</li><li>处理数据和控制冒险：在静态发射处理器中，编译器解决大部分或者所有的可能冒险。与此相反的，动态发射处理器用硬件技术在运行时至少消除某些类别的冒险。</li></ol><blockquote><p>尽管，我们把它们描述成不同的方法，但事实上，一个方法经常借助另外一个方法的技术。</p></blockquote><h1 id="Speculation-推测"><a href="#Speculation-推测" class="headerlink" title="Speculation(推测)"></a><a name="spec">Speculation(推测)</a></h1><p class="note note-primary"><font color="blue">speculation</font>: An approach whereby the compiler or processor guesses the outcome of an instruction to remove it as a dependence in executing other instructions<br>提前给出结果(猜测)来避免后面的指令对正在运行指令的依赖</p><p>以下是几种猜测的情形：</p><ul><li>我们猜测分支的结果，那样分支后面的指令可以提早执行。</li><li>我们猜测存字和取字指令访问的不是同一个地址，那样我们在执行存字指令前去执行取字指令。</li></ul><p>但是，猜测可能出现错误❌。所以：任何推测技术都必须包含一种机制：1、检查推测是否正确；2、回滚由于推测提前执行的指令的影响。</p><ol><li><p>推测错误时恢复机制：</p><ul><li>for compile: 插入额外的指令检查推测的正确性✔并提供一个fix-up例程供推测错误时使用。</li><li>for processor: 用buffer缓存推测结果直到推测的结果得到确认。如果推测正确，把缓存的能容写到相应的寄存器中，指令完成。如果推测不正确，硬件冲刷掉buffer，重新执行正确的指令序列。</li></ul></li><li><p>推测可能引入另外的问题：对某些指令的推测会导致原本不存在的异常发生。比如，推测执行一条装载指令，在推测错误的情况下，该指令所使用的地址是非法的。</p></li></ol><h1 id="Static-multiple-issue"><a href="#Static-multiple-issue" class="headerlink" title="Static multiple-issue"></a>Static multiple-issue</h1><p class="note note-primary">Static multiple-issue processers all use the compiler to assist with packaging instructions and handling hazards.</p><p><code>issue packet</code>(发射包)：在一个时钟周期内可以发射的指令集合，可以用一条完成多种操作的长指令来类比</p><p><code>Very Long Instruction Word</code>(超长指令字)：一种指令集架构，能够发射多条操作，这些操作在单个指令中被定义为独立的，并且一般都有独立的操作码域。</p><ul><li><p>静态多发射处理器有两种：</p><ol><li>编译器避免所有冒险；</li><li>硬件检测数据冒险，并在两个发射包间产生阻塞，而编译器只负责避免一个指令包间的依赖。</li></ol></li><li><p>为了并行发射ALU和数据传输操作，需要有额外的硬件：</p><ol><li>寄存器堆要有额外的端口供连个操作读取操作数；</li><li>要有额外的ALU来同时执行EX阶段。</li></ol></li><li><p>多发射带来的问题：由于额外的指令重叠，冒险的可能性加倍。</p><ol><li>装载指令有一个时钟周期的<code>使用延迟</code>（use latency)；这意味着下一个发射包中所有指令都不能使用装载的结果。</li><li>原本没有使用延迟的ALU指令，其结果不能被在同一个发射包的其他指令使用。</li></ol></li></ul><p><img src="https://image.beenli.cn/img/20200927/pFpgnJVAbslU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><code>循环展开</code>(loop unrolling)：一种从访问数组的循环程序中获得更多性能的技术。其中循环体会被复制多份并且在不同循环体中的指令会调度在一起。</li></ul><pre><code class="hljs c"><span class="hljs-comment">/***************** 例程：把一段数组中的数全部加上一个数(x21)  ********************/</span>
+Loop:  ld  x31, <span class="hljs-number">0</span>(x20)  	<span class="hljs-comment">// x31=array element</span>
+       add  x31, x31, x21   <span class="hljs-comment">// add scalar in x21</span>
+       sd  x31, <span class="hljs-number">0</span>(x20) 		<span class="hljs-comment">// store result</span>
+       addi  x20, x20, <span class="hljs-number">-8</span>   <span class="hljs-comment">// decrement pointer</span>
+       blt  x22, x20, Loop  <span class="hljs-comment">// compare to loop limit,branch if x20 &gt; x22</span></code></pre><blockquote><p>不进行循环展开的静态多发射调度：</p></blockquote><p><img src="https://image.beenli.cn/img/20200928/dGh2jYTva3bm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>循环展开结果：</p></blockquote><p><img src="https://image.beenli.cn/img/20200928/5Sd7gcLfIrQ5.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>在循环展开过程中，编译器引入了几个临时编译器（x28、x29、x30）。这个过程叫做<code>寄存器重命名</code>: 目的是消除一些虚假依赖。</li><li>如果我们只使用x31寄存器：我们将在sd x31,8(x20)后面重复ld x31,0(x20), add x31, x31, x21。但是这些序列尽管都使用x31，它们实际上是不相关的。</li><li><code>antidependence</code> or <code>name dependence</code>(反相关或名字相关)：一组指令集和下一组指令集之间no data value flow，仅仅是因为重用寄存器名引起的相关。</li></ul><h1 id="Dynamic-multiple-issue"><a href="#Dynamic-multiple-issue" class="headerlink" title="Dynamic multiple-issue"></a>Dynamic multiple-issue</h1><p class="note note-primary">Dynamic multiple-issue processors are also known as <font color="blur">superscalar</font> processors, or simply superscalars</p><h2 id="Basic-concept"><a href="#Basic-concept" class="headerlink" title="Basic concept"></a>Basic concept</h2><p>最简单的超标量处理器：指令按顺序发射，处理器决定每个周期发射0条，1条或多条指令。</p><p>显然为了获得好的性能，处理器仍然需要编译器帮忙编排指令顺序来减少依赖。</p><p>简单超标量处理器与VLIW处理器(静态发射)的区别：</p><ul><li>for superscalar:：1、不管是否经过编译器编排指令顺序，都由硬件来保证执行的正确性✔。2、编译过的代码将始终正确的运行，无论发射速率还是流水线架构。</li><li>for VLIW：不像👆那样，当移植到不同的处理器模型往往需要重新编译。在其他的静态发射处理器中，代码能够在不同的处理器实现上正确运行，但是效率很差也需要重新编译。</li></ul><p>许多超标量处理器扩展了基本的动态发射策略，将<font color="blue">dynamic pipeline scheduling(动态流水线调度)</font>包含进来。</p><pre><code class="hljs c"><span class="hljs-comment">/*************** 一个简单的例子 **************/</span>
+ld  x31, <span class="hljs-number">0</span>(x21)
+add  x1,  x31, x2
+sub  x23, x23, x3
+andi  x5,  x23, <span class="hljs-number">20</span></code></pre><blockquote><p><font color="red">说明</font>：即使sub指令准备好执行，它也必须等待ld和add指令先结束才行。如果内存很慢，sub指令可能会等待多个周期（比如cache没有命中）</p></blockquote><h2 id="dynamic-pipeline-scheduling"><a href="#dynamic-pipeline-scheduling" class="headerlink" title="dynamic pipeline scheduling"></a>dynamic pipeline scheduling</h2><blockquote><p>Dynamic pipeline scheduling chooses which instructions to execute next, possibly reordering them to avoid stalls.<br><strong>动态调度可以运行时动态调整指令顺序</strong></p></blockquote><p>流水线被分为三个主要部分：</p><ul><li>an instruction fetch and issue unit（取指发射单元)</li><li>multiple functional units（多种功能单元）</li><li>commit unit(提交单元)</li></ul><p><img src="https://image.beenli.cn/img/20200928/CiiibeQE7Kom.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>每个功能单元有个buffer, 称为<code>保留站</code>（reservation station)，其中保存着操作数和操作(opcode ❓)。</li><li>功能单元运算完成的结果传送给1、commit unit；2、旁路给所需的保留站。</li><li>提交单元也有buffer，称为<code>reorder buffer</code>(重排序缓冲区)：缓存结果直到确定是安全时才写入register file或者memory。</li></ol><blockquote><p><strong>保留站缓存操作数➕提交单元缓存结果＝＝》寄存器重命名</strong></p><ul><li>发射指令时，它被复制到对应功能单元的保留站上，如果它的操作数在寄存器堆或者提交单元缓冲区中有，那么操作数立马复制到保留站。如果指令已经发射，那么对应操作数的副本不再需要，可以重写覆盖。</li><li>如果一个操作数不在register file or reorder buffer，他必须等待某个功能单元的结果。硬件帮助追踪所需的功能单元，当单元计算出结果直接复制到保留站而旁路掉寄存器堆。</li></ul></blockquote><p><code>out-of-order execution</code>(乱序执行)：处理器在不违背原有数据流顺序的前提下以某种顺序执行各条指令，但是执行指令的顺序可以与取指不同。</p><p><code>in-order commit</code>(顺序提交)：流水线执行的结果以取指顺序写回程序员可见的寄存器的一种提交方式。（当异常发生时，处理器可以找到最后执行的那条指令，而只有这条导致异常的指令之前的指令才能对寄存器状态进行改变。</p><p><a href="#spec">推测</a>和动态调度经常结合在一起：</p><ul><li>通过对分支的预测，动态调度可以在推测方向上进行取指和执行。由于指令是顺序提交，我们可以在分支指令及所有推测执行的指令提交前知道推测是否准确。</li><li>通过对装载指令目的地址的预测，对存取指令进行重排序和利用提交单元避免错误的推测。</li></ul><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Organization &amp; Design</category>
+      </categories>
+      <tags>
+        <tag>processor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据通路(1)--Basic Datapath</title>
     <url>/posts/74018a17/</url>
     <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
 slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
@@ -1113,7 +1152,7 @@ beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
       </tags>
   </entry>
   <entry>
-    <title>数据通路(2)--控制</title>
+    <title>数据通路(2)--Control</title>
     <url>/posts/f0189490/</url>
     <content><![CDATA[<h1 id="1、ALU控制"><a href="#1、ALU控制" class="headerlink" title="1、ALU控制"></a>1、ALU控制</h1><blockquote><p>MIPS ALU在4位控制信号上定义了6种有效的输入组合</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/VGrg5UNVVt4J.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>存储器访问指令：add</li><li>R型指令：根据指令低6位的funct字段<a href="#link"><sup>1</sup></a> ，ALU执行5种操作中的一种(nor暂时没用)</li><li>branch指令：sub(两个操作数相减判断是否为零)</li></ul><ul><li><code>多级译码</code>：输入：6位funct字段和2位ALUOP字段————&gt;输出：4位ALU control lines</li></ul><p><img src="https://image.beenli.cn/img/20200820/xlEg0oIEPQA5.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控制单元生成ALUOP</center><ul><li>真值表——优化后转换为门电路（坑待定）</li></ul><p><img src="https://image.beenli.cn/img/20200820/fBArSknPUEb4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、主控制单元"><a href="#2、主控制单元" class="headerlink" title="2、主控制单元"></a>2、主控制单元</h1><div id="link"></div><ul><li>指令格式</li></ul><p><img src="https://image.beenli.cn/img/20200820/MLWQrvKbTmz4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>R型指令opcode为0；lw为35；sw为43 ; branch为<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8">4⃣</span></li></ul><p><img src="https://image.beenli.cn/img/20200820/w7nhaHnvyrH3.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>7个多选器控制信号的作用</center><p><img src="https://image.beenli.cn/img/20200820/kdnnx95gnWHt.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控单元产生7个一位控制信号+2位ALUOP</center><ul><li><p>控制信号真值表</p><p><img src="https://image.beenli.cn/img/20200820/xa7NDi0PBA7x.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>op[5:0]取至Instruction[31:26]</p></li><li>RegDst: R为1表示目的寄存器为rd; lw为rs; sw和branch不用写回寄存器堆所以没有目的寄存器。</li><li>ALUSrc: R和branch为0表示ALU第二个操作数来自rt; lw和sw表示第二个操作数来自低16位的扩展。</li><li>MemtoReg: sw和branch为x表示不用写回。R为0表示ALU计算结果写回；lw表示数据寄存器取出来的数写回</li><li>Regwirte: R和lw要写回所以为1。</li><li>MenRead: 只要lw要读所以只有lw为1</li><li>MemWrite: 只有sw要写</li><li>Branch: 只有branch才触发</li><li>ALUOP: R为10；存储为00；branch为01</li></ul><ul><li><p>跳转实现（即改变PC的值）</p><p>其OPcode为2.低26位都是offset_address。</p><p><img src="https://image.beenli.cn/img/20200820/PCxbE327wJVr.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><script>
         document.querySelectorAll('.github-emoji')
