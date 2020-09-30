@@ -289,32 +289,6 @@ chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子�
       </tags>
   </entry>
   <entry>
-    <title>Unprivileged Spec(1)--RV32I</title>
-    <url>/posts/6c2bdcd1/</url>
-    <content><![CDATA[<h1 id="1-Preface"><a href="#1-Preface" class="headerlink" title="1 Preface"></a>1 Preface</h1><blockquote></blockquote><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>RISC-V</category>
-      </categories>
-  </entry>
-  <entry>
     <title>SSH</title>
     <url>/posts/782a8ece/</url>
     <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
@@ -349,6 +323,32 @@ ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v
       <tags>
         <tag>协议</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>Unprivileged Spec(1)--RV32I</title>
+    <url>/posts/6c2bdcd1/</url>
+    <content><![CDATA[<center>Base Integer Instruction Set</center><h1 id="1-Preface"><a href="#1-Preface" class="headerlink" title="1 Preface"></a>1 Preface</h1><blockquote><p>RV32I是为了足够成为编译器目标并能支持现代操作系统环境而设计的一个基本整数指令集。它也为了减少实现硬件的最小需求而设计。RV32I包含40个独立的指令，尽管一些简单的实现可能涵盖ECALL/EBREAK指令和单一的系统硬件指令（a single SYSTEM hardware instruction)，它总是捕获(always traps)并且可能用nop实现FENCE指令，以减少指令数到38个。RV32I能够模拟几乎任何的ISA扩展（除了A扩展，它需要额外硬件支持原子操作(atomicity）</p><p>在实践中，包含机器模式特权架构的硬件实现将需要9个CSR指令。</p><p>基本整数指令集的子集也许对于教学目的很有用(pedagogical purposes), 但是基础已经被定义，对子集的真正的硬件实现中除了忽略非对齐内存访问并把所有的SYSTEM instruction视为单一的异常(single trap)，我们不应该有什么其它的动机。</p><hr><p>关于RV32I的大多数评论也适用于RV64I base。</p></blockquote><h1 id="2-Programmer’s-Model"><a href="#2-Programmer’s-Model" class="headerlink" title="2 Programmer’s Model"></a>2 Programmer’s Model</h1><blockquote><p>对于RV32I非特权状态一共有32个寄存器(都是32位宽，i.e. ,XLEN=32)：<code>x0~x31</code>;x0被硬编码到0。另外31个寄存器保存的值可以被解释为：Ⅰ、布尔值的集合，Ⅱ、补码的有符号二进制整数，Ⅲ、无符号二进制整数</p><p>有一个额外的非特权寄存器，<code>pc</code>(program counter)：保存当前指令的地址</p></blockquote><ul><li>在Base Integer ISA中，没有指定的栈指针或者子例程返回地址链接寄存器(link register)；指令编码允许任何寄存器被用于这个目的；但是，标准软件调用惯例(calling convention)使用寄存器<code>x1</code>保存调用的返回地址，<code>x5</code>作为备用链接寄存器。标准调用例程使用<code>x2</code>作为栈指针(stack pointer)</li><li>硬件可以使用<code>x1</code>或<code>x2</code>来加速函数调用和返回(因为可以尽早解码)；<a href="#jal">详情见<code>JAL</code>和<code>JALR</code>指令</a></li><li>可选的压缩16-bit指令格式基于这样的假设设计的：<code>x1</code>：返回地址寄存器；<code>x2</code>:栈指针。使用其他约定的软件将正常运行，但可能有较大的代码大小。</li></ul><hr><p><strong><font color="red">备注：</font></strong></p><ul><li>可用架构寄存器(available architectural registers)的数量能够对<code>代码大小</code>，<code>性能</code>，<code>能耗</code>产生重大影响。尽管16个寄存器对于运行编译代码的整数ISA来说是足够的，但是在16位长使用3-address格式的指令中编码拥有16个寄存器完整的ISA是不可能的。(⭐PS:16个寄存器，address至少4位，三地址就12位，那么只剩下4位区分不同的指令了,即最多16条不同的指令)。</li><li>尽管2-address是可能的。但它增加指令条数并且降低功耗。我们想要避免立即数指令的大小来简化硬件实现，一旦32-bit的指令大小被采用，支持32个整数寄存器就很显而易见了。一个更大数量的整数寄存器也有助于提高高性能代码的性能，可广泛使用<code>循环展开</code>（loop unrolling)、<code>软件流水线</code>(software pipelining)和<code>缓存平铺</code>(cache tiling)。❓</li><li>基于上面这些原因，我们为基础ISA选择了一个常规大小（conventional size)——32个整数寄存器。动态寄存器使用趋向于被一些经常访问的寄存器主宰，并且<code>regfile</code>(寄存器堆)的实现可被优化以减少频繁访问寄存器的访问能量(access energy)。</li><li>可选的16位压缩指令格式绝大部分只使用8个寄存器，因此能提供稠密的指令编码(dense instruction encoding),但是如果想要的话，额外的指令集扩展能支持更大的寄存器空间(要么扁平的要么分层次的)。</li></ul><h1 id="3-Base-Instruction-Formats"><a href="#3-Base-Instruction-Formats" class="headerlink" title="3 Base Instruction Formats"></a>3 Base Instruction Formats</h1><blockquote><p>有4种核心的指令格式：R/I/S/U。指令长度都是32位，并且必须在内存中以4字节为边界对齐。指令地址非对齐的异常，常常是由于分支的发生(taken branch)或者非条件跳转的目标地址不是4字节对齐。</p></blockquote><ul><li><p>对于解码一个保留指令的行为是没有规定的(unspecified)</p></li><li><p>RISC-V ISA保持源寄存器(<code>rs1</code>和<code>rs2</code>)和目标寄存器(<code>rd</code>)的位置在所有指令格式中相同以简化解码。除了使用在CSR指令中的5bit的立即数，立即数总是<code>sign-extended</code>，通常是打包到指令中最左边的可用位，这样分配以减少硬件的复杂程度。特别是，对于所有立即数的符号位总是在最高位(也就是Ins[31])来加速符号扩展电路。</p><p><img src="https://image.beenli.cn/img/20200930/F4vpswvD8a17.jpg?imageslim" srcset="/img/loading.gif" alt="mark"><br><strong><i></i></strong></p><center><strong><i>imm[x]指的是当前位在扩展成32位立即数中的位置</i></strong></center><p></p><ul><li>实际应用中，大部分立即数要么很小，要么需要所有的位数(XLEN bits)。我们选择非对称立即数分割：常规指令中立即数占12bits;特殊的 load-upper-immediate 指令中立即数占20bits。这样做是为了给常规指令更多的opcode空间。</li></ul></li></ul><h1 id="4-Immediate-Encoding"><a href="#4-Immediate-Encoding" class="headerlink" title="4 Immediate Encoding"></a>4 Immediate Encoding</h1><blockquote><p>指令格式还有两个变种(variants)：B/J，它们基于立即数的处理衍生出来。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/NR78wxr6Nbb8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>S和B仅有的区别：在B格式中12bit立即数域乘以2用于编码分支偏移。而不是像传统做法那样，将指令编码中的所有立即数位用硬件左移一位,中间的位数(imm[10:1])和符号位保留在固定位置，而S格式中的最低位(inst[7])在B格式中编码一个高阶位。</li><li>U和J的仅有区别：U要向左移12位；而J只用移动1位。在U和J指令立即数中指令的位置尽量跟其他格式的指令或者它们互相重叠。</li></ul><p><img src="https://image.beenli.cn/img/20200930/CoSeYfK4wdG4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>RISC-V</category>
+      </categories>
   </entry>
   <entry>
     <title>Tasks and Functions</title>
@@ -500,58 +500,6 @@ result = factorial(n);
       </tags>
   </entry>
   <entry>
-    <title>VIM-Plug</title>
-    <url>/posts/b71407e8/</url>
-    <content><![CDATA[<h2 id="VIM-Plugs"><a href="#VIM-Plugs" class="headerlink" title="VIM-Plugs"></a><center>VIM-Plugs</center></h2><h5 id="1、vim-plug-插件管理器"><a href="#1、vim-plug-插件管理器" class="headerlink" title="1、vim-plug: 插件管理器"></a>1、<a href="https://github.com/junegunn/vim-plug" rel="external nofollow noreferrer">vim-plug</a>: 插件管理器</h5><pre><code class="hljs CQL">call plug#begin('D:/App/vim/vim81/vimfiles/plugs')//插件安装目录(可以随意定)
-
-" Shorthand notation for plugin
-Plug 'foo/bar'                   //插件下载地址，GitHub可以简写
-
-call plug#end()					// 函数结束标志</code></pre><blockquote><p>command</p></blockquote><ol><li>:PlugInstall // 安装插件</li><li>:PlugClean // 清理invalid插件</li><li>:PlugUpgrade // 升级插件</li><li>:PlugDiff // 查看现有插件与下载地址处插件不同，即检测更新细节</li><li>:PlugStatus // 查看插件加载情况</li><li>:PlugSnapshot // 生成用于恢复当前插件快照的脚本</li></ol><blockquote><p>feature</p></blockquote><pre><code class="hljs typescript">Plug <span class="hljs-string">'zhuzhzh/verilog_emacsauto.vim'</span>, {<span class="hljs-string">'for'</span>: [<span class="hljs-string">'verilog'</span>, <span class="hljs-string">'systemverilog'</span>] }
-<span class="hljs-comment">// 当且仅当打开的文件为Verilog或者systemVerilog时加载此插件</span>
-
-Plug <span class="hljs-string">'scrooloose/nerdtree'</span>, { <span class="hljs-string">'on'</span>: <span class="hljs-string">'NERDTreeToggle'</span> }
-<span class="hljs-comment">//当且仅当触发toggle命令时加载此插件</span></code></pre><hr><h5 id="2、lightline-彩色状态栏"><a href="#2、lightline-彩色状态栏" class="headerlink" title="2、lightline:彩色状态栏"></a>2、<a href="https://github.com/itchyny/lightline.vim" rel="external nofollow noreferrer">lightline</a>:彩色状态栏</h5><p><img src="http://image.beenli.cn/img/20200406/5NePjt0zYxFR.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="3、vim-colors-solarized-比较舒服的配色方案"><a href="#3、vim-colors-solarized-比较舒服的配色方案" class="headerlink" title="3、vim-colors-solarized:比较舒服的配色方案"></a>3、<a href="https://github.com/altercation/vim-colors-solarized" rel="external nofollow noreferrer">vim-colors-solarized</a>:比较舒服的配色方案</h5><p><img src="http://image.beenli.cn/img/20200406/daLnl7t2NSCK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此插件含有两种色调：dark；light</p><blockquote><p>call togglebg#map(“<f1>“) // 可以设置快捷键自行切换</f1></p></blockquote><hr><h5 id="4、youcompleteme：自动补全"><a href="#4、youcompleteme：自动补全" class="headerlink" title="4、youcompleteme：自动补全"></a>4、<a href="https://github.com/ycm-core/YouCompleteMe" rel="external nofollow noreferrer">youcompleteme</a>：自动补全</h5><hr><h5 id="5、vim-snippets-SirVer-ultisnips-代码片填充"><a href="#5、vim-snippets-SirVer-ultisnips-代码片填充" class="headerlink" title="5、vim-snippets+SirVer/ultisnips : 代码片填充"></a>5、<a href="https://github.com/honza/vim-snippets" rel="external nofollow noreferrer">vim-snippets</a>+<a href="https://github.com/SirVer/ultisnips" rel="external nofollow noreferrer">SirVer/ultisnips</a> : 代码片填充</h5><p>第一个插件提供好多语言的代码片文件。第二插件提供的填充引擎。</p><p>snippet有两种格式：</p><ul><li><code>snippets/*</code>: snippets using snipMate format</li><li><code>UltiSnips/*</code>: snippets using UltiSnips format</li></ul><p><img src="http://image.beenli.cn/img/20200406/lWeLOp6hU7Na.gif" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs livescript">可以自己编写snippets文件	{n}代表要填写的空白处。<span class="hljs-comment">/* placeholder*/</span>
-snippet test
-	<span class="hljs-regexp">// Author: Wan Li</span>
-<span class="hljs-regexp">	//</span> time: `strftime(<span class="hljs-string">"%Y-%m-%d"</span>)`
-	<span class="hljs-regexp">// function: ${1:/*写下测试的功能*/}</span>
-<span class="hljs-regexp">	//</span> ---------------------------------------------------
-	<span class="hljs-string">\`timescale</span> <span class="hljs-number">1ns</span>/<span class="hljs-number">1ns</span>
-	<span class="hljs-string">\`include</span> <span class="hljs-string">"${2:/*包含的模块文件*/}"</span>
-
-    
-配置_vimrc文件
-<span class="hljs-keyword">let</span> g:UltiSnipsExpandTrigger=<span class="hljs-string">"&lt;c-j&gt;"</span>		<span class="hljs-regexp">//ctrl + j 触发</span>
-<span class="hljs-regexp">let g:UltiSnipsJumpForwardTrigger="&lt;c-b&gt;"	//</span>ctrl + b 跳到下一个需要填写的空处
-<span class="hljs-keyword">let</span> g:UltiSnipsJumpBackwardTrigger=<span class="hljs-string">"&lt;c-z&gt;"</span>	<span class="hljs-regexp">//ctrl + z 跳到上一个需要填写的空出</span></code></pre><hr><h5 id="6、nerdtree-可视化目录树"><a href="#6、nerdtree-可视化目录树" class="headerlink" title="6、nerdtree: 可视化目录树"></a>6、<a href="https://github.com/preservim/nerdtree" rel="external nofollow noreferrer">nerdtree</a>: 可视化目录树</h5><p><img src="http://image.beenli.cn/img/20200406/GAYHOnmiPSIj.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/zU1CDLe23EOh.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/36WBczsR3bS2.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="7、tabbar-整齐的标签窗口"><a href="#7、tabbar-整齐的标签窗口" class="headerlink" title="7、tabbar: 整齐的标签窗口"></a>7、<a href="https://github.com/majutsushi/tagbar" rel="external nofollow noreferrer">tabbar</a>: 整齐的标签窗口</h5><p><img src="http://image.beenli.cn/img/20200406/9PX5LoRQveLS.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="8、tpope-vim-commentary-快速注释"><a href="#8、tpope-vim-commentary-快速注释" class="headerlink" title="8、tpope/vim-commentary: 快速注释"></a>8、<a href="https://github.com/tpope/vim-commentary" rel="external nofollow noreferrer">tpope/vim-commentary</a>: 快速注释</h5><blockquote><p>gcc ：注释/取消注释一行</p><p>gc{motion}</p><p>gc : 注释selection块</p><p>7，17 Commentary</p></blockquote><hr><h5 id="9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco"><a href="#9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco" class="headerlink" title="9、vim-gutentags：借助universal ctags 自动产生标签文件:taco:"></a>9、<a href="https://github.com/ludovicchabant/vim-gutentags" rel="external nofollow noreferrer">vim-gutentags</a>：借助<a href="https://docs.ctags.io/en/latest/" rel="external nofollow noreferrer">universal ctags</a> 自动产生标签文件<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8">🌮</span></h5><p>有了这个标签文件，你又可以<code>&lt;C+]&gt;</code>跳转</p><hr><h5 id="10、vim-easy-align：自动对齐"><a href="#10、vim-easy-align：自动对齐" class="headerlink" title="10、vim-easy-align：自动对齐"></a>10、<a href="https://github.com/junegunn/vim-easy-align" rel="external nofollow noreferrer"><strong>vim-easy-align</strong></a>：自动对齐</h5><p>按官方配置来设置快捷键/ga触发</p><blockquote><p>“ Start interactive EasyAlign in visual mode (e.g. vipga)<br>xmap ga<plug>(EasyAlign)</plug></p><p>“ Start interactive EasyAlign for a motion/text object (e.g. gaip)<br>nmap ga<plug>(EasyAlign)</plug></p></blockquote><ul><li><code>1</code> Around the 1st occurrences of delimiters</li><li><code>2</code> Around the 2nd occurrences of delimiters</li><li>…</li><li><code>*</code> Around all occurrences of delimiters</li><li><code>**</code> Left-right alternating alignment around all delimiters</li><li><code>-</code> Around the last occurrences of delimiters (<code>-1</code>)</li><li><code>-2</code> Around the second to last occurrences of delimiters</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">Key</th><th style="text-align:center">Description/Use cases</th></tr></thead><tbody><tr><td style="text-align:center">``</td><td style="text-align:center">General alignment around whitespaces</td></tr><tr><td style="text-align:center"><code>=</code></td><td style="text-align:center">Operators containing equals sign (<code>=</code>, <code>==,</code> <code>!=</code>, <code>+=</code>, <code>&amp;&amp;=</code>, …)</td></tr><tr><td style="text-align:center"><code>:</code></td><td style="text-align:center">Suitable for formatting JSON or YAML</td></tr><tr><td style="text-align:center"><code>.</code></td><td style="text-align:center">Multi-line method chaining</td></tr><tr><td style="text-align:center"><code>,</code></td><td style="text-align:center">Multi-line method arguments</td></tr><tr><td style="text-align:center"><code>&amp;</code></td><td style="text-align:center">LaTeX tables (matches <code>&amp;</code> and <code>\\</code>)</td></tr><tr><td style="text-align:center"><code>#</code></td><td style="text-align:center">Ruby/Python comments</td></tr><tr><td style="text-align:center"><code>"</code></td><td style="text-align:center">Vim comments</td></tr><tr><td style="text-align:center">``</td><td style="text-align:center">Table markdown</td></tr></tbody></table></div><p><img src="http://image.beenli.cn/img/20200406/fubial5cDLym.gif" srcset="/img/loading.gif" alt="mark"></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Software</category>
-        <category>VIM</category>
-      </categories>
-      <tags>
-        <tag>Plugs</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>git hooks自动部署hexo</title>
     <url>/posts/fb29ac9a/</url>
     <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers</code></pre></li></ol></li></ol><p>vim /etc/sudoer<br></p><pre><code class="hljs stata">
@@ -615,37 +563,31 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
       </tags>
   </entry>
   <entry>
-    <title>testbench(1)</title>
-    <url>/posts/26241a85/</url>
-    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化
-<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;
+    <title>VIM-Plug</title>
+    <url>/posts/b71407e8/</url>
+    <content><![CDATA[<h2 id="VIM-Plugs"><a href="#VIM-Plugs" class="headerlink" title="VIM-Plugs"></a><center>VIM-Plugs</center></h2><h5 id="1、vim-plug-插件管理器"><a href="#1、vim-plug-插件管理器" class="headerlink" title="1、vim-plug: 插件管理器"></a>1、<a href="https://github.com/junegunn/vim-plug" rel="external nofollow noreferrer">vim-plug</a>: 插件管理器</h5><pre><code class="hljs CQL">call plug#begin('D:/App/vim/vim81/vimfiles/plugs')//插件安装目录(可以随意定)
 
-第二种: 定义信号时初始化
-<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)
+" Shorthand notation for plugin
+Plug 'foo/bar'                   //插件下载地址，GitHub可以简写
 
-等价于:
-<span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-    #<span class="hljs-number">5</span>;
-    a=b;
-<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)
+call plug#end()					// 函数结束标志</code></pre><blockquote><p>command</p></blockquote><ol><li>:PlugInstall // 安装插件</li><li>:PlugClean // 清理invalid插件</li><li>:PlugUpgrade // 升级插件</li><li>:PlugDiff // 查看现有插件与下载地址处插件不同，即检测更新细节</li><li>:PlugStatus // 查看插件加载情况</li><li>:PlugSnapshot // 生成用于恢复当前插件快照的脚本</li></ol><blockquote><p>feature</p></blockquote><pre><code class="hljs typescript">Plug <span class="hljs-string">'zhuzhzh/verilog_emacsauto.vim'</span>, {<span class="hljs-string">'for'</span>: [<span class="hljs-string">'verilog'</span>, <span class="hljs-string">'systemverilog'</span>] }
+<span class="hljs-comment">// 当且仅当打开的文件为Verilog或者systemVerilog时加载此插件</span>
 
-等价于
-<span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-	temp = b;
-	#<span class="hljs-number">5</span>;
-	a = temp;
-<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-	# <span class="hljs-number">10</span>
-	@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span>
-<span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>
-	#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;
-<span class="hljs-keyword">initial</span>
-	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) 
-	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
-<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
+Plug <span class="hljs-string">'scrooloose/nerdtree'</span>, { <span class="hljs-string">'on'</span>: <span class="hljs-string">'NERDTreeToggle'</span> }
+<span class="hljs-comment">//当且仅当触发toggle命令时加载此插件</span></code></pre><hr><h5 id="2、lightline-彩色状态栏"><a href="#2、lightline-彩色状态栏" class="headerlink" title="2、lightline:彩色状态栏"></a>2、<a href="https://github.com/itchyny/lightline.vim" rel="external nofollow noreferrer">lightline</a>:彩色状态栏</h5><p><img src="http://image.beenli.cn/img/20200406/5NePjt0zYxFR.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="3、vim-colors-solarized-比较舒服的配色方案"><a href="#3、vim-colors-solarized-比较舒服的配色方案" class="headerlink" title="3、vim-colors-solarized:比较舒服的配色方案"></a>3、<a href="https://github.com/altercation/vim-colors-solarized" rel="external nofollow noreferrer">vim-colors-solarized</a>:比较舒服的配色方案</h5><p><img src="http://image.beenli.cn/img/20200406/daLnl7t2NSCK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此插件含有两种色调：dark；light</p><blockquote><p>call togglebg#map(“<f1>“) // 可以设置快捷键自行切换</f1></p></blockquote><hr><h5 id="4、youcompleteme：自动补全"><a href="#4、youcompleteme：自动补全" class="headerlink" title="4、youcompleteme：自动补全"></a>4、<a href="https://github.com/ycm-core/YouCompleteMe" rel="external nofollow noreferrer">youcompleteme</a>：自动补全</h5><hr><h5 id="5、vim-snippets-SirVer-ultisnips-代码片填充"><a href="#5、vim-snippets-SirVer-ultisnips-代码片填充" class="headerlink" title="5、vim-snippets+SirVer/ultisnips : 代码片填充"></a>5、<a href="https://github.com/honza/vim-snippets" rel="external nofollow noreferrer">vim-snippets</a>+<a href="https://github.com/SirVer/ultisnips" rel="external nofollow noreferrer">SirVer/ultisnips</a> : 代码片填充</h5><p>第一个插件提供好多语言的代码片文件。第二插件提供的填充引擎。</p><p>snippet有两种格式：</p><ul><li><code>snippets/*</code>: snippets using snipMate format</li><li><code>UltiSnips/*</code>: snippets using UltiSnips format</li></ul><p><img src="http://image.beenli.cn/img/20200406/lWeLOp6hU7Na.gif" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs livescript">可以自己编写snippets文件	{n}代表要填写的空白处。<span class="hljs-comment">/* placeholder*/</span>
+snippet test
+	<span class="hljs-regexp">// Author: Wan Li</span>
+<span class="hljs-regexp">	//</span> time: `strftime(<span class="hljs-string">"%Y-%m-%d"</span>)`
+	<span class="hljs-regexp">// function: ${1:/*写下测试的功能*/}</span>
+<span class="hljs-regexp">	//</span> ---------------------------------------------------
+	<span class="hljs-string">\`timescale</span> <span class="hljs-number">1ns</span>/<span class="hljs-number">1ns</span>
+	<span class="hljs-string">\`include</span> <span class="hljs-string">"${2:/*包含的模块文件*/}"</span>
+
+    
+配置_vimrc文件
+<span class="hljs-keyword">let</span> g:UltiSnipsExpandTrigger=<span class="hljs-string">"&lt;c-j&gt;"</span>		<span class="hljs-regexp">//ctrl + j 触发</span>
+<span class="hljs-regexp">let g:UltiSnipsJumpForwardTrigger="&lt;c-b&gt;"	//</span>ctrl + b 跳到下一个需要填写的空处
+<span class="hljs-keyword">let</span> g:UltiSnipsJumpBackwardTrigger=<span class="hljs-string">"&lt;c-z&gt;"</span>	<span class="hljs-regexp">//ctrl + z 跳到上一个需要填写的空出</span></code></pre><hr><h5 id="6、nerdtree-可视化目录树"><a href="#6、nerdtree-可视化目录树" class="headerlink" title="6、nerdtree: 可视化目录树"></a>6、<a href="https://github.com/preservim/nerdtree" rel="external nofollow noreferrer">nerdtree</a>: 可视化目录树</h5><p><img src="http://image.beenli.cn/img/20200406/GAYHOnmiPSIj.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/zU1CDLe23EOh.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/36WBczsR3bS2.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="7、tabbar-整齐的标签窗口"><a href="#7、tabbar-整齐的标签窗口" class="headerlink" title="7、tabbar: 整齐的标签窗口"></a>7、<a href="https://github.com/majutsushi/tagbar" rel="external nofollow noreferrer">tabbar</a>: 整齐的标签窗口</h5><p><img src="http://image.beenli.cn/img/20200406/9PX5LoRQveLS.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="8、tpope-vim-commentary-快速注释"><a href="#8、tpope-vim-commentary-快速注释" class="headerlink" title="8、tpope/vim-commentary: 快速注释"></a>8、<a href="https://github.com/tpope/vim-commentary" rel="external nofollow noreferrer">tpope/vim-commentary</a>: 快速注释</h5><blockquote><p>gcc ：注释/取消注释一行</p><p>gc{motion}</p><p>gc : 注释selection块</p><p>7，17 Commentary</p></blockquote><hr><h5 id="9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco"><a href="#9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco" class="headerlink" title="9、vim-gutentags：借助universal ctags 自动产生标签文件:taco:"></a>9、<a href="https://github.com/ludovicchabant/vim-gutentags" rel="external nofollow noreferrer">vim-gutentags</a>：借助<a href="https://docs.ctags.io/en/latest/" rel="external nofollow noreferrer">universal ctags</a> 自动产生标签文件<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8">🌮</span></h5><p>有了这个标签文件，你又可以<code>&lt;C+]&gt;</code>跳转</p><hr><h5 id="10、vim-easy-align：自动对齐"><a href="#10、vim-easy-align：自动对齐" class="headerlink" title="10、vim-easy-align：自动对齐"></a>10、<a href="https://github.com/junegunn/vim-easy-align" rel="external nofollow noreferrer"><strong>vim-easy-align</strong></a>：自动对齐</h5><p>按官方配置来设置快捷键/ga触发</p><blockquote><p>“ Start interactive EasyAlign in visual mode (e.g. vipga)<br>xmap ga<plug>(EasyAlign)</plug></p><p>“ Start interactive EasyAlign for a motion/text object (e.g. gaip)<br>nmap ga<plug>(EasyAlign)</plug></p></blockquote><ul><li><code>1</code> Around the 1st occurrences of delimiters</li><li><code>2</code> Around the 2nd occurrences of delimiters</li><li>…</li><li><code>*</code> Around all occurrences of delimiters</li><li><code>**</code> Left-right alternating alignment around all delimiters</li><li><code>-</code> Around the last occurrences of delimiters (<code>-1</code>)</li><li><code>-2</code> Around the second to last occurrences of delimiters</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">Key</th><th style="text-align:center">Description/Use cases</th></tr></thead><tbody><tr><td style="text-align:center">``</td><td style="text-align:center">General alignment around whitespaces</td></tr><tr><td style="text-align:center"><code>=</code></td><td style="text-align:center">Operators containing equals sign (<code>=</code>, <code>==,</code> <code>!=</code>, <code>+=</code>, <code>&amp;&amp;=</code>, …)</td></tr><tr><td style="text-align:center"><code>:</code></td><td style="text-align:center">Suitable for formatting JSON or YAML</td></tr><tr><td style="text-align:center"><code>.</code></td><td style="text-align:center">Multi-line method chaining</td></tr><tr><td style="text-align:center"><code>,</code></td><td style="text-align:center">Multi-line method arguments</td></tr><tr><td style="text-align:center"><code>&amp;</code></td><td style="text-align:center">LaTeX tables (matches <code>&amp;</code> and <code>\\</code>)</td></tr><tr><td style="text-align:center"><code>#</code></td><td style="text-align:center">Ruby/Python comments</td></tr><tr><td style="text-align:center"><code>"</code></td><td style="text-align:center">Vim comments</td></tr><tr><td style="text-align:center">``</td><td style="text-align:center">Table markdown</td></tr></tbody></table></div><p><img src="http://image.beenli.cn/img/20200406/fubial5cDLym.gif" srcset="/img/loading.gif" alt="mark"></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -665,11 +607,11 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
           });
       </script>]]></content>
       <categories>
-        <category>Digital IC</category>
-        <category>verilog</category>
+        <category>Software</category>
+        <category>VIM</category>
       </categories>
       <tags>
-        <tag>testbench</tag>
+        <tag>Plugs</tag>
       </tags>
   </entry>
   <entry>
@@ -804,6 +746,64 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </tags>
   </entry>
   <entry>
+    <title>testbench(1)</title>
+    <url>/posts/26241a85/</url>
+    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化
+<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;
+
+第二种: 定义信号时初始化
+<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)
+
+等价于:
+<span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+    #<span class="hljs-number">5</span>;
+    a=b;
+<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)
+
+等价于
+<span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+	temp = b;
+	#<span class="hljs-number">5</span>;
+	a = temp;
+<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+	# <span class="hljs-number">10</span>
+	@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span>
+<span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>
+	#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;
+<span class="hljs-keyword">initial</span>
+	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) 
+	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
+<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>verilog</category>
+      </categories>
+      <tags>
+        <tag>testbench</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>存储电路</title>
     <url>/posts/19fa4593/</url>
     <content><![CDATA[<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><blockquote><p>在复杂的数字电路中，不仅需要对各种数字信号进行<code>算术运算</code>和<code>逻辑运算</code>，而且还需要在运算过程中不断将运算数据和运算结果保存起来。因此，<code>存储电路</code>就成为计算机以及所有复杂数字系统不可缺少的组成部分。</p></blockquote><ul><li><p>分类总结</p><p><img src="http://image.beenli.cn/img/20200806/KInKOkBSpdhF.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><h2 id="二、SR锁存器"><a href="#二、SR锁存器" class="headerlink" title="二、SR锁存器"></a>二、SR锁存器</h2><p class="note note-info">SR锁存器(Set-Reset Latch) 是静态存储单元中最基本，也是电路结构最简单的一种。</p><ol><li><p>或门锁存器</p><p><img src="http://image.beenli.cn/img/20200806/mkE1Uu5jsyux.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>当$R_D$是1或者$S_D$是1而另外一个是0时，可以看到S起到<code>set 1</code>；而R起到<code>reset 0</code>的作用。</li><li>当有一个回到0时(此时两输入都为0)，可以保持原来的状态不变。(因为输出的1反馈到输入)</li><li><span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8">❌</span>不允许输入同为1。（此时输出同为0为无效状态，并且同时变为0时存在竞争冒险）</li></ul></li><li><p>与门锁存器(同理)<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8">🙂</span></p><p><img src="http://image.beenli.cn/img/20200806/ny32DamxXGT9.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h2 id="三、触发器"><a href="#三、触发器" class="headerlink" title="三、触发器"></a>三、触发器</h2><p class="note note-info">触发器与锁存器不同在于：增加了一个触发信号输入端(时钟信号<strong>CLK</strong>)。只有当触发信号到来时，其功能与锁存器相同。</p><h3 id="1、电平触发"><a href="#1、电平触发" class="headerlink" title="1、电平触发"></a>1、电平触发</h3><p class="note note-light">只有触发信号在有效电平的时候，输入信号才能作用。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p><h4 id="①同步SR触发器"><a href="#①同步SR触发器" class="headerlink" title="①同步SR触发器"></a>①同步SR触发器</h4><p><img src="http://image.beenli.cn/img/20200806/w2EFARutEXwH.jpg?imageslim" srcset="/img/loading.gif" alt="cl没有⭕代表高电平有效"></p><center>框图<strong>Cl</strong>外面没有⭕代表高电平有效</center><h4 id="②异步复位置位"><a href="#②异步复位置位" class="headerlink" title="②异步复位置位"></a>②异步复位置位</h4><p>// 将<code>置位信号</code>$S_{D}^{‘}$接入G1, <code>复位信号</code>$R_{D}^{‘}$接G2</p><h4 id="③单端输入-D型号锁存器"><a href="#③单端输入-D型号锁存器" class="headerlink" title="③单端输入(D型号锁存器)"></a>③单端输入(D型号锁存器)</h4><p>// 规避了约束条件SR=0</p><p><img src="http://image.beenli.cn/img/20200806/xIOR3Naxv9I6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="④Transparent-D-Latch"><a href="#④Transparent-D-Latch" class="headerlink" title="④Transparent D-Latch"></a>④Transparent D-Latch</h4><p>// CMOS传输门构成</p><p><img src="http://image.beenli.cn/img/20200806/Gs96RXY8qL57.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>当TG2打开，TG1关闭时。两个反相器串联把截止前瞬间的信号(<code>反相器G1输入电容</code>)锁住。</p><h3 id="2、边沿触发"><a href="#2、边沿触发" class="headerlink" title="2、边沿触发"></a>2、边沿触发</h3><p class="note note-light">提高触发器可靠性，增强抗干扰能力，希望触发器次态仅取决于CLK信号<strong>边沿</strong>到达时刻输入信号的状态。而边沿之前或之后输入状态的变化对触发器的次态没有影响。</p><h4 id="①两个电平触发D触发器"><a href="#①两个电平触发D触发器" class="headerlink" title="①两个电平触发D触发器"></a>①两个电平触发D触发器</h4><p><img src="http://image.beenli.cn/img/20200806/XRFiu2qdjwAn.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>不看置位信号就是两个Transparent D-Latch</li><li>当第一个工作时，第二个保持。透明D锁存器：所以输出能跟随时钟边沿瞬间输入的值</li></ul><h4 id="②维持阻塞-pushpin"><a href="#②维持阻塞-pushpin" class="headerlink" title="②维持阻塞:pushpin:"></a>②维持阻塞<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h4 id="③门电路传输延迟-pushpin"><a href="#③门电路传输延迟-pushpin" class="headerlink" title="③门电路传输延迟:pushpin:"></a>③门电路传输延迟<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h3 id="3、脉冲触发"><a href="#3、脉冲触发" class="headerlink" title="3、脉冲触发"></a>3、脉冲触发</h3><p class="note note-light">为了提高可靠性：希望每个CLK周期里面输出端状态只能改变<strong>一次</strong></p><h4 id="①主从SR"><a href="#①主从SR" class="headerlink" title="①主从SR"></a>①主从SR</h4><p>Master-Slave SR Flip-Flop</p><p><img src="http://image.beenli.cn/img/20200812/sT6pd0FRytWY.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center><strong>￢</strong>：延时输出</center><p><img src="http://image.beenli.cn/img/20200812/Gj3SXcH9aMF3.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>高电平有效，下降沿状态才会改变</center><ul><li>clk高电平<code>主触发器</code>有效，<code>从触发器</code>保持原来状态。</li><li>clk从高变到低时，主触发器被封锁，从触发器按照主触发器相同的状态翻转。</li><li>因此：一个周期输出只可能翻转一次。</li></ul><h4 id="②主从JK-规避SR-1"><a href="#②主从JK-规避SR-1" class="headerlink" title="②主从JK(规避SR=1)"></a>②主从JK(<code>规避SR=1</code>)</h4><p><img src="http://image.beenli.cn/img/20200812/3w2tYTQ9HhKm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script type="math/tex;mode=display">Q^* = S + \overline RQ(for\quad SR)</script><script type="math/tex;mode=display">JK: S=J \overline Q\quad R=KQ</script><script type="math/tex;mode=display">Q^*=J \overline Q+(\overline K+\overline Q)Q=J \overline Q + \overline KQ\quad(for\quad JK)</script><ul><li>clk变低电平时把主触发器的值<code>复制</code>给了次触发器。（所以上边推导时Q即代表中间输出也代表后边输出）</li><li>主触发器有效时(高电平)Q要么为1要么为0，不可能同时为0或者为1。因为G3,G4都为1。它们通过反相器互咬。</li><li>考察当J=1，R=1时，G7,G8输出$Q$和$\overline Q$(不是全0，就🆗)。所以当Q=1，输出为0，当Q=0,输出为1,即反向。</li></ul><h2 id="四、触发器的动态特性-pushpin"><a href="#四、触发器的动态特性-pushpin" class="headerlink" title="四、触发器的动态特性:pushpin:"></a>四、触发器的动态特性<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h2><h2 id="五、References"><a href="#五、References" class="headerlink" title="五、References"></a>五、References</h2><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none;padding-left:0"><li id="fn:1"><span style="display:inline-block;vertical-align:top;padding-right:10px">1.</span><span style="display:inline-block;vertical-align:top">外国教材有时把此电路叫（Gated SR latch), 时钟信号叫做“使能”信号（enable）</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div><script>
@@ -831,74 +831,6 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </categories>
       <tags>
         <tag>circuits</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>操作系统-熟悉实验环境(1)</title>
-    <url>/posts/9cf5ff72/</url>
-    <content><![CDATA[<h2 id="熟悉实验环境"><a href="#熟悉实验环境" class="headerlink" title="熟悉实验环境"></a><center>熟悉实验环境</center></h2><h3 id="1、x86模拟器Bochs1"><a href="#1、x86模拟器Bochs1" class="headerlink" title="1、x86模拟器Bochs1"></a>1、x86模拟器<a href="http://bochs.sourceforge.net/" rel="external nofollow noreferrer">Bochs</a><a href="#link"><sup>1</sup></a></h3><p class="note note-info">Bochs is a highly portable open source IA-32 (x86) PC emulator written in C++, that runs on most popular platforms. It includes emulation of the Intel x86 CPU, common I/O devices, and a custom BIOS. Bochs can be compiled to emulate many different x86 CPUs, from early 386 to the most recent x86-64 Intel and AMD processors which may even not reached the market yet.</p><p>可以看到<code>Boch</code>可以模拟<code>intel x86 CPU</code></p><p>在它模拟出的环境中可以运行 Linux、DOS 和各种版本的 Windows 等多种操作系统</p><h3 id="2、操作系统Ubuntu"><a href="#2、操作系统Ubuntu" class="headerlink" title="2、操作系统Ubuntu"></a>2、操作系统<a href="https://ubuntu.com/" rel="external nofollow noreferrer">Ubuntu</a></h3><p>因为有些实验内容涉及到在自己改进的 <code>Linux 0.11</code>下，运行自己编的应用程序。被改进的功能都是高 版本 Linux 内核已经具有的，在其上确认自己编写的应用程序无误后，再用之测试自己改进的 Linux 0.11，可以更有信心些。</p><h3 id="3、实验压缩包hit-oslab"><a href="#3、实验压缩包hit-oslab" class="headerlink" title="3、实验压缩包hit-oslab"></a>3、实验压缩包<a href="https://github.com/hoverwinter/HIT-OSLab" rel="external nofollow noreferrer">hit-oslab</a></h3><p>文件结构:</p><pre><code class="hljs bash">.
-..
-└── bocks
-|   	├── BIOS-bochs-latest
-|       ├── bochs-dbg
-|   	├── bochs-gdb
-|   	├── bochsrc.bxrc
-|   	├── bochsrc-gdb.bxrc
-|       └── vgabios.bin
-|
-└── hdc
-|   	└── umounted
-└── Linux-0.11
-|		└── boot
-|		├── kernel
-|		├── fs
-|		├── lib
-|		├── init				
-|		├── mm
-|		├── tools			
-|		├── include
-|		├── tags
-|		└── Makefile
-├── dbg-asm
-├── dbg-c
-├── gdb
-├── gdb-cmd.txt
-├── run
-├── rungdb
-└── mount-hdc</code></pre><ol><li><p>Image文件</p><p>我们在宿主操作系统也就是ubuntu上对Linux 0.11进行开发，修改和编译。</p><p>之后在Linux-0.11目录会生成一个<code>Image</code>的文件。（编译后的目标文件）</p><p><br></p><p>该文件包含引导和所以内核的二进制代码。</p><p class="note note-primary">oslab 采用 bochs 模拟器加载这个 Image 文件，模拟执行 Linux 0.11，这样省却了重新启动计算机的麻烦。</p></li><li><p>bochs目录</p><p>bochs目录是与bochs相关的执行文件、数据文件和配置文件</p></li><li><p>run 脚本</p><p><code>run</code> 是 运行bochs的脚本命令</p><p>运行后bochs会自动在他的</p><p>虚拟软驱——linux-0.11/Image</p><p>虚拟硬盘——hdc-0.11.img</p><p class="note note-primary">在 0.11 下访问文件系统，访问的就是 hdc-0.11.img 文件内虚拟的文件系统。<br>退出bochs之前现存盘，运行sync命令</p></li><li><p>hdc-0.11.img 文件</p><p>文件的格式是 Minix 文件系统的镜像。Linux 所有版本都支持这种格式的文件系统</p><p>所以可以在宿主系统上挂载该文件系统。达到宿主系统和Linux 0.11之间文件交换的效果</p><p>其中包含的文件有：</p><ul><li>Bash shell；</li><li>一些基本的 Linux 命令、工具，比如 cp、rm、mv、tar；</li><li>vi 编辑器；</li><li>gcc 1.4 编译器，可用来编译标准 C 程序；</li><li>as86 和 ld86；</li><li>Linux 0.11 的源代码，可在 0.11 下编译，然后覆盖现有的二进制内核。</li></ul></li><li><p>编译</p><blockquote><p>make all(make 命令会自动跳过未被修改的文件 )</p><p>如果重新编译没有效果可以试试删除中间文件: make clean &amp;&amp; make all</p></blockquote></li><li><p>运行</p><p><code>./run</code></p></li></ol><h3 id="4、调试"><a href="#4、调试" class="headerlink" title="4、调试"></a>4、调试</h3><ol><li><p>汇编级调试</p><p><code>./dbg-asm</code></p></li><li><p>C语言调试</p><ol><li><p><code>./dbg-c</code></p></li><li><p><code>./rungdb</code>(新开一个窗口)</p><blockquote><p>注意：启动的顺序不能交换，否则 gdb 无法连接。</p></blockquote></li></ol></li></ol><h3 id="5、文件交换"><a href="#5、文件交换" class="headerlink" title="5、文件交换"></a>5、文件交换</h3><pre><code class="hljs bash"><span class="hljs-comment"># 启动挂载脚本</span>
-$ <span class="hljs-built_in">cd</span> ~/oslab
-$ sudo ./mount-hdc
-
-<span class="hljs-comment"># 进入文件系统</span>
-$ <span class="hljs-built_in">cd</span> ./mount-hdc/
-
-<span class="hljs-comment"># 读写完毕，卸载文件系统</span>
-$ <span class="hljs-built_in">cd</span> ~/oslab
-$ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><div id="link"></div><p>[1] <a href="https://mooc.study.163.com/course/1000002004?tid=2402971010#/info" rel="external nofollow noreferrer">哈尔滨工业大学.操作系统</a></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>OS</category>
-      </categories>
-      <tags>
-        <tag>网易云网课</tag>
       </tags>
   </entry>
   <entry>
@@ -975,6 +907,109 @@ gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</
       </categories>
       <tags>
         <tag>verilog</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>操作系统-熟悉实验环境(1)</title>
+    <url>/posts/9cf5ff72/</url>
+    <content><![CDATA[<h2 id="熟悉实验环境"><a href="#熟悉实验环境" class="headerlink" title="熟悉实验环境"></a><center>熟悉实验环境</center></h2><h3 id="1、x86模拟器Bochs1"><a href="#1、x86模拟器Bochs1" class="headerlink" title="1、x86模拟器Bochs1"></a>1、x86模拟器<a href="http://bochs.sourceforge.net/" rel="external nofollow noreferrer">Bochs</a><a href="#link"><sup>1</sup></a></h3><p class="note note-info">Bochs is a highly portable open source IA-32 (x86) PC emulator written in C++, that runs on most popular platforms. It includes emulation of the Intel x86 CPU, common I/O devices, and a custom BIOS. Bochs can be compiled to emulate many different x86 CPUs, from early 386 to the most recent x86-64 Intel and AMD processors which may even not reached the market yet.</p><p>可以看到<code>Boch</code>可以模拟<code>intel x86 CPU</code></p><p>在它模拟出的环境中可以运行 Linux、DOS 和各种版本的 Windows 等多种操作系统</p><h3 id="2、操作系统Ubuntu"><a href="#2、操作系统Ubuntu" class="headerlink" title="2、操作系统Ubuntu"></a>2、操作系统<a href="https://ubuntu.com/" rel="external nofollow noreferrer">Ubuntu</a></h3><p>因为有些实验内容涉及到在自己改进的 <code>Linux 0.11</code>下，运行自己编的应用程序。被改进的功能都是高 版本 Linux 内核已经具有的，在其上确认自己编写的应用程序无误后，再用之测试自己改进的 Linux 0.11，可以更有信心些。</p><h3 id="3、实验压缩包hit-oslab"><a href="#3、实验压缩包hit-oslab" class="headerlink" title="3、实验压缩包hit-oslab"></a>3、实验压缩包<a href="https://github.com/hoverwinter/HIT-OSLab" rel="external nofollow noreferrer">hit-oslab</a></h3><p>文件结构:</p><pre><code class="hljs bash">.
+..
+└── bocks
+|   	├── BIOS-bochs-latest
+|       ├── bochs-dbg
+|   	├── bochs-gdb
+|   	├── bochsrc.bxrc
+|   	├── bochsrc-gdb.bxrc
+|       └── vgabios.bin
+|
+└── hdc
+|   	└── umounted
+└── Linux-0.11
+|		└── boot
+|		├── kernel
+|		├── fs
+|		├── lib
+|		├── init				
+|		├── mm
+|		├── tools			
+|		├── include
+|		├── tags
+|		└── Makefile
+├── dbg-asm
+├── dbg-c
+├── gdb
+├── gdb-cmd.txt
+├── run
+├── rungdb
+└── mount-hdc</code></pre><ol><li><p>Image文件</p><p>我们在宿主操作系统也就是ubuntu上对Linux 0.11进行开发，修改和编译。</p><p>之后在Linux-0.11目录会生成一个<code>Image</code>的文件。（编译后的目标文件）</p><p><br></p><p>该文件包含引导和所以内核的二进制代码。</p><p class="note note-primary">oslab 采用 bochs 模拟器加载这个 Image 文件，模拟执行 Linux 0.11，这样省却了重新启动计算机的麻烦。</p></li><li><p>bochs目录</p><p>bochs目录是与bochs相关的执行文件、数据文件和配置文件</p></li><li><p>run 脚本</p><p><code>run</code> 是 运行bochs的脚本命令</p><p>运行后bochs会自动在他的</p><p>虚拟软驱——linux-0.11/Image</p><p>虚拟硬盘——hdc-0.11.img</p><p class="note note-primary">在 0.11 下访问文件系统，访问的就是 hdc-0.11.img 文件内虚拟的文件系统。<br>退出bochs之前现存盘，运行sync命令</p></li><li><p>hdc-0.11.img 文件</p><p>文件的格式是 Minix 文件系统的镜像。Linux 所有版本都支持这种格式的文件系统</p><p>所以可以在宿主系统上挂载该文件系统。达到宿主系统和Linux 0.11之间文件交换的效果</p><p>其中包含的文件有：</p><ul><li>Bash shell；</li><li>一些基本的 Linux 命令、工具，比如 cp、rm、mv、tar；</li><li>vi 编辑器；</li><li>gcc 1.4 编译器，可用来编译标准 C 程序；</li><li>as86 和 ld86；</li><li>Linux 0.11 的源代码，可在 0.11 下编译，然后覆盖现有的二进制内核。</li></ul></li><li><p>编译</p><blockquote><p>make all(make 命令会自动跳过未被修改的文件 )</p><p>如果重新编译没有效果可以试试删除中间文件: make clean &amp;&amp; make all</p></blockquote></li><li><p>运行</p><p><code>./run</code></p></li></ol><h3 id="4、调试"><a href="#4、调试" class="headerlink" title="4、调试"></a>4、调试</h3><ol><li><p>汇编级调试</p><p><code>./dbg-asm</code></p></li><li><p>C语言调试</p><ol><li><p><code>./dbg-c</code></p></li><li><p><code>./rungdb</code>(新开一个窗口)</p><blockquote><p>注意：启动的顺序不能交换，否则 gdb 无法连接。</p></blockquote></li></ol></li></ol><h3 id="5、文件交换"><a href="#5、文件交换" class="headerlink" title="5、文件交换"></a>5、文件交换</h3><pre><code class="hljs bash"><span class="hljs-comment"># 启动挂载脚本</span>
+$ <span class="hljs-built_in">cd</span> ~/oslab
+$ sudo ./mount-hdc
+
+<span class="hljs-comment"># 进入文件系统</span>
+$ <span class="hljs-built_in">cd</span> ./mount-hdc/
+
+<span class="hljs-comment"># 读写完毕，卸载文件系统</span>
+$ <span class="hljs-built_in">cd</span> ~/oslab
+$ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><div id="link"></div><p>[1] <a href="https://mooc.study.163.com/course/1000002004?tid=2402971010#/info" rel="external nofollow noreferrer">哈尔滨工业大学.操作系统</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>OS</category>
+      </categories>
+      <tags>
+        <tag>网易云网课</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据通路(1)--Basic Datapath</title>
+    <url>/posts/74018a17/</url>
+    <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
+slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
+						  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offset
+lw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。
+beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
+						  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst				  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Organization &amp; Design</category>
+      </categories>
+      <tags>
+        <tag>processor</tag>
       </tags>
   </entry>
   <entry>
@@ -1219,41 +1254,6 @@ p = t;
     <title>数据通路(2)--Control</title>
     <url>/posts/f0189490/</url>
     <content><![CDATA[<h1 id="1、ALU控制"><a href="#1、ALU控制" class="headerlink" title="1、ALU控制"></a>1、ALU控制</h1><blockquote><p>MIPS ALU在4位控制信号上定义了6种有效的输入组合</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/VGrg5UNVVt4J.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>存储器访问指令：add</li><li>R型指令：根据指令低6位的funct字段<a href="#link"><sup>1</sup></a> ，ALU执行5种操作中的一种(nor暂时没用)</li><li>branch指令：sub(两个操作数相减判断是否为零)</li></ul><ul><li><code>多级译码</code>：输入：6位funct字段和2位ALUOP字段————&gt;输出：4位ALU control lines</li></ul><p><img src="https://image.beenli.cn/img/20200820/xlEg0oIEPQA5.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控制单元生成ALUOP</center><ul><li>真值表——优化后转换为门电路（坑待定）</li></ul><p><img src="https://image.beenli.cn/img/20200820/fBArSknPUEb4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、主控制单元"><a href="#2、主控制单元" class="headerlink" title="2、主控制单元"></a>2、主控制单元</h1><div id="link"></div><ul><li>指令格式</li></ul><p><img src="https://image.beenli.cn/img/20200820/MLWQrvKbTmz4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>R型指令opcode为0；lw为35；sw为43 ; branch为<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8">4⃣</span></li></ul><p><img src="https://image.beenli.cn/img/20200820/w7nhaHnvyrH3.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>7个多选器控制信号的作用</center><p><img src="https://image.beenli.cn/img/20200820/kdnnx95gnWHt.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控单元产生7个一位控制信号+2位ALUOP</center><ul><li><p>控制信号真值表</p><p><img src="https://image.beenli.cn/img/20200820/xa7NDi0PBA7x.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>op[5:0]取至Instruction[31:26]</p></li><li>RegDst: R为1表示目的寄存器为rd; lw为rs; sw和branch不用写回寄存器堆所以没有目的寄存器。</li><li>ALUSrc: R和branch为0表示ALU第二个操作数来自rt; lw和sw表示第二个操作数来自低16位的扩展。</li><li>MemtoReg: sw和branch为x表示不用写回。R为0表示ALU计算结果写回；lw表示数据寄存器取出来的数写回</li><li>Regwirte: R和lw要写回所以为1。</li><li>MenRead: 只要lw要读所以只有lw为1</li><li>MemWrite: 只有sw要写</li><li>Branch: 只有branch才触发</li><li>ALUOP: R为10；存储为00；branch为01</li></ul><ul><li><p>跳转实现（即改变PC的值）</p><p>其OPcode为2.低26位都是offset_address。</p><p><img src="https://image.beenli.cn/img/20200820/PCxbE327wJVr.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Organization &amp; Design</category>
-      </categories>
-      <tags>
-        <tag>processor</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据通路(1)--Basic Datapath</title>
-    <url>/posts/74018a17/</url>
-    <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
-slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
-						  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offset
-lw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。
-beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
-						  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst				  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
