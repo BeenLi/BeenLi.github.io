@@ -289,6 +289,43 @@ chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子�
       </tags>
   </entry>
   <entry>
+    <title>Unprivileged Spec(1)--RV32I</title>
+    <url>/posts/6c2bdcd1/</url>
+    <content><![CDATA[<center>RV32I Base Integer Instruction Set</center><h1 id="1-Preface"><a href="#1-Preface" class="headerlink" title="1 Preface"></a>1 Preface</h1><blockquote><p>&nbsp;&nbsp;&nbsp;&nbsp;RV32I是为了足够成为编译器目标并能支持现代操作系统环境而设计的一个基本整数指令集。它也为了减少实现硬件的最小需求而设计。RV32I包含40个独立的指令，尽管一些简单的实现可能涵盖ECALL/EBREAK指令和单一的系统硬件指令（a single <a href="#system">SYSTEM hardware instruction</a>)，它总是捕获(always traps)并且可能用nop实现FENCE指令，以减少指令数到38个。RV32I能够模拟几乎任何的ISA扩展（除了A扩展，它需要额外硬件支持原子操作(atomicity）</p><p>&nbsp;&nbsp;&nbsp;&nbsp;在实践中，包含机器模式特权架构的硬件实现将需要9个CSR指令。</p><p>&nbsp;&nbsp;&nbsp;&nbsp;基本整数指令集的子集也许对于教学目的很有用(pedagogical purposes), 但是基础已经被定义，对子集的真正的硬件实现中除了忽略非对齐内存访问并把所有的SYSTEM instruction视为单一的异常(single trap)，我们不应该有什么其它的动机。</p><hr><p>关于RV32I的大多数评论也适用于RV64I base。</p></blockquote><h1 id="2-Programmer’s-Model"><a href="#2-Programmer’s-Model" class="headerlink" title="2 Programmer’s Model"></a>2 Programmer’s Model</h1><blockquote><p>对于RV32I非特权状态一共有32个寄存器(都是32位宽，i.e. ,XLEN=32)：<code>x0~x31</code>;x0被硬编码到0。另外31个寄存器保存的值可以被解释为：Ⅰ、布尔值的集合，Ⅱ、补码的有符号二进制整数，Ⅲ、无符号二进制整数</p><p>有一个额外的非特权寄存器，<code>pc</code>(program counter)：保存当前指令的地址</p></blockquote><ul><li>在Base Integer ISA中，没有指定的栈指针或者子例程返回地址链接寄存器(link register)；指令编码允许任何寄存器被用于这个目的；但是，标准软件调用惯例(calling convention)使用寄存器<code>x1</code>保存调用的返回地址，<code>x5</code>作为备用链接寄存器。标准调用例程使用<code>x2</code>作为栈指针(stack pointer)</li><li>硬件可以使用<code>x1</code>或<code>x2</code>来加速函数调用和返回(因为可以尽早解码)；<a href="#jal">详情见<code>JAL</code>和<code>JALR</code>指令</a></li><li>可选的压缩16-bit指令格式基于这样的假设设计的：<code>x1</code>：返回地址寄存器；<code>x2</code>:栈指针。使用其他约定的软件将正常运行，但可能有较大的代码大小。</li></ul><hr><p><strong><font color="red">备注：</font></strong></p><ul><li>可用架构寄存器(available architectural registers)的数量能够对<code>代码大小</code>，<code>性能</code>，<code>能耗</code>产生重大影响。尽管16个寄存器对于运行编译代码的整数ISA来说是足够的，但是在16位长使用3-address格式的指令中编码拥有16个寄存器完整的ISA是不可能的。(⭐PS:16个寄存器，address至少4位，三地址就12位，那么只剩下4位区分不同的指令了,即最多16条不同的指令)。</li><li>尽管2-address是可能的。但它增加指令条数并且降低功耗。我们想要避免立即数指令的大小来简化硬件实现，一旦32-bit的指令大小被采用，支持32个整数寄存器就很显而易见了。一个更大数量的整数寄存器也有助于提高高性能代码的性能，可广泛使用<code>循环展开</code>（loop unrolling)、<code>软件流水线</code>(software pipelining)和<code>缓存平铺</code>(cache tiling)。❓</li><li>基于上面这些原因，我们为基础ISA选择了一个常规大小（conventional size)——32个整数寄存器。动态寄存器使用趋向于被一些经常访问的寄存器主宰，并且<code>regfile</code>(寄存器堆)的实现可被优化以减少频繁访问寄存器的访问能量(access energy)。</li><li>可选的16位压缩指令格式绝大部分只使用8个寄存器，因此能提供稠密的指令编码(dense instruction encoding),但是如果想要的话，额外的指令集扩展能支持更大的寄存器空间(要么扁平的要么分层次的)。</li></ul><h1 id="3-Base-Instruction-Formats"><a href="#3-Base-Instruction-Formats" class="headerlink" title="3 Base Instruction Formats"></a>3 Base Instruction Formats</h1><blockquote><p>有4种核心的指令格式：R/I/S/U。指令长度都是32位，并且必须在内存中以4字节为边界对齐。指令地址非对齐的异常，常常是由于分支的发生(taken branch)或者非条件跳转的目标地址不是4字节对齐。</p></blockquote><ul><li><p>对于解码一个保留指令的行为是没有规定的(unspecified)</p></li><li><p>RISC-V ISA保持源寄存器(<code>rs1</code>和<code>rs2</code>)和目标寄存器(<code>rd</code>)的位置在所有指令格式中相同以简化解码。除了使用在CSR指令中的5bit的立即数，立即数总是<code>sign-extended</code>，通常是打包到指令中最左边的可用位，这样分配以减少硬件的复杂程度。特别是，对于所有立即数的符号位总是在最高位(也就是Ins[31])来加速符号扩展电路。</p><p><img src="https://image.beenli.cn/img/20200930/F4vpswvD8a17.jpg?imageslim" srcset="/img/loading.gif" alt="mark"><br><strong><i></i></strong></p><center><strong><i>imm[x]指的是当前位在扩展成32位立即数中的位置</i></strong></center><p></p><ul><li>实际应用中，大部分立即数要么很小，要么需要所有的位数(XLEN bits)。我们选择非对称立即数分割：常规指令中立即数占12bits;特殊的 load-upper-immediate 指令中立即数占20bits。这样做是为了给常规指令更多的opcode空间。</li></ul></li></ul><h1 id="4-Immediate-Encoding"><a href="#4-Immediate-Encoding" class="headerlink" title="4 Immediate Encoding"></a>4 Immediate Encoding</h1><blockquote><p>指令格式还有两个变种(variants)：B/J，它们基于立即数的处理衍生出来。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/NR78wxr6Nbb8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>S和B仅有的区别：在B格式中12bit立即数域乘以2用于编码分支偏移。而不是像传统做法那样，将指令编码中的所有立即数位用硬件左移一位,中间的位数(imm[10:1])和符号位保留在固定位置，而S格式中的最低位(inst[7])在B格式中编码一个高阶位。</li><li>U和J的仅有区别：U要向左移12位；而J只用移动1位。在U和J指令立即数中指令的位置尽量跟其他格式的指令或者它们互相重叠。</li></ul><p><img src="https://image.beenli.cn/img/20200930/CoSeYfK4wdG4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="5-Computational"><a href="#5-Computational" class="headerlink" title="5 Computational "></a>5 <a name="compute">Computational</a></h1><blockquote><p>大多数的<code>整数算术指令</code>(Integer computational instruction)对保存在整数寄存器中的<code>XLEN</code>位的值进行操作。整数计算指令要么被编码为使用I格式的寄存器-立即数操作；要么使用R格式的寄存器-寄存器操作。对于这两种类型指令的目的寄存器都是<code>rd</code>。没有整型计算指令会导致算术异常</p></blockquote><ul><li><p>基本指令集不包括对整数算术运算上做<code>溢出检查</code>(overflow checks)支持的特殊指令集。因为许多溢出检查能够更便宜地(cheaply)使用RISC-V分支来实现</p></li><li><p>对<code>无符号加法</code>的溢出检查仅仅需要在加法指令后加上一条额外的分支指令</p><pre><code class="hljs assembly">add t0,t1,t2
+blut t0, t1, overflow</code></pre></li><li><p>对于有符号加法：如果一个操作数的符号已知，溢出检查仅需要加法之后的一个分支（覆盖了带有立即数操作数的常见加法情形）</p><pre><code class="hljs assembly">addi t0, t1, +imm
+blt t0, t1, overflow</code></pre></li><li><p>对于常规的<code>有符号加法</code>，加法之后需要三条额外的指令。利用当且仅当另一个操作数为负时，该和应小于其中一个操作数的观察。</p><pre><code class="hljs assembly">add t0, t1, t2
+slti t3, t2, 0
+slt t4, t0, t1
+bne t3, t4, overflow</code></pre></li><li><p>在RV64I中，32位有符号的加法溢出可以通过比较ADD和ADDW操作的结果来进一步优化。(ADDW肯定不会溢出)</p></li></ul><h2 id="Register-Immediate"><a href="#Register-Immediate" class="headerlink" title="Register-Immediate"></a><a name="arith">Register-Immediate</a></h2><p><img src="https://image.beenli.cn/img/20200930/9lWr2QpMilov.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>ADDI</code>：将12位立即数符号扩展后与<code>rs1</code>中的值相加，算术溢出忽略，结果的低32位存到<code>rd</code>寄存器中。</p><pre><code class="hljs assembly">/* 两条指令等效 */
+ADDI rd, rs1, 0
+MV rd , rs1(汇编伪指令：将rs1中的值复制给rd)</code></pre></li><li><p><code>SLTI</code>(set less than immediate): 当寄存器<code>rs1</code>中的值小于立即数（俩者都视为有符号数)，将寄存器<code>rd</code>置为1；否则置0。<code>SLTIU</code>: 功能一样，但是把比较的对象视为无符号数。</p><pre><code class="hljs assembly">/* 两条指令等效 */
+SLTIU rd, rs1, 1(当rs1等于0,rd为1,否则为0)
+SEQZ rd, rs</code></pre></li><li><p><code>ANDI, ORI, XORI</code>: 三个逻辑运算符，分别对rs1和立即数执行<code>按位</code>(bitwise)的与，或，异或运算。</p><pre><code class="hljs assembly">/* 两条指令等效 */
+XORI rd, rs1, -1(-1的补码为全1)
+NOT rd, rs(将rs各位取反赋值给rd)</code></pre><hr><p><img src="https://image.beenli.cn/img/20200930/ohbIXFmmows6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p><code>移位</code>被编码一种特殊的I类型指令格式。</p><ul><li>被移位的操作数为<code>rs1</code>；移位的位数被编码在立即数域的低五位上。</li><li>👉移类型被编码在第30位上；</li><li><code>SLLI</code>(shift left logical)：0被移动到低位</li><li><code>SRLI</code>: 0被移动到高位</li><li><code>SRAI</code>: (shift right arithmetic): 原符号位复制到空出的高位</li></ul></blockquote><hr><p><img src="https://image.beenli.cn/img/20200930/HH9oFeg4OyQC.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><code>LUI</code>(load upper immediate): 用于构建32位常数并使用U格式指令。把U-immediate的值放在目的寄存器的高20位，其它低位用0填充。</li><li><code>AUIPC</code>(add upper immediate to pc)：用于构建与pc相关的地址，并使用U格式指令。形成32位的偏移(高20位来自立即数，低12位用0填充)，把这个偏移加到AUIPC指令的地址上，然后把结果放到<code>rd</code>中。（rd = pc-4+im)<ul><li>AUIPC指令支持<code>双指令序列</code>(two-instruction sequences)访问相对PC的任意偏移(for both control-flow transfers and data accesses)</li><li>一个AUIPC和JALR中12位偏移的组合能够转换控制给任意32位的PC相对地址(PC-relative address)，而一个ALIPC加上一个常规load和store指令中的12位立即数偏移能供访问任意32位PC相对地址的数据地址(PC-relative data address)</li><li>当前PC值可以通过设置立即数为0获得，尽管JAL+4指令也能获得本地PC(JAL下一指令)，它可能在简单微架构中造成流水线崩溃，或者在更复杂的微架构中污染BTB(❓)</li></ul></li></ol><h2 id="Register-Register"><a href="#Register-Register" class="headerlink" title="Register-Register"></a>Register-Register</h2><blockquote><p>RV32I定义了几个R型算术运算。所有的运算都读取<code>rs1</code>,<code>rs2</code>寄存器的值作为源操作数，把结果写回<code>rd</code>寄存器。<code>funct7</code>和<code>funct3</code>域选择合适的运算。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/cdJ8aBabLVTk.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><a href="#arith">意义同👆。</a></p><h2 id="NOP-Instruction"><a href="#NOP-Instruction" class="headerlink" title="NOP Instruction"></a>NOP Instruction</h2><p><img src="https://image.beenli.cn/img/20200930/QOhQFMEFTYs1.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>NOP指令：不会改变任何架构上可见的状态。出来推进PC，增加任何适用的性能计数器。NOP被编码为`ADDI x0, x0, 0</li><li>NOPs可以被用来对齐代码段与重要的微架构地址边界。或者为内联代码修改(inline code modification)流出空间。尽管有许多可能的方法去编码NOP,我们使用了规范的NOP编码来允许微架构优化以及更易读的反汇编输出。其它的NOP编码可以用作指示指令(HINT instruction)</li><li>选择ADDI作为NOP编码是因为它在跨一系列系统执行时最可能占用最少的资源;除此之外，该指令仅读取一个寄存器。并且，一个ADDI功能单元在超标量设计中更容易可用，因为adds是最常见的运算</li><li>地址生成单元可以使用相同的硬件够执行ADDI，该硬件被用于base+offset地址计算，而register-register ADD，逻辑运算或移位运算操作需要额外的硬件。</li></ul><h1 id="6-Control-Transfer"><a href="#6-Control-Transfer" class="headerlink" title="6 Control Transfer"></a>6 Control Transfer</h1><blockquote><p>RV32I提供两种控制转义指令：<code>无条件跳转</code>，<code>条件分支</code></p><p>RV32I控制转义指令没有架构上可见的<code>延迟槽</code>(delay slot)</p></blockquote><h2 id="Unconditional-Jumps"><a href="#Unconditional-Jumps" class="headerlink" title="Unconditional Jumps"></a>Unconditional Jumps</h2><p><img src="https://image.beenli.cn/img/20200930/qCmY8sLbKGDK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>JAL</code>(jump and link)指令使用<code>J-type</code>格式，J-immediate以两字节的倍数编码一个有符号偏移。(in multiple of 2 bytes；则该偏移要乘以2)。偏移符号扩展，然后加上当前指令的地址形成<code>跳转目标地址</code>(jump target address)。Jumps因此能够访问±1 MiB范围。JAL存储下一条指令的地址(pc+4)到<code>rd</code>；</p><p>标准软件调用约定使用x1作为返回地址寄存器，x5作为备用链接寄存器。</p><p><img src="https://image.beenli.cn/img/20200930/VUjOV9BMhinO.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>JALR</code>(jump and link register)：间接跳转指令：使用<code>I-type</code>，目标地址通过把符号扩展的12比特立即数加到rs1上，然后置结果的最低位为0获得；下一条指令的地址(pc+4)写到寄存器rd。如果结果不需要，可以把<code>x0</code>当作目的寄存器。</p><p>如果目标地址没有对齐四字节边界，jar和jarl指令将产生<code>指令地址非对齐</code>异常。</p><p>返回地址<code>预测栈</code>(prediction stack)是高性能取值单元的一个常见特点，要求准确检测用于过程调用和返回的指令是有效的。</p><ul><li>对于RISC-V,关于指令使用的线索通过寄存器号的使用被简单的编码。</li><li>JAL指令应该把返回地址压进返回地址栈(RAS)中，当且仅当<code>rd = x1/x5</code>；</li><li>JALR指令应该push/pop a RAS</li></ul><p><img src="https://image.beenli.cn/img/20200930/WC8l9YmmyroI.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>link is true when the register is either x1 or x5</center><h2 id="Conditional-Branches"><a href="#Conditional-Branches" class="headerlink" title="Conditional Branches"></a>Conditional Branches</h2><blockquote><p>所有分支指令使用<code>B-type</code>格式。</p><p>12比特的立即数用2字节的倍数编码有符号偏移</p><p>立即数符号扩展后与当前指令地址相加，可以访问的地址范围：<code>±4 KiB</code></p></blockquote><p><img src="https://image.beenli.cn/img/20200930/PR0CJpoojIFU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>BEQ</code>:branch equal;&nbsp;&nbsp;<code>BNE</code>: branch not equal;&nbsp;&nbsp;<code>BLT</code>: branch less than;&nbsp;&nbsp;<code>BGE</code>: branch greater than;</p><ul><li>应该对软件进行优化，使顺序代码路径成为最常见的路径，并将较不经常使用的分支代码路径置于行外。软件还应该假设，至少在第一次遇到分支时，预测向后跳转的分支发生，向前跳转的分支不发生。动态预测器应该快速学习任何可预测的分支行为。</li><li>不像一些其它的架构，RISC-V中对于<code>非条件分支</code>应该总是使用<code>jump</code>(JAL with rd=x0)指令而不是条件总是满足的有条件分支指令</li><li>RISC-V跳转也是与pc相关的，并且比分支支持更大的偏置范围，而且不会污染条件分支预测表。</li></ul><h1 id="7-Load-and-Store-😳"><a href="#7-Load-and-Store-😳" class="headerlink" title="7 Load and Store(😳)"></a>7 Load and Store(😳)</h1><blockquote><p>RV32I是一个装载和存储架构：只有<code>load</code>和<code>store</code>指令能够访问内存，算术指令只能操作CPU寄存器。</p></blockquote><ul><li>RV32I提供了32-bit的地址空间，用字节编码。</li><li><code>EEI</code>定义了地址空间的那部分可以被哪些指令合法访问。(e.g.，一些地址可能只能被读，或仅支持按字访问)</li><li>目的寄存器为<code>x0</code>的装载指令将抛出异常，即使装载的值被丢弃也会造成其它的副作用。</li></ul><blockquote><p>In RISC-V，endianness is byte-address invariant</p></blockquote><ul><li><p>如果一个字节以某种顺序(at some endianness)存储到内存某个地址处，那么以字节大小从那个地址以任意的顺序(in any endianness)装载的结果是存储的值。</p></li><li><p>小端(little-endian): 多字节存储时把寄存器最低为字节写到内存字节地址的最低为，随后寄存器的其它字节以权重升序写入。（权重越大的字节占据的内存地址越大）</p></li></ul><hr><p><img src="https://image.beenli.cn/img/20200930/gJvyXMYKv7Ov.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>装载和存储指令用于在寄存器和内存中转换数据。</p><p>Loads: <code>I-type</code></p><p>Stores: <code>S-type</code></p><p>有效地址：立即数符号扩展加上基址寄存器<code>rs1</code></p><p>目的地址：Ⅰ、for load:从内存取值到<code>rd</code>;Ⅱ、for store：复制<code>rs2</code>的值到内存</p></blockquote><h1 id="8-Memory-Ordering"><a href="#8-Memory-Ordering" class="headerlink" title="8 Memory Ordering"></a>8 Memory Ordering</h1><p><img src="https://image.beenli.cn/img/20200930/8gVkNfBMa1IW.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p><code>FENCE</code>：用于排序被其它RISC-V线程，外部设备或者协处理器可见的设备I/O和存储器访问。</p></li><li><p>任何设备输入(I)，设备输出(O)，存储器读取(R),存储器写(W)的组合能够被排序成任何相同的组合。</p></li><li>通俗地说，没有其它线程或者外部设备能够在<code>fence</code>之前的指令集进行任何操作之前，观测到在<code>fence</code>后者的指令集合所做的任何操作。就像一个屏障一样，前面的操作只有先完成，后面的指令结果才能被其它处理器观察到。</li><li>memory-mapped I/O设备很典型地被没有cache的loads和store访问，它们使用I和O而不是R和W。</li><li>指令集扩展也可以描述新的I/O指令，使用fence指令中I和O位进行排序</li></ul><p><img src="https://image.beenli.cn/img/20200930/6dnc1SCYbwDA.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>fence mode域在ins[31:28]；当fm=0000时排序所有的内存操作。</li><li>可选的<code>FENCE.TSO</code>指令其fm=1000；predecessor=RW,并且successor=RW。TSO命令它的前面集合中的所有加载操作先于它的后继集合中的所有内存操作；它的前面集合中的所有存储操作(store operation)都要先于它的后继集合中的所有存储操作</li></ul><h1 id="9-Call-and-Breakpoints"><a href="#9-Call-and-Breakpoints" class="headerlink" title="9 Call and Breakpoints"></a>9 Call and Breakpoints</h1><blockquote><p><a name="system">SYSTEM instruction</a>：被用于访问需要特权访问的系统功能，使用<code>I-type</code>。</p><p>分为两大类：</p><ul><li>自动读-修改-写(read-modify-write)<code>控制状态寄存器</code>(CSRs)。</li><li>潜在的特权指令(potentially privileged instructions)</li></ul><p>系统指令被定义成运行稍简单的实现总是捕获异常给单一的<code>软件异常处理器</code>(software trap handle)；更加复杂的实现可能需要执行更多条系统指令</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/Wf33chpE3JIQ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>这两个指令会向<code>配套执行环境</code>(supporting execution environment)引起一个精确的<code>请求异常</code>(requested trap)。</p><h2 id="ECALL"><a href="#ECALL" class="headerlink" title="ECALL"></a>ECALL</h2><blockquote><p><code>ECALL</code>：向运行环境提出服务请求(service request)</p><p>EEl将定义服务请求的参数如何传递，但通常这些都是在整数寄存器中指定的位置</p></blockquote><h2 id="EBREAK"><a href="#EBREAK" class="headerlink" title="EBREAK"></a>EBREAK</h2><blockquote><p><code>EBREAK</code>：返回控制权给调试器环境(debugging environment)</p></blockquote><h1 id="10-Hint"><a href="#10-Hint" class="headerlink" title="10 Hint"></a>10 Hint</h1><blockquote><p>RV32I为<code>HINT</code>指令保留了大的编码空间，通常是用来和微架构沟通性能提示。HINTs被编码为<a href="#compute">整数计算指令</a>,其中<code>rd=x0</code>。因此，像nop指令一样，HINTs不会改变架构可见的状态，除了增加pc和任何适用的性能计数器。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/nVtEvPja9AXi.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>RISC-V</category>
+      </categories>
+  </entry>
+  <entry>
     <title>SSH</title>
     <url>/posts/782a8ece/</url>
     <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
@@ -325,9 +362,31 @@ ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v
       </tags>
   </entry>
   <entry>
-    <title>Unprivileged Spec(1)--RV32I</title>
-    <url>/posts/6c2bdcd1/</url>
-    <content><![CDATA[<center>Base Integer Instruction Set</center><h1 id="1-Preface"><a href="#1-Preface" class="headerlink" title="1 Preface"></a>1 Preface</h1><blockquote><p>RV32I是为了足够成为编译器目标并能支持现代操作系统环境而设计的一个基本整数指令集。它也为了减少实现硬件的最小需求而设计。RV32I包含40个独立的指令，尽管一些简单的实现可能涵盖ECALL/EBREAK指令和单一的系统硬件指令（a single SYSTEM hardware instruction)，它总是捕获(always traps)并且可能用nop实现FENCE指令，以减少指令数到38个。RV32I能够模拟几乎任何的ISA扩展（除了A扩展，它需要额外硬件支持原子操作(atomicity）</p><p>在实践中，包含机器模式特权架构的硬件实现将需要9个CSR指令。</p><p>基本整数指令集的子集也许对于教学目的很有用(pedagogical purposes), 但是基础已经被定义，对子集的真正的硬件实现中除了忽略非对齐内存访问并把所有的SYSTEM instruction视为单一的异常(single trap)，我们不应该有什么其它的动机。</p><hr><p>关于RV32I的大多数评论也适用于RV64I base。</p></blockquote><h1 id="2-Programmer’s-Model"><a href="#2-Programmer’s-Model" class="headerlink" title="2 Programmer’s Model"></a>2 Programmer’s Model</h1><blockquote><p>对于RV32I非特权状态一共有32个寄存器(都是32位宽，i.e. ,XLEN=32)：<code>x0~x31</code>;x0被硬编码到0。另外31个寄存器保存的值可以被解释为：Ⅰ、布尔值的集合，Ⅱ、补码的有符号二进制整数，Ⅲ、无符号二进制整数</p><p>有一个额外的非特权寄存器，<code>pc</code>(program counter)：保存当前指令的地址</p></blockquote><ul><li>在Base Integer ISA中，没有指定的栈指针或者子例程返回地址链接寄存器(link register)；指令编码允许任何寄存器被用于这个目的；但是，标准软件调用惯例(calling convention)使用寄存器<code>x1</code>保存调用的返回地址，<code>x5</code>作为备用链接寄存器。标准调用例程使用<code>x2</code>作为栈指针(stack pointer)</li><li>硬件可以使用<code>x1</code>或<code>x2</code>来加速函数调用和返回(因为可以尽早解码)；<a href="#jal">详情见<code>JAL</code>和<code>JALR</code>指令</a></li><li>可选的压缩16-bit指令格式基于这样的假设设计的：<code>x1</code>：返回地址寄存器；<code>x2</code>:栈指针。使用其他约定的软件将正常运行，但可能有较大的代码大小。</li></ul><hr><p><strong><font color="red">备注：</font></strong></p><ul><li>可用架构寄存器(available architectural registers)的数量能够对<code>代码大小</code>，<code>性能</code>，<code>能耗</code>产生重大影响。尽管16个寄存器对于运行编译代码的整数ISA来说是足够的，但是在16位长使用3-address格式的指令中编码拥有16个寄存器完整的ISA是不可能的。(⭐PS:16个寄存器，address至少4位，三地址就12位，那么只剩下4位区分不同的指令了,即最多16条不同的指令)。</li><li>尽管2-address是可能的。但它增加指令条数并且降低功耗。我们想要避免立即数指令的大小来简化硬件实现，一旦32-bit的指令大小被采用，支持32个整数寄存器就很显而易见了。一个更大数量的整数寄存器也有助于提高高性能代码的性能，可广泛使用<code>循环展开</code>（loop unrolling)、<code>软件流水线</code>(software pipelining)和<code>缓存平铺</code>(cache tiling)。❓</li><li>基于上面这些原因，我们为基础ISA选择了一个常规大小（conventional size)——32个整数寄存器。动态寄存器使用趋向于被一些经常访问的寄存器主宰，并且<code>regfile</code>(寄存器堆)的实现可被优化以减少频繁访问寄存器的访问能量(access energy)。</li><li>可选的16位压缩指令格式绝大部分只使用8个寄存器，因此能提供稠密的指令编码(dense instruction encoding),但是如果想要的话，额外的指令集扩展能支持更大的寄存器空间(要么扁平的要么分层次的)。</li></ul><h1 id="3-Base-Instruction-Formats"><a href="#3-Base-Instruction-Formats" class="headerlink" title="3 Base Instruction Formats"></a>3 Base Instruction Formats</h1><blockquote><p>有4种核心的指令格式：R/I/S/U。指令长度都是32位，并且必须在内存中以4字节为边界对齐。指令地址非对齐的异常，常常是由于分支的发生(taken branch)或者非条件跳转的目标地址不是4字节对齐。</p></blockquote><ul><li><p>对于解码一个保留指令的行为是没有规定的(unspecified)</p></li><li><p>RISC-V ISA保持源寄存器(<code>rs1</code>和<code>rs2</code>)和目标寄存器(<code>rd</code>)的位置在所有指令格式中相同以简化解码。除了使用在CSR指令中的5bit的立即数，立即数总是<code>sign-extended</code>，通常是打包到指令中最左边的可用位，这样分配以减少硬件的复杂程度。特别是，对于所有立即数的符号位总是在最高位(也就是Ins[31])来加速符号扩展电路。</p><p><img src="https://image.beenli.cn/img/20200930/F4vpswvD8a17.jpg?imageslim" srcset="/img/loading.gif" alt="mark"><br><strong><i></i></strong></p><center><strong><i>imm[x]指的是当前位在扩展成32位立即数中的位置</i></strong></center><p></p><ul><li>实际应用中，大部分立即数要么很小，要么需要所有的位数(XLEN bits)。我们选择非对称立即数分割：常规指令中立即数占12bits;特殊的 load-upper-immediate 指令中立即数占20bits。这样做是为了给常规指令更多的opcode空间。</li></ul></li></ul><h1 id="4-Immediate-Encoding"><a href="#4-Immediate-Encoding" class="headerlink" title="4 Immediate Encoding"></a>4 Immediate Encoding</h1><blockquote><p>指令格式还有两个变种(variants)：B/J，它们基于立即数的处理衍生出来。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/NR78wxr6Nbb8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>S和B仅有的区别：在B格式中12bit立即数域乘以2用于编码分支偏移。而不是像传统做法那样，将指令编码中的所有立即数位用硬件左移一位,中间的位数(imm[10:1])和符号位保留在固定位置，而S格式中的最低位(inst[7])在B格式中编码一个高阶位。</li><li>U和J的仅有区别：U要向左移12位；而J只用移动1位。在U和J指令立即数中指令的位置尽量跟其他格式的指令或者它们互相重叠。</li></ul><p><img src="https://image.beenli.cn/img/20200930/CoSeYfK4wdG4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
+    <title>VIM-Plug</title>
+    <url>/posts/b71407e8/</url>
+    <content><![CDATA[<h2 id="VIM-Plugs"><a href="#VIM-Plugs" class="headerlink" title="VIM-Plugs"></a><center>VIM-Plugs</center></h2><h5 id="1、vim-plug-插件管理器"><a href="#1、vim-plug-插件管理器" class="headerlink" title="1、vim-plug: 插件管理器"></a>1、<a href="https://github.com/junegunn/vim-plug" rel="external nofollow noreferrer">vim-plug</a>: 插件管理器</h5><pre><code class="hljs CQL">call plug#begin('D:/App/vim/vim81/vimfiles/plugs')//插件安装目录(可以随意定)
+
+" Shorthand notation for plugin
+Plug 'foo/bar'                   //插件下载地址，GitHub可以简写
+
+call plug#end()					// 函数结束标志</code></pre><blockquote><p>command</p></blockquote><ol><li>:PlugInstall // 安装插件</li><li>:PlugClean // 清理invalid插件</li><li>:PlugUpgrade // 升级插件</li><li>:PlugDiff // 查看现有插件与下载地址处插件不同，即检测更新细节</li><li>:PlugStatus // 查看插件加载情况</li><li>:PlugSnapshot // 生成用于恢复当前插件快照的脚本</li></ol><blockquote><p>feature</p></blockquote><pre><code class="hljs typescript">Plug <span class="hljs-string">'zhuzhzh/verilog_emacsauto.vim'</span>, {<span class="hljs-string">'for'</span>: [<span class="hljs-string">'verilog'</span>, <span class="hljs-string">'systemverilog'</span>] }
+<span class="hljs-comment">// 当且仅当打开的文件为Verilog或者systemVerilog时加载此插件</span>
+
+Plug <span class="hljs-string">'scrooloose/nerdtree'</span>, { <span class="hljs-string">'on'</span>: <span class="hljs-string">'NERDTreeToggle'</span> }
+<span class="hljs-comment">//当且仅当触发toggle命令时加载此插件</span></code></pre><hr><h5 id="2、lightline-彩色状态栏"><a href="#2、lightline-彩色状态栏" class="headerlink" title="2、lightline:彩色状态栏"></a>2、<a href="https://github.com/itchyny/lightline.vim" rel="external nofollow noreferrer">lightline</a>:彩色状态栏</h5><p><img src="http://image.beenli.cn/img/20200406/5NePjt0zYxFR.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="3、vim-colors-solarized-比较舒服的配色方案"><a href="#3、vim-colors-solarized-比较舒服的配色方案" class="headerlink" title="3、vim-colors-solarized:比较舒服的配色方案"></a>3、<a href="https://github.com/altercation/vim-colors-solarized" rel="external nofollow noreferrer">vim-colors-solarized</a>:比较舒服的配色方案</h5><p><img src="http://image.beenli.cn/img/20200406/daLnl7t2NSCK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此插件含有两种色调：dark；light</p><blockquote><p>call togglebg#map(“<f1>“) // 可以设置快捷键自行切换</f1></p></blockquote><hr><h5 id="4、youcompleteme：自动补全"><a href="#4、youcompleteme：自动补全" class="headerlink" title="4、youcompleteme：自动补全"></a>4、<a href="https://github.com/ycm-core/YouCompleteMe" rel="external nofollow noreferrer">youcompleteme</a>：自动补全</h5><hr><h5 id="5、vim-snippets-SirVer-ultisnips-代码片填充"><a href="#5、vim-snippets-SirVer-ultisnips-代码片填充" class="headerlink" title="5、vim-snippets+SirVer/ultisnips : 代码片填充"></a>5、<a href="https://github.com/honza/vim-snippets" rel="external nofollow noreferrer">vim-snippets</a>+<a href="https://github.com/SirVer/ultisnips" rel="external nofollow noreferrer">SirVer/ultisnips</a> : 代码片填充</h5><p>第一个插件提供好多语言的代码片文件。第二插件提供的填充引擎。</p><p>snippet有两种格式：</p><ul><li><code>snippets/*</code>: snippets using snipMate format</li><li><code>UltiSnips/*</code>: snippets using UltiSnips format</li></ul><p><img src="http://image.beenli.cn/img/20200406/lWeLOp6hU7Na.gif" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs livescript">可以自己编写snippets文件	{n}代表要填写的空白处。<span class="hljs-comment">/* placeholder*/</span>
+snippet test
+	<span class="hljs-regexp">// Author: Wan Li</span>
+<span class="hljs-regexp">	//</span> time: `strftime(<span class="hljs-string">"%Y-%m-%d"</span>)`
+	<span class="hljs-regexp">// function: ${1:/*写下测试的功能*/}</span>
+<span class="hljs-regexp">	//</span> ---------------------------------------------------
+	<span class="hljs-string">\`timescale</span> <span class="hljs-number">1ns</span>/<span class="hljs-number">1ns</span>
+	<span class="hljs-string">\`include</span> <span class="hljs-string">"${2:/*包含的模块文件*/}"</span>
+
+    
+配置_vimrc文件
+<span class="hljs-keyword">let</span> g:UltiSnipsExpandTrigger=<span class="hljs-string">"&lt;c-j&gt;"</span>		<span class="hljs-regexp">//ctrl + j 触发</span>
+<span class="hljs-regexp">let g:UltiSnipsJumpForwardTrigger="&lt;c-b&gt;"	//</span>ctrl + b 跳到下一个需要填写的空处
+<span class="hljs-keyword">let</span> g:UltiSnipsJumpBackwardTrigger=<span class="hljs-string">"&lt;c-z&gt;"</span>	<span class="hljs-regexp">//ctrl + z 跳到上一个需要填写的空出</span></code></pre><hr><h5 id="6、nerdtree-可视化目录树"><a href="#6、nerdtree-可视化目录树" class="headerlink" title="6、nerdtree: 可视化目录树"></a>6、<a href="https://github.com/preservim/nerdtree" rel="external nofollow noreferrer">nerdtree</a>: 可视化目录树</h5><p><img src="http://image.beenli.cn/img/20200406/GAYHOnmiPSIj.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/zU1CDLe23EOh.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/36WBczsR3bS2.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="7、tabbar-整齐的标签窗口"><a href="#7、tabbar-整齐的标签窗口" class="headerlink" title="7、tabbar: 整齐的标签窗口"></a>7、<a href="https://github.com/majutsushi/tagbar" rel="external nofollow noreferrer">tabbar</a>: 整齐的标签窗口</h5><p><img src="http://image.beenli.cn/img/20200406/9PX5LoRQveLS.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="8、tpope-vim-commentary-快速注释"><a href="#8、tpope-vim-commentary-快速注释" class="headerlink" title="8、tpope/vim-commentary: 快速注释"></a>8、<a href="https://github.com/tpope/vim-commentary" rel="external nofollow noreferrer">tpope/vim-commentary</a>: 快速注释</h5><blockquote><p>gcc ：注释/取消注释一行</p><p>gc{motion}</p><p>gc : 注释selection块</p><p>7，17 Commentary</p></blockquote><hr><h5 id="9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco"><a href="#9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco" class="headerlink" title="9、vim-gutentags：借助universal ctags 自动产生标签文件:taco:"></a>9、<a href="https://github.com/ludovicchabant/vim-gutentags" rel="external nofollow noreferrer">vim-gutentags</a>：借助<a href="https://docs.ctags.io/en/latest/" rel="external nofollow noreferrer">universal ctags</a> 自动产生标签文件<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8">🌮</span></h5><p>有了这个标签文件，你又可以<code>&lt;C+]&gt;</code>跳转</p><hr><h5 id="10、vim-easy-align：自动对齐"><a href="#10、vim-easy-align：自动对齐" class="headerlink" title="10、vim-easy-align：自动对齐"></a>10、<a href="https://github.com/junegunn/vim-easy-align" rel="external nofollow noreferrer"><strong>vim-easy-align</strong></a>：自动对齐</h5><p>按官方配置来设置快捷键/ga触发</p><blockquote><p>“ Start interactive EasyAlign in visual mode (e.g. vipga)<br>xmap ga<plug>(EasyAlign)</plug></p><p>“ Start interactive EasyAlign for a motion/text object (e.g. gaip)<br>nmap ga<plug>(EasyAlign)</plug></p></blockquote><ul><li><code>1</code> Around the 1st occurrences of delimiters</li><li><code>2</code> Around the 2nd occurrences of delimiters</li><li>…</li><li><code>*</code> Around all occurrences of delimiters</li><li><code>**</code> Left-right alternating alignment around all delimiters</li><li><code>-</code> Around the last occurrences of delimiters (<code>-1</code>)</li><li><code>-2</code> Around the second to last occurrences of delimiters</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">Key</th><th style="text-align:center">Description/Use cases</th></tr></thead><tbody><tr><td style="text-align:center">``</td><td style="text-align:center">General alignment around whitespaces</td></tr><tr><td style="text-align:center"><code>=</code></td><td style="text-align:center">Operators containing equals sign (<code>=</code>, <code>==,</code> <code>!=</code>, <code>+=</code>, <code>&amp;&amp;=</code>, …)</td></tr><tr><td style="text-align:center"><code>:</code></td><td style="text-align:center">Suitable for formatting JSON or YAML</td></tr><tr><td style="text-align:center"><code>.</code></td><td style="text-align:center">Multi-line method chaining</td></tr><tr><td style="text-align:center"><code>,</code></td><td style="text-align:center">Multi-line method arguments</td></tr><tr><td style="text-align:center"><code>&amp;</code></td><td style="text-align:center">LaTeX tables (matches <code>&amp;</code> and <code>\\</code>)</td></tr><tr><td style="text-align:center"><code>#</code></td><td style="text-align:center">Ruby/Python comments</td></tr><tr><td style="text-align:center"><code>"</code></td><td style="text-align:center">Vim comments</td></tr><tr><td style="text-align:center">``</td><td style="text-align:center">Table markdown</td></tr></tbody></table></div><p><img src="http://image.beenli.cn/img/20200406/fubial5cDLym.gif" srcset="/img/loading.gif" alt="mark"></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -347,8 +406,12 @@ ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v
           });
       </script>]]></content>
       <categories>
-        <category>RISC-V</category>
+        <category>Software</category>
+        <category>VIM</category>
       </categories>
+      <tags>
+        <tag>Plugs</tag>
+      </tags>
   </entry>
   <entry>
     <title>Tasks and Functions</title>
@@ -563,58 +626,6 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
       </tags>
   </entry>
   <entry>
-    <title>VIM-Plug</title>
-    <url>/posts/b71407e8/</url>
-    <content><![CDATA[<h2 id="VIM-Plugs"><a href="#VIM-Plugs" class="headerlink" title="VIM-Plugs"></a><center>VIM-Plugs</center></h2><h5 id="1、vim-plug-插件管理器"><a href="#1、vim-plug-插件管理器" class="headerlink" title="1、vim-plug: 插件管理器"></a>1、<a href="https://github.com/junegunn/vim-plug" rel="external nofollow noreferrer">vim-plug</a>: 插件管理器</h5><pre><code class="hljs CQL">call plug#begin('D:/App/vim/vim81/vimfiles/plugs')//插件安装目录(可以随意定)
-
-" Shorthand notation for plugin
-Plug 'foo/bar'                   //插件下载地址，GitHub可以简写
-
-call plug#end()					// 函数结束标志</code></pre><blockquote><p>command</p></blockquote><ol><li>:PlugInstall // 安装插件</li><li>:PlugClean // 清理invalid插件</li><li>:PlugUpgrade // 升级插件</li><li>:PlugDiff // 查看现有插件与下载地址处插件不同，即检测更新细节</li><li>:PlugStatus // 查看插件加载情况</li><li>:PlugSnapshot // 生成用于恢复当前插件快照的脚本</li></ol><blockquote><p>feature</p></blockquote><pre><code class="hljs typescript">Plug <span class="hljs-string">'zhuzhzh/verilog_emacsauto.vim'</span>, {<span class="hljs-string">'for'</span>: [<span class="hljs-string">'verilog'</span>, <span class="hljs-string">'systemverilog'</span>] }
-<span class="hljs-comment">// 当且仅当打开的文件为Verilog或者systemVerilog时加载此插件</span>
-
-Plug <span class="hljs-string">'scrooloose/nerdtree'</span>, { <span class="hljs-string">'on'</span>: <span class="hljs-string">'NERDTreeToggle'</span> }
-<span class="hljs-comment">//当且仅当触发toggle命令时加载此插件</span></code></pre><hr><h5 id="2、lightline-彩色状态栏"><a href="#2、lightline-彩色状态栏" class="headerlink" title="2、lightline:彩色状态栏"></a>2、<a href="https://github.com/itchyny/lightline.vim" rel="external nofollow noreferrer">lightline</a>:彩色状态栏</h5><p><img src="http://image.beenli.cn/img/20200406/5NePjt0zYxFR.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="3、vim-colors-solarized-比较舒服的配色方案"><a href="#3、vim-colors-solarized-比较舒服的配色方案" class="headerlink" title="3、vim-colors-solarized:比较舒服的配色方案"></a>3、<a href="https://github.com/altercation/vim-colors-solarized" rel="external nofollow noreferrer">vim-colors-solarized</a>:比较舒服的配色方案</h5><p><img src="http://image.beenli.cn/img/20200406/daLnl7t2NSCK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此插件含有两种色调：dark；light</p><blockquote><p>call togglebg#map(“<f1>“) // 可以设置快捷键自行切换</f1></p></blockquote><hr><h5 id="4、youcompleteme：自动补全"><a href="#4、youcompleteme：自动补全" class="headerlink" title="4、youcompleteme：自动补全"></a>4、<a href="https://github.com/ycm-core/YouCompleteMe" rel="external nofollow noreferrer">youcompleteme</a>：自动补全</h5><hr><h5 id="5、vim-snippets-SirVer-ultisnips-代码片填充"><a href="#5、vim-snippets-SirVer-ultisnips-代码片填充" class="headerlink" title="5、vim-snippets+SirVer/ultisnips : 代码片填充"></a>5、<a href="https://github.com/honza/vim-snippets" rel="external nofollow noreferrer">vim-snippets</a>+<a href="https://github.com/SirVer/ultisnips" rel="external nofollow noreferrer">SirVer/ultisnips</a> : 代码片填充</h5><p>第一个插件提供好多语言的代码片文件。第二插件提供的填充引擎。</p><p>snippet有两种格式：</p><ul><li><code>snippets/*</code>: snippets using snipMate format</li><li><code>UltiSnips/*</code>: snippets using UltiSnips format</li></ul><p><img src="http://image.beenli.cn/img/20200406/lWeLOp6hU7Na.gif" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs livescript">可以自己编写snippets文件	{n}代表要填写的空白处。<span class="hljs-comment">/* placeholder*/</span>
-snippet test
-	<span class="hljs-regexp">// Author: Wan Li</span>
-<span class="hljs-regexp">	//</span> time: `strftime(<span class="hljs-string">"%Y-%m-%d"</span>)`
-	<span class="hljs-regexp">// function: ${1:/*写下测试的功能*/}</span>
-<span class="hljs-regexp">	//</span> ---------------------------------------------------
-	<span class="hljs-string">\`timescale</span> <span class="hljs-number">1ns</span>/<span class="hljs-number">1ns</span>
-	<span class="hljs-string">\`include</span> <span class="hljs-string">"${2:/*包含的模块文件*/}"</span>
-
-    
-配置_vimrc文件
-<span class="hljs-keyword">let</span> g:UltiSnipsExpandTrigger=<span class="hljs-string">"&lt;c-j&gt;"</span>		<span class="hljs-regexp">//ctrl + j 触发</span>
-<span class="hljs-regexp">let g:UltiSnipsJumpForwardTrigger="&lt;c-b&gt;"	//</span>ctrl + b 跳到下一个需要填写的空处
-<span class="hljs-keyword">let</span> g:UltiSnipsJumpBackwardTrigger=<span class="hljs-string">"&lt;c-z&gt;"</span>	<span class="hljs-regexp">//ctrl + z 跳到上一个需要填写的空出</span></code></pre><hr><h5 id="6、nerdtree-可视化目录树"><a href="#6、nerdtree-可视化目录树" class="headerlink" title="6、nerdtree: 可视化目录树"></a>6、<a href="https://github.com/preservim/nerdtree" rel="external nofollow noreferrer">nerdtree</a>: 可视化目录树</h5><p><img src="http://image.beenli.cn/img/20200406/GAYHOnmiPSIj.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/zU1CDLe23EOh.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200406/36WBczsR3bS2.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="7、tabbar-整齐的标签窗口"><a href="#7、tabbar-整齐的标签窗口" class="headerlink" title="7、tabbar: 整齐的标签窗口"></a>7、<a href="https://github.com/majutsushi/tagbar" rel="external nofollow noreferrer">tabbar</a>: 整齐的标签窗口</h5><p><img src="http://image.beenli.cn/img/20200406/9PX5LoRQveLS.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h5 id="8、tpope-vim-commentary-快速注释"><a href="#8、tpope-vim-commentary-快速注释" class="headerlink" title="8、tpope/vim-commentary: 快速注释"></a>8、<a href="https://github.com/tpope/vim-commentary" rel="external nofollow noreferrer">tpope/vim-commentary</a>: 快速注释</h5><blockquote><p>gcc ：注释/取消注释一行</p><p>gc{motion}</p><p>gc : 注释selection块</p><p>7，17 Commentary</p></blockquote><hr><h5 id="9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco"><a href="#9、vim-gutentags：借助universal-ctags-自动产生标签文件-taco" class="headerlink" title="9、vim-gutentags：借助universal ctags 自动产生标签文件:taco:"></a>9、<a href="https://github.com/ludovicchabant/vim-gutentags" rel="external nofollow noreferrer">vim-gutentags</a>：借助<a href="https://docs.ctags.io/en/latest/" rel="external nofollow noreferrer">universal ctags</a> 自动产生标签文件<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f32e.png?v8">🌮</span></h5><p>有了这个标签文件，你又可以<code>&lt;C+]&gt;</code>跳转</p><hr><h5 id="10、vim-easy-align：自动对齐"><a href="#10、vim-easy-align：自动对齐" class="headerlink" title="10、vim-easy-align：自动对齐"></a>10、<a href="https://github.com/junegunn/vim-easy-align" rel="external nofollow noreferrer"><strong>vim-easy-align</strong></a>：自动对齐</h5><p>按官方配置来设置快捷键/ga触发</p><blockquote><p>“ Start interactive EasyAlign in visual mode (e.g. vipga)<br>xmap ga<plug>(EasyAlign)</plug></p><p>“ Start interactive EasyAlign for a motion/text object (e.g. gaip)<br>nmap ga<plug>(EasyAlign)</plug></p></blockquote><ul><li><code>1</code> Around the 1st occurrences of delimiters</li><li><code>2</code> Around the 2nd occurrences of delimiters</li><li>…</li><li><code>*</code> Around all occurrences of delimiters</li><li><code>**</code> Left-right alternating alignment around all delimiters</li><li><code>-</code> Around the last occurrences of delimiters (<code>-1</code>)</li><li><code>-2</code> Around the second to last occurrences of delimiters</li></ul><div class="table-container"><table><thead><tr><th style="text-align:center">Key</th><th style="text-align:center">Description/Use cases</th></tr></thead><tbody><tr><td style="text-align:center">``</td><td style="text-align:center">General alignment around whitespaces</td></tr><tr><td style="text-align:center"><code>=</code></td><td style="text-align:center">Operators containing equals sign (<code>=</code>, <code>==,</code> <code>!=</code>, <code>+=</code>, <code>&amp;&amp;=</code>, …)</td></tr><tr><td style="text-align:center"><code>:</code></td><td style="text-align:center">Suitable for formatting JSON or YAML</td></tr><tr><td style="text-align:center"><code>.</code></td><td style="text-align:center">Multi-line method chaining</td></tr><tr><td style="text-align:center"><code>,</code></td><td style="text-align:center">Multi-line method arguments</td></tr><tr><td style="text-align:center"><code>&amp;</code></td><td style="text-align:center">LaTeX tables (matches <code>&amp;</code> and <code>\\</code>)</td></tr><tr><td style="text-align:center"><code>#</code></td><td style="text-align:center">Ruby/Python comments</td></tr><tr><td style="text-align:center"><code>"</code></td><td style="text-align:center">Vim comments</td></tr><tr><td style="text-align:center">``</td><td style="text-align:center">Table markdown</td></tr></tbody></table></div><p><img src="http://image.beenli.cn/img/20200406/fubial5cDLym.gif" srcset="/img/loading.gif" alt="mark"></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Software</category>
-        <category>VIM</category>
-      </categories>
-      <tags>
-        <tag>Plugs</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>jupyter notebook</title>
     <url>/posts/2641cf45/</url>
     <content><![CDATA[<center>jupyter notebook</center><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><ul><li>安装python</li><li>安装pip</li><li>（安装ipython）</li><li>安装jupyter notebook(pip install jupyter notebook)</li></ul><h3 id="2、jupyter命令"><a href="#2、jupyter命令" class="headerlink" title="2、jupyter命令"></a>2、jupyter命令</h3><ul><li><p>查看已经安装的核</p><pre><code class="hljs taggerscript">jupyter kernelspec list 
@@ -686,6 +697,64 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </tags>
   </entry>
   <entry>
+    <title>testbench(1)</title>
+    <url>/posts/26241a85/</url>
+    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化
+<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;
+
+第二种: 定义信号时初始化
+<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)
+
+等价于:
+<span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+    #<span class="hljs-number">5</span>;
+    a=b;
+<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)
+
+等价于
+<span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+	temp = b;
+	#<span class="hljs-number">5</span>;
+	a = temp;
+<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+	# <span class="hljs-number">10</span>
+	@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span>
+<span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>
+	#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;
+<span class="hljs-keyword">initial</span>
+	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) 
+	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
+<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>verilog</category>
+      </categories>
+      <tags>
+        <tag>testbench</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>单链表翻转</title>
     <url>/posts/39c22857/</url>
     <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a><center>单链表翻转</center></h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><pre><code class="hljs c"><span class="hljs-function">struct ListNode *<span class="hljs-title">reverseList</span><span class="hljs-params">(struct ListNode* head)</span></span>{
@@ -743,64 +812,6 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </categories>
       <tags>
         <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>testbench(1)</title>
-    <url>/posts/26241a85/</url>
-    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化
-<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;
-
-第二种: 定义信号时初始化
-<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)
-
-等价于:
-<span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-    #<span class="hljs-number">5</span>;
-    a=b;
-<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)
-
-等价于
-<span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-	temp = b;
-	#<span class="hljs-number">5</span>;
-	a = temp;
-<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-	# <span class="hljs-number">10</span>
-	@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span>
-<span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>
-	#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;
-<span class="hljs-keyword">initial</span>
-	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) 
-	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
-<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Digital IC</category>
-        <category>verilog</category>
-      </categories>
-      <tags>
-        <tag>testbench</tag>
       </tags>
   </entry>
   <entry>
