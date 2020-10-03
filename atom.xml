@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>BeenLi&#39;s blog</title>
+  <title>WanLi&#39;s blog</title>
   <icon>https://www.gravatar.com/avatar/a560576344d33015bbc0603eeb844702</icon>
-  <subtitle>趁还年轻, 多折腾几下</subtitle>
+  <subtitle>Stay hungry,Stay foolish...</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.beenli.cn/"/>
-  <updated>2020-09-30T12:18:10.086Z</updated>
+  <updated>2020-10-03T09:34:50.500Z</updated>
   <id>https://www.beenli.cn/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>From 1000Hz clock to 1Hz--OneHertz</title>
+    <link href="https://www.beenli.cn/posts/8cdff568/"/>
+    <id>https://www.beenli.cn/posts/8cdff568/</id>
+    <published>2020-10-03T06:47:49.000Z</published>
+    <updated>2020-10-03T09:34:50.500Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>problem link：<a href="https://hdlbits.01xz.net/wiki/Exams/ece241_2014_q7b" rel="external nofollow noreferrer">https://hdlbits.01xz.net/wiki/Exams/ece241_2014_q7b</a></p></blockquote><h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><blockquote><p>从频率为1000Hz的时钟中得到频率为1Hz的信号(<code>OneHertz</code>)，它用来驱动一系列时/分/秒计数器的使能信号(Enable signal)以此创建一个数字时钟墙(digital wall clock)。因为需要时钟每秒计数一次，OneHertz信号必须每秒准确地断言一个周期(周期为1秒，且每周期只能翻转一次)。</p></blockquote><h2 id="Problem-Description"><a href="#Problem-Description" class="headerlink" title="Problem Description"></a>Problem Description</h2><blockquote><p>用BCD计数器和少许其它的门构建<code>分频器</code>(frequency divider)。并且输出你所使用的BCD计数器的使能信号。(c_enable[0] for the fastest counter, c_enable[2] for the slowest)</p><p>如下的BCD计数器已经提供给你，<code>Enable</code>为高电平计数器才能正常工作，<code>Reset</code>为同步高电平置位0；<br></p><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> bcdcount (<span class="hljs-keyword">input</span> clk,<span class="hljs-keyword">input</span> reset,<span class="hljs-keyword">input</span> enable,<span class="hljs-keyword">output</span> <span class="hljs-keyword">reg</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] Q);</code></pre><br>你设计的电路中所有的计数器必须直接使用相同的1000Hz时钟信号。<p></p></blockquote><h2 id="Template"><a href="#Template" class="headerlink" title="Template"></a>Template</h2><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> top_module (    <span class="hljs-keyword">input</span> clk,    <span class="hljs-keyword">input</span> reset,    <span class="hljs-keyword">output</span> OneHertz,    <span class="hljs-keyword">output</span> [<span class="hljs-number">2</span>:<span class="hljs-number">0</span>] c_enable);</code></pre><h2 id="First-Try"><a href="#First-Try" class="headerlink" title="First Try"></a>First Try</h2><h3 id="answer"><a href="#answer" class="headerlink" title="answer"></a>answer</h3><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> top_module (    <span class="hljs-keyword">input</span> clk,    <span class="hljs-keyword">input</span> reset,    <span class="hljs-keyword">output</span> OneHertz,    <span class="hljs-keyword">output</span> [<span class="hljs-number">2</span>:<span class="hljs-number">0</span>] c_enable);     <span class="hljs-keyword">reg</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] Q0,Q1,Q2;    <span class="hljs-comment">/************ BCD十进制,当Q=1001时使能--&gt;十倍频 ***************/</span>    <span class="hljs-keyword">assign</span> c_enable[<span class="hljs-number">0</span>] = <span class="hljs-number">1'b1</span>;<span class="hljs-comment">// 让第一个计数器全速计数</span>    <span class="hljs-keyword">assign</span> c_enable[<span class="hljs-number">1</span>] = Q0[<span class="hljs-number">3</span>] &amp; Q0[<span class="hljs-number">0</span>];<span class="hljs-comment">// 第二计数器计数周期是第一个的10倍</span>    <span class="hljs-keyword">assign</span> c_enable[<span class="hljs-number">2</span>] = Q1[<span class="hljs-number">3</span>] &amp; Q1[<span class="hljs-number">0</span>]; <span class="hljs-comment">// 第二计数器计数周期是第二个的10倍</span>    <span class="hljs-keyword">assign</span> OneHertz = Q2[<span class="hljs-number">3</span>] &amp; Q2[<span class="hljs-number">0</span>];    bcdcount counter0 (clk, reset, c_enable[<span class="hljs-number">0</span>], Q0);     bcdcount counter1 (clk, reset, c_enable[<span class="hljs-number">1</span>], Q1);    bcdcount counter2 (clk, reset, c_enable[<span class="hljs-number">2</span>], Q2);<span class="hljs-keyword">endmodule</span></code></pre><h3 id="result❌"><a href="#result❌" class="headerlink" title="result❌"></a>result❌</h3><p><img src="https://image.beenli.cn/img/20201003/WrnmNC6Ae30I.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>在计数0-10的时候是正确的</center><p><img src="https://image.beenli.cn/img/20201003/BBvSVnJpwakc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p>在计数90-99的时候: c_enable[2]本该为0却变为了1，导致输出c_enable=5=3’b101;</p></li><li><p>由于c_enable[2]=Q1[3] &amp; Q1[0]，起初我认为是Q1有问题；后续画出如下草图发现还是c_enable有问题</p><p><img src="https://image.beenli.cn/img/20201003/Fzbw4O8G94sC.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><ul><li>由于Q1是由计数器生成的，只要使能信号没问题，那么它就还🆗</li><li>又由于使能信号1和2是我们定义，所以从这里下手解决问题比较方便；</li><li>由上图知使能信号2有问题，它在计数90-99期间一直为高电平，我们只希望其在99时为高电平。</li><li>所有修改使能2的赋值：c_enable[2] = Q1[3] &amp; Q1[0] <code>&amp; c_enable[1]</code></li><li>同理我们也要修改OneHertz = Q2[3] &amp; Q2[0] &amp; <code>c_enable[2]</code>;，让其只在999时才有效；否则其在900-999一直有效；</li></ul><h2 id="Final-answer"><a href="#Final-answer" class="headerlink" title="Final answer"></a>Final answer</h2><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> top_module (    <span class="hljs-keyword">input</span> clk,    <span class="hljs-keyword">input</span> reset,    <span class="hljs-keyword">output</span> OneHertz,    <span class="hljs-keyword">output</span> [<span class="hljs-number">2</span>:<span class="hljs-number">0</span>] c_enable); <span class="hljs-comment">//</span>    <span class="hljs-keyword">reg</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] Q0,Q1,Q2;    <span class="hljs-keyword">assign</span> c_enable[<span class="hljs-number">0</span>] = <span class="hljs-number">1'b1</span>;    <span class="hljs-keyword">assign</span> c_enable[<span class="hljs-number">1</span>] = Q0[<span class="hljs-number">3</span>] &amp; Q0[<span class="hljs-number">0</span>];    <span class="hljs-keyword">assign</span> c_enable[<span class="hljs-number">2</span>] = Q1[<span class="hljs-number">3</span>] &amp; Q1[<span class="hljs-number">0</span>] &amp; c_enable[<span class="hljs-number">1</span>];     <span class="hljs-keyword">assign</span> OneHertz = Q2[<span class="hljs-number">3</span>] &amp; Q2[<span class="hljs-number">0</span>] &amp; c_enable[<span class="hljs-number">2</span>];    bcdcount counter0 (clk, reset, c_enable[<span class="hljs-number">0</span>], Q0);     bcdcount counter1 (clk, reset, c_enable[<span class="hljs-number">1</span>], Q1);    bcdcount counter2 (clk, reset, c_enable[<span class="hljs-number">2</span>], Q2);<span class="hljs-keyword">endmodule</span></code></pre><h2 id="Advanced-problem-❓"><a href="#Advanced-problem-❓" class="headerlink" title="Advanced problem(❓)"></a>Advanced problem(❓)</h2><p>⭐如何实现<code>50%</code>(xx%)占空比的10(xx)倍频电路</p><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;blockquote&gt;&lt;p&gt;problem link：&lt;a href=&quot;https://hdlbits.01xz.net/wiki/Exams/ece241_2014_q7b&quot; rel=&quot;external nofollow noreferrer&quot;&gt;https://hdlbits
+      
+    
+    </summary>
+    
+    
+      <category term="Digital IC" scheme="https://www.beenli.cn/categories/Digital-IC/"/>
+    
+      <category term="HDL Bits" scheme="https://www.beenli.cn/categories/Digital-IC/HDL-Bits/"/>
+    
+    
+      <category term="circuits" scheme="https://www.beenli.cn/tags/circuits/"/>
+    
+  </entry>
   
   <entry>
     <title>Unprivileged Spec(1)--RV32I</title>
@@ -532,34 +560,6 @@
       
       
         &lt;h1 id=&quot;Gate-and-switch-level-modeling&quot;&gt;&lt;a href=&quot;#Gate-and-switch-level-modeling&quot; class=&quot;headerlink&quot; title=&quot;Gate-and-switch-level modeling&quot;&gt;
-      
-    
-    </summary>
-    
-    
-      <category term="Digital IC" scheme="https://www.beenli.cn/categories/Digital-IC/"/>
-    
-      <category term="verilog" scheme="https://www.beenli.cn/categories/Digital-IC/verilog/"/>
-    
-    
-      <category term="specification" scheme="https://www.beenli.cn/tags/specification/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>testbench(1)</title>
-    <link href="https://www.beenli.cn/posts/26241a85/"/>
-    <id>https://www.beenli.cn/posts/26241a85/</id>
-    <published>2020-04-04T02:38:11.000Z</published>
-    <updated>2020-09-30T12:01:40.761Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;第二种: 定义信号时初始化<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)等价于:<span class="hljs-keyword">initial</span><span class="hljs-keyword">begin</span>    #<span class="hljs-number">5</span>;    a=b;<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)等价于<span class="hljs-keyword">initial</span><span class="hljs-keyword">begin</span>temp = b;#<span class="hljs-number">5</span>;a = temp;<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span><span class="hljs-keyword">begin</span># <span class="hljs-number">10</span>@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span><span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;<span class="hljs-keyword">initial</span><span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) <span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;Testbench-1&quot;&gt;&lt;a href=&quot;#Testbench-1&quot; class=&quot;headerlink&quot; title=&quot;Testbench(1)&quot;&gt;&lt;/a&gt;&lt;center&gt;Testbench(1)&lt;/center&gt;&lt;/h2&gt;&lt;h3 id=&quot;1、testbenc
       
     
     </summary>
