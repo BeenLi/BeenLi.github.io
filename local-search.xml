@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>12-hour clock using six BCD digits</title>
+    <link href="/posts/8cc45ed0/"/>
+    <url>/posts/8cc45ed0/</url>
+    
+    <content type="html"><![CDATA[<script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>Digital IC</category>
+      
+      <category>HDL Bits</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>circuits</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>From 1000Hz clock to 1Hz--OneHertz</title>
     <link href="/posts/8cdff568/"/>
     <url>/posts/8cdff568/</url>
