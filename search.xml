@@ -1,36 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>12-hour clock using six BCD digits</title>
-    <url>/posts/8cc45ed0/</url>
-    <content><![CDATA[<script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Digital IC</category>
-        <category>HDL Bits</category>
-      </categories>
-      <tags>
-        <tag>circuits</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>From 1000Hz clock to 1Hz--OneHertz</title>
     <url>/posts/8cdff568/</url>
     <content><![CDATA[<blockquote><p>problem link：<a href="https://hdlbits.01xz.net/wiki/Exams/ece241_2014_q7b" rel="external nofollow noreferrer">https://hdlbits.01xz.net/wiki/Exams/ece241_2014_q7b</a></p></blockquote><h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><blockquote><p>从频率为1000Hz的时钟中得到频率为1Hz的信号(<code>OneHertz</code>)，它用来驱动一系列时/分/秒计数器的使能信号(Enable signal)以此创建一个数字时钟墙(digital wall clock)。因为需要时钟每秒计数一次，OneHertz信号必须每秒准确地断言一个周期(周期为1秒，且每周期只能翻转一次)。</p></blockquote><h2 id="Problem-Description"><a href="#Problem-Description" class="headerlink" title="Problem Description"></a>Problem Description</h2><blockquote><p>用BCD计数器和少许其它的门构建<code>分频器</code>(frequency divider)。并且输出你所使用的BCD计数器的使能信号。(c_enable[0] for the fastest counter, c_enable[2] for the slowest)</p><p>如下的BCD计数器已经提供给你，<code>Enable</code>为高电平计数器才能正常工作，<code>Reset</code>为同步高电平置位0；<br></p><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> bcdcount (
@@ -100,43 +70,9 @@
       </tags>
   </entry>
   <entry>
-    <title>Git for novice</title>
-    <url>/posts/f05478c5/</url>
-    <content><![CDATA[<h2 id="1、Git-and-GitHub"><a href="#1、Git-and-GitHub" class="headerlink" title="1、Git and GitHub"></a>1、Git and GitHub</h2><p><code>Github</code> 可以看成是一个基于Git的系统，它提供了仓库的可视化。是一个<code>远程托管仓库</code>。如果是public，其他人可以随意查看，修改。如果是private只有你自己可以查看了。如果为了安全，可以团队自己搭建一个git服务器。</p><p><code>Git</code>大家都已经很熟悉了，分布式版本控制系统(Distributed version control system)</p><h2 id="2、Why-do-we-use-git"><a href="#2、Why-do-we-use-git" class="headerlink" title="2、Why do we use git"></a>2、Why do we use git</h2><ol><li>可以更好地在GitHub上开发，分享啊。</li><li>多人协同开发。</li><li>版本控制，可以任意回滚到之前某个版本。</li></ol><h2 id="3、How-do-we-use-git"><a href="#3、How-do-we-use-git" class="headerlink" title="3、How do we use git"></a>3、How do we use git</h2><p><img src="http://image.beenli.cn/img/20200428/AdQsxqK9vslE.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h3 id="场景1"><a href="#场景1" class="headerlink" title="场景1"></a>场景1</h3><blockquote><p>在GitHub上看到一个不错的项目，想要研究，学习为目的。</p></blockquote><ol><li><p>先fork一份到自己的GitHub上。</p></li><li><p>clone到本地</p><p>-o 指定远程仓库的名字，否则默认为<code>origin</code></p><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> [-b &lt;指定分支名&gt;]&lt;远程仓库地址&gt; [-o booyah]  
-默认是克隆所有分支。</code></pre></li><li><p>进行自己的开发。修改文件后</p><p>此时git status可以看到：修改过的文件红色标处。<code>Untracked files</code><img src="http://image.beenli.cn/img/20200427/3yURcSj2qBqU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs bash">git add ./[filename]			// 把修改过的文件添加到暂存区。</code></pre><p><img src="http://image.beenli.cn/img/20200427/ri8cAxnmujYg.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此时文件变成绿色。即已经添加到了暂存区。</p></li><li><p>提交</p><pre><code class="hljs bash">git commit -m <span class="hljs-string">"添加文件的说明"</span>			// 提交</code></pre><p>提交完成了，工作目录应该显示是空的。</p></li><li><p>推送到远程仓库</p><pre><code class="hljs bash">git pull origin [branch name] 			// 推送到指定仓库的指定分支上。</code></pre><p><img src="http://image.beenli.cn/img/20200427/aTKLfLxC1XUc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h3 id="场景2"><a href="#场景2" class="headerlink" title="场景2"></a>场景2</h3><blockquote><p>自己新建一个仓库。做项目开发。</p></blockquote><ol><li><p>初始化一个本地仓库</p><pre><code class="hljs bash">git init xxx	// 新建一个名为xxx的仓库</code></pre></li><li><p>进入仓库，然后就可以开发了。</p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span>  xxx 		// 此目录就是工程根目录。</code></pre></li><li><p>如果要上传到GitHub上。即远端git服务器</p><ul><li><p>首先在GitHub上新建一个仓库。</p></li><li><p>本地仓库与远程仓库建立联系。</p><pre><code class="hljs axapta">git remote add origin &lt;<span class="hljs-keyword">server</span>&gt;	<span class="hljs-comment">// 与GitHub仓库建立联系. origin 可以换成任意名字。</span></code></pre><p><img src="http://image.beenli.cn/img/20200427/9id7SRqNtn2j.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到我通过origin pull不上去。因为我连接的是remote_name。</p></blockquote></li><li><p>push到远程服务器上</p><pre><code class="hljs bash">git push origin master 			// 推送到远程服务器上</code></pre></li></ul><p>如果是克隆远程仓库的话，那么可以跳过remote（因为本地master已经和远程master联系上了)。直接推送到远程服务器。</p></li></ol><h2 id="4、common-commands1"><a href="#4、common-commands1" class="headerlink" title="4、common commands1"></a>4、common commands<a href="#link"><sup>1</sup></a></h2><h3 id="1、branch（分支"><a href="#1、branch（分支" class="headerlink" title="1、branch（分支)"></a>1、branch（分支)</h3><h4 id="1、新建分支"><a href="#1、新建分支" class="headerlink" title="1、新建分支"></a>1、新建分支</h4><pre><code class="hljs bash">git checkout -b xxx		// 新建分支并切换到xxx
-git branch xxx			// 只是新建一个分支，仍留在本地。（新建的分支复刻目分支)</code></pre><blockquote><p>git branch [-b branchName commitId] 从指定分支和commit号上开始新的分支</p></blockquote><h4 id="2、分支切换"><a href="#2、分支切换" class="headerlink" title="2、分支切换"></a>2、分支切换</h4><pre><code class="hljs bash">git branch [-a]				//查看分支
-git checkout xxx			//切换到xxx分支</code></pre><blockquote><p>git branch 参数-a: 查看所有分支，包括远端的分支。 -v 查看分支指向的commit。 —remote查看远程分支</p></blockquote><h4 id="3、合并分支"><a href="#3、合并分支" class="headerlink" title="3、合并分支"></a>3、合并分支</h4><ol><li><p>先把你次要分支提交完全。</p></li><li><p>切换到你要合并其他分支的主分支上</p></li><li><p>合并</p><pre><code class="hljs bash">git merge <span class="hljs-built_in">test</span>			// 在主分支上合并<span class="hljs-built_in">test</span>分支</code></pre><p><img src="http://image.beenli.cn/img/20200427/GXOtI8DdGor8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p>可以看到已经合并了test1分支。现在它们指向同一个commit。</p><p>如果遇到冲突，手动判断哪一个修改留下。</p></blockquote><h4 id="4、删除分支"><a href="#4、删除分支" class="headerlink" title="4、删除分支"></a>4、删除分支</h4><pre><code class="hljs bash">git branch -d [branch name]
-
-git push origin --delete [branch name]  // 删除远程分支
-$ git push origin --delete testing
-To github.com:BeenLi/learn_git.git
- - [deleted]         testing</code></pre><h4 id="5、远程分支"><a href="#5、远程分支" class="headerlink" title="5、远程分支"></a>5、远程分支</h4><pre><code class="hljs bash">$ git ls-remote		// 查看远程分支
-
-From git@github.com:BeenLi/learn_git.git
-6fc7758ee27a73196a81391efd803dc19541eb88        HEAD
-6fc7758ee27a73196a81391efd803dc19541eb88        refs/heads/master
-807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/heads/testing
-807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/pull/1/head
-998239f25772ea809310d9f92c9e96a67c158b82        refs/pull/1/merge
-
-$ git remote show	// 查看远程仓库名字
-remote_name</code></pre><blockquote><p>“origin” 是当你运行 git clone 时默认的远程仓库名字</p></blockquote><h4 id="6、跟踪分支"><a href="#6、跟踪分支" class="headerlink" title="6、跟踪分支"></a>6、跟踪分支</h4><pre><code class="hljs armasm"><span class="hljs-symbol">git</span> checkout -<span class="hljs-keyword">b </span>[<span class="hljs-keyword">branch] </span>[remotename]/[<span class="hljs-keyword">branch]</span>
-<span class="hljs-keyword"></span>
-<span class="hljs-keyword">git </span>checkout --track origin/serverfix		// 快捷命令
-当克隆一个仓库时，它通常会自动地创建一个跟踪 origin/master 的 master 分支
-
-<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--set-upstream-to origin/remoteBranchName localBranchName 修改远程分支
-<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--unset-upstream					// 撤销跟踪远程分支</code></pre><p><img src="http://image.beenli.cn/img/20200428/4tSisNi0opQ7.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到 设置了分支test3 跟踪 远端的master分支。现在分支与master分支相同。</p><p>现在，本地分支 test 会自动从 remote_name/master 拉取。</p></blockquote><pre><code class="hljs angelscript">$ git branch -vv
-  master <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
-  test1  <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
-  test2  <span class="hljs-number">420f</span>721 第二次本地提交
-  testing e051a6f [remote_name/testing: ahead <span class="hljs-number">1</span>] 测试追踪分支情况
-* test3  <span class="hljs-number">4f</span>db7bd [remote_name/master] 测试本地提交
-
-可以看到test3 是master的跟踪分支。
-testing分支领先<span class="hljs-number">1</span>。表示有本地有一个commit没有push到服务器上。</code></pre><h4 id="7、分支拉取"><a href="#7、分支拉取" class="headerlink" title="7、分支拉取"></a>7、分支拉取</h4><pre><code class="hljs bash">git pull  == git fetch + git merge
-git fetch 不会修改当前工作区的文件。它只会获取数据然后让你自己合并。</code></pre><h4 id="8、上传分支"><a href="#8、上传分支" class="headerlink" title="8、上传分支"></a>8、上传分支</h4><pre><code class="hljs bash">git push origin localbranch:remotebranch
-如果添加了远程分支就直接push了。</code></pre><h3 id="2、reset-撤销"><a href="#2、reset-撤销" class="headerlink" title="2、reset (撤销)"></a>2、reset (撤销)</h3><p><a href="#link">参考🔗</a></p><p><img src="http://image.beenli.cn/img/20200428/CUvCyfwWR8h9.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="1、reset-—hard"><a href="#1、reset-—hard" class="headerlink" title="1、reset —hard"></a>1、reset —hard</h4><p>reset —hard：重置stage区和工作目录(会在重置 <strong>HEAD</strong> 和<strong>branch</strong>的同时，重置stage区和工作目录里的内容)</p><p>即回到上一次commit的位置。，全部清空。</p><h4 id="2、reset-—soft"><a href="#2、reset-—soft" class="headerlink" title="2、reset —soft"></a>2、reset —soft</h4><p>reset —soft：保留工作目录和暂存区中的内容，并把重置 HEAD 所带来的新的差异放进暂存区</p><p>即你之前commit的文件，退回到<code>stage</code>。需要重新提交。</p><h4 id="3、reset-—mixed"><a href="#3、reset-—mixed" class="headerlink" title="3、reset [—mixed]"></a>3、reset [—mixed]</h4><p>reset: 保留工作目录，并清空暂存区</p><p>也就是你要重新add，然后commit。</p><div id="link"></div><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[1] <a href="https://blog.csdn.net/qq_15037231/article/details/79137753" rel="external nofollow noreferrer">分支用法</a></p><p>[2] <a href="https://www.jianshu.com/p/c2ec5f06cf1a" rel="external nofollow noreferrer">reset用法</a></p><p>[3] <a href="https://www.runoob.com/manual/git-guide/" rel="external nofollow noreferrer">简明教程</a></p><p>[4] <a href="https://baijiahao.baidu.com/s?id=1664197276209808372&amp;wfr=spider&amp;for=pc" rel="external nofollow noreferrer">动态过程</a></p><script>
+    <title>12-hour clock using six BCD digits</title>
+    <url>/posts/8cc45ed0/</url>
+    <content><![CDATA[<script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -156,11 +92,89 @@ git fetch 不会修改当前工作区的文件。它只会获取数据然后让�
           });
       </script>]]></content>
       <categories>
-        <category>Software</category>
-        <category>Git</category>
+        <category>Digital IC</category>
+        <category>HDL Bits</category>
       </categories>
       <tags>
-        <tag>git</tag>
+        <tag>circuits</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Gate-and-switch-level modeling</title>
+    <url>/posts/aff089ac/</url>
+    <content><![CDATA[<h1 id="Gate-and-switch-level-modeling"><a href="#Gate-and-switch-level-modeling" class="headerlink" title="Gate-and-switch-level modeling"></a><center>Gate-and-switch-level modeling</center></h1><h2 id="1、verilog-std-1364-20051"><a href="#1、verilog-std-1364-20051" class="headerlink" title="1、verilog-std-1364-20051"></a>1、verilog-std-1364-2005<a href="#link"><sup>1</sup></a></h2><blockquote><p>There are <code>14 logic gates</code> and <code>12 switches</code> predefined in the Verilog HDL to provide the gate- and switch-level modeling facility. Modeling with logic gates and switches has the following advantages:</p></blockquote><p>— Gates provide a much closer one-to-one <code>mapping</code> between the actual circuit and the model.<br>— There is no <code>continuous assignment</code> equivalent to the <code>bidirectional transfer gate</code>.</p><p>Verilog1364-2005标准规定了26个基本原件，其中14个门级原件，12个开关级原件。</p><p>对于这些原件不需要定义直接调用。</p><h2 id="2、门级建模2"><a href="#2、门级建模2" class="headerlink" title="2、门级建模2"></a>2、门级建模<a href="#link"><sup>2</sup></a></h2><p><img src="http://image.beenli.cn/global/20200405/86dMFOGFTOna.png?imageslim" srcset="/img/loading.gif" alt="内置门级元件"></p><ol><li><p>多输入门：</p><pre><code class="hljs verilog">n_input_gate_instance ::= [ name_of_gate_instance ] 
+( output_terminal , input_terminal { , input_terminal } ) 
+
+<span class="hljs-keyword">and</span> A1(out1, in1, in2);
+<span class="hljs-keyword">or</span>  O1(outa, inb, inc, ind);
+<span class="hljs-keyword">xor</span> X1(outx, inx, iny, inz, inw);</code></pre></li><li><p>多输出门调用:</p><pre><code class="hljs verilog">n_output_gate_instance ::= [ name_of_gate_instance ] 
+( output_terminal { , output_terminal } , input_terminal ) 
+
+<span class="hljs-keyword">buf</span> BUF_1(bufout1, bufout2, bufout3, bufin);
+<span class="hljs-keyword">not</span> NOT_1(out1, out2, in);</code></pre></li><li><p>三态门调用:</p><pre><code class="hljs verilog">enable_gate_instance ::= [ name_of_gate_instance ] 
+( output_terminal , input_terminal , enable_terminal )
+
+<span class="hljs-keyword">bufif1</span> BF1(data_bus, data, enable);</code></pre></li><li><p>二个电阻</p><p>The instance declaration of a pullup or a pulldown source shall begin with one of the following keywords: <code>pullup</code> , <code>pulldown</code></p><pre><code class="hljs verilog">pull_gate_instance ::= [ name_of_gate_instance ] ( output_terminal )  
+
+<span class="hljs-keyword">pullup</span>   (<span class="hljs-keyword">strong1</span>)  p1 (neta), p2 (netb);
+
+In <span class="hljs-keyword">this</span> example, the  p1  <span class="hljs-keyword">instance</span> drives  neta  <span class="hljs-keyword">and</span> the  p2  <span class="hljs-keyword">instance</span> drives netb  <span class="hljs-keyword">with</span> <span class="hljs-keyword">strong</span> strength.</code></pre></li><li><p>注意: 门级原件的端口列表都固定好了，可以不用定义中间连接信号类型(wire)</p><hr></li></ol><h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><pre><code class="hljs verilog"><span class="hljs-comment">// 门级建模实现最小项表达式</span>
+<span class="hljs-comment">// F(a, b, c) = m1 + m2 + m3 + m6 + m7 = (!a)c + b</span>
+<span class="hljs-keyword">module</span> zuixiaoxiang(out, a, b, c);
+    <span class="hljs-keyword">input</span> a, b, c;
+    <span class="hljs-keyword">output</span> out;
+    <span class="hljs-keyword">wire</span> s1, s2;
+    <span class="hljs-keyword">not</span> U1(s1, a);
+    <span class="hljs-keyword">and</span> U2(s2, s1, c);
+    <span class="hljs-keyword">or</span> U3(out, s2, b);
+<span class="hljs-keyword">endmodule</span></code></pre><p><img src="http://image.beenli.cn/global/20200405/ADk6SPgKBGVt.jpg?imageslim" srcset="/img/loading.gif" alt="门级"></p><h2 id="3、开关级建模"><a href="#3、开关级建模" class="headerlink" title="3、开关级建模"></a>3、开关级建模</h2><ol><li>MOS switches</li></ol><div class="table-container"><table><thead><tr><th><strong>cmos</strong></th><th><strong>pmos</strong></th><th><strong>nmos</strong></th></tr></thead><tbody><tr><td><strong>rcmos</strong></td><td><strong>rnmos</strong></td><td><strong>rpmos</strong></td></tr></tbody></table></div><blockquote><p>rmos : 代表晶体管导通时源漏有较高的阻抗(<code>impedance</code>)</p></blockquote><pre><code class="hljs verilog">The following example declares a <span class="hljs-keyword">pmos</span> switch:
+
+<span class="hljs-keyword">pmos</span>  p1 (out, data, control);
+
+The <span class="hljs-keyword">output</span> is  out , the data <span class="hljs-keyword">input</span> is  data , <span class="hljs-keyword">and</span> the control <span class="hljs-keyword">input</span> is 
+control<span class="hljs-variable">.The</span> <span class="hljs-keyword">instance</span> name is  p1 .</code></pre><ol><li>Bidirectional pass switches(双向开关)</li></ol><div class="table-container"><table><thead><tr><th><strong>tran</strong></th><th><strong>tranif1</strong></th><th><strong>tranif0</strong></th></tr></thead><tbody><tr><td><strong>rtran</strong></td><td><strong>rtranif1</strong></td><td><strong>rtranif0</strong></td></tr></tbody></table></div><blockquote><p>The bidirectional pass switches shall not delay signals propagating through them. When tranif0, tranif1,rtranif0, or rtranif1 devices are turned off, they shall block signals; and when they are turned on, they shall pass signals. The tran and rtran devices cannot be turned off, and they shall always pass signals.(双向开关没有传播延时)</p></blockquote><pre><code class="hljs verilog">The following example declares an <span class="hljs-keyword">instance</span> of <span class="hljs-keyword">tranif1</span>:
+
+<span class="hljs-keyword">tranif1</span>  t1 (inout1,inout2,control);
+
+The bidirectional terminals are  inout1  <span class="hljs-keyword">and</span>  inout2 . The control <span class="hljs-keyword">input</span> is  control . The <span class="hljs-keyword">instance</span> name is t1 .</code></pre><hr><h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><pre><code class="hljs verilog"><span class="hljs-comment">// 2输入与门</span>
+<span class="hljs-comment">// time:2020-04-05</span>
+<span class="hljs-keyword">module</span> and2_1(out, a, b);
+    <span class="hljs-keyword">input</span> a,b;
+    <span class="hljs-keyword">output</span> out;
+    <span class="hljs-keyword">wire</span> s1, s2;
+    <span class="hljs-keyword">supply0</span> Gnd;
+    <span class="hljs-keyword">supply1</span> Vdd;
+    <span class="hljs-keyword">pmos</span> U1(s1, Vdd, a);
+    <span class="hljs-keyword">pmos</span> U2(s1, Vdd, b);
+    <span class="hljs-keyword">nmos</span> U3(s1, s2, a);
+    <span class="hljs-keyword">nmos</span> U4(s2, Gnd, b);
+    <span class="hljs-keyword">pmos</span> U5(out, Vdd, s1);
+    <span class="hljs-keyword">nmos</span> U6(out, Gnd, s1);
+<span class="hljs-keyword">endmodule</span></code></pre><p><img src="http://image.beenli.cn/img/20200405/UWkPoOqPACnO.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>quarter II 综合不了，没办法直接看viewer。只能把书上的图扒来了。</p><hr><h4 id="终于找到了一款RTL级，gate级，开关级debugger和viewer的软件"><a href="#终于找到了一款RTL级，gate级，开关级debugger和viewer的软件" class="headerlink" title="终于找到了一款RTL级，gate级，开关级debugger和viewer的软件"></a>终于找到了一款RTL级，gate级，开关级debugger和viewer的软件</h4><p><a href="http://www.concept.de/SpiceVision.html" rel="external nofollow noreferrer">trainsistor-level debugger and viewer</a></p><p>但是目前下载不了，得找客服联系。不知有人有用过这款软件没有。有的话请你一定告诉我。</p><h2 id="Renference"><a href="#Renference" class="headerlink" title="Renference"></a>Renference</h2><div id="link"></div><p>[1] <a href="https://standards.ieee.org/standard/1364-2005.html" rel="external nofollow noreferrer">verilog-std-1364-2005</a></p><p>[2] <a href="">蔡觉平.2015.Verilog HDL 数字集成电路高级程序设计 31P</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>verilog</category>
+      </categories>
+      <tags>
+        <tag>specification</tag>
       </tags>
   </entry>
   <entry>
@@ -276,6 +290,70 @@ a = b + (* mode = <span class="hljs-string">"cla"</span> *) c;</code></pre></li>
       </tags>
   </entry>
   <entry>
+    <title>Git for novice</title>
+    <url>/posts/f05478c5/</url>
+    <content><![CDATA[<h2 id="1、Git-and-GitHub"><a href="#1、Git-and-GitHub" class="headerlink" title="1、Git and GitHub"></a>1、Git and GitHub</h2><p><code>Github</code> 可以看成是一个基于Git的系统，它提供了仓库的可视化。是一个<code>远程托管仓库</code>。如果是public，其他人可以随意查看，修改。如果是private只有你自己可以查看了。如果为了安全，可以团队自己搭建一个git服务器。</p><p><code>Git</code>大家都已经很熟悉了，分布式版本控制系统(Distributed version control system)</p><h2 id="2、Why-do-we-use-git"><a href="#2、Why-do-we-use-git" class="headerlink" title="2、Why do we use git"></a>2、Why do we use git</h2><ol><li>可以更好地在GitHub上开发，分享啊。</li><li>多人协同开发。</li><li>版本控制，可以任意回滚到之前某个版本。</li></ol><h2 id="3、How-do-we-use-git"><a href="#3、How-do-we-use-git" class="headerlink" title="3、How do we use git"></a>3、How do we use git</h2><p><img src="http://image.beenli.cn/img/20200428/AdQsxqK9vslE.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h3 id="场景1"><a href="#场景1" class="headerlink" title="场景1"></a>场景1</h3><blockquote><p>在GitHub上看到一个不错的项目，想要研究，学习为目的。</p></blockquote><ol><li><p>先fork一份到自己的GitHub上。</p></li><li><p>clone到本地</p><p>-o 指定远程仓库的名字，否则默认为<code>origin</code></p><pre><code class="hljs bash">git <span class="hljs-built_in">clone</span> [-b &lt;指定分支名&gt;]&lt;远程仓库地址&gt; [-o booyah]  
+默认是克隆所有分支。</code></pre></li><li><p>进行自己的开发。修改文件后</p><p>此时git status可以看到：修改过的文件红色标处。<code>Untracked files</code><img src="http://image.beenli.cn/img/20200427/3yURcSj2qBqU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><pre><code class="hljs bash">git add ./[filename]			// 把修改过的文件添加到暂存区。</code></pre><p><img src="http://image.beenli.cn/img/20200427/ri8cAxnmujYg.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>此时文件变成绿色。即已经添加到了暂存区。</p></li><li><p>提交</p><pre><code class="hljs bash">git commit -m <span class="hljs-string">"添加文件的说明"</span>			// 提交</code></pre><p>提交完成了，工作目录应该显示是空的。</p></li><li><p>推送到远程仓库</p><pre><code class="hljs bash">git pull origin [branch name] 			// 推送到指定仓库的指定分支上。</code></pre><p><img src="http://image.beenli.cn/img/20200427/aTKLfLxC1XUc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h3 id="场景2"><a href="#场景2" class="headerlink" title="场景2"></a>场景2</h3><blockquote><p>自己新建一个仓库。做项目开发。</p></blockquote><ol><li><p>初始化一个本地仓库</p><pre><code class="hljs bash">git init xxx	// 新建一个名为xxx的仓库</code></pre></li><li><p>进入仓库，然后就可以开发了。</p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span>  xxx 		// 此目录就是工程根目录。</code></pre></li><li><p>如果要上传到GitHub上。即远端git服务器</p><ul><li><p>首先在GitHub上新建一个仓库。</p></li><li><p>本地仓库与远程仓库建立联系。</p><pre><code class="hljs axapta">git remote add origin &lt;<span class="hljs-keyword">server</span>&gt;	<span class="hljs-comment">// 与GitHub仓库建立联系. origin 可以换成任意名字。</span></code></pre><p><img src="http://image.beenli.cn/img/20200427/9id7SRqNtn2j.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到我通过origin pull不上去。因为我连接的是remote_name。</p></blockquote></li><li><p>push到远程服务器上</p><pre><code class="hljs bash">git push origin master 			// 推送到远程服务器上</code></pre></li></ul><p>如果是克隆远程仓库的话，那么可以跳过remote（因为本地master已经和远程master联系上了)。直接推送到远程服务器。</p></li></ol><h2 id="4、common-commands1"><a href="#4、common-commands1" class="headerlink" title="4、common commands1"></a>4、common commands<a href="#link"><sup>1</sup></a></h2><h3 id="1、branch（分支"><a href="#1、branch（分支" class="headerlink" title="1、branch（分支)"></a>1、branch（分支)</h3><h4 id="1、新建分支"><a href="#1、新建分支" class="headerlink" title="1、新建分支"></a>1、新建分支</h4><pre><code class="hljs bash">git checkout -b xxx		// 新建分支并切换到xxx
+git branch xxx			// 只是新建一个分支，仍留在本地。（新建的分支复刻目分支)</code></pre><blockquote><p>git branch [-b branchName commitId] 从指定分支和commit号上开始新的分支</p></blockquote><h4 id="2、分支切换"><a href="#2、分支切换" class="headerlink" title="2、分支切换"></a>2、分支切换</h4><pre><code class="hljs bash">git branch [-a]				//查看分支
+git checkout xxx			//切换到xxx分支</code></pre><blockquote><p>git branch 参数-a: 查看所有分支，包括远端的分支。 -v 查看分支指向的commit。 —remote查看远程分支</p></blockquote><h4 id="3、合并分支"><a href="#3、合并分支" class="headerlink" title="3、合并分支"></a>3、合并分支</h4><ol><li><p>先把你次要分支提交完全。</p></li><li><p>切换到你要合并其他分支的主分支上</p></li><li><p>合并</p><pre><code class="hljs bash">git merge <span class="hljs-built_in">test</span>			// 在主分支上合并<span class="hljs-built_in">test</span>分支</code></pre><p><img src="http://image.beenli.cn/img/20200427/GXOtI8DdGor8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p>可以看到已经合并了test1分支。现在它们指向同一个commit。</p><p>如果遇到冲突，手动判断哪一个修改留下。</p></blockquote><h4 id="4、删除分支"><a href="#4、删除分支" class="headerlink" title="4、删除分支"></a>4、删除分支</h4><pre><code class="hljs bash">git branch -d [branch name]
+
+git push origin --delete [branch name]  // 删除远程分支
+$ git push origin --delete testing
+To github.com:BeenLi/learn_git.git
+ - [deleted]         testing</code></pre><h4 id="5、远程分支"><a href="#5、远程分支" class="headerlink" title="5、远程分支"></a>5、远程分支</h4><pre><code class="hljs bash">$ git ls-remote		// 查看远程分支
+
+From git@github.com:BeenLi/learn_git.git
+6fc7758ee27a73196a81391efd803dc19541eb88        HEAD
+6fc7758ee27a73196a81391efd803dc19541eb88        refs/heads/master
+807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/heads/testing
+807b956e7a57eef2f148dc7cb5b14ae3992955e6        refs/pull/1/head
+998239f25772ea809310d9f92c9e96a67c158b82        refs/pull/1/merge
+
+$ git remote show	// 查看远程仓库名字
+remote_name</code></pre><blockquote><p>“origin” 是当你运行 git clone 时默认的远程仓库名字</p></blockquote><h4 id="6、跟踪分支"><a href="#6、跟踪分支" class="headerlink" title="6、跟踪分支"></a>6、跟踪分支</h4><pre><code class="hljs armasm"><span class="hljs-symbol">git</span> checkout -<span class="hljs-keyword">b </span>[<span class="hljs-keyword">branch] </span>[remotename]/[<span class="hljs-keyword">branch]</span>
+<span class="hljs-keyword"></span>
+<span class="hljs-keyword">git </span>checkout --track origin/serverfix		// 快捷命令
+当克隆一个仓库时，它通常会自动地创建一个跟踪 origin/master 的 master 分支
+
+<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--set-upstream-to origin/remoteBranchName localBranchName 修改远程分支
+<span class="hljs-symbol">git</span> <span class="hljs-keyword">branch </span>--unset-upstream					// 撤销跟踪远程分支</code></pre><p><img src="http://image.beenli.cn/img/20200428/4tSisNi0opQ7.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到 设置了分支test3 跟踪 远端的master分支。现在分支与master分支相同。</p><p>现在，本地分支 test 会自动从 remote_name/master 拉取。</p></blockquote><pre><code class="hljs angelscript">$ git branch -vv
+  master <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
+  test1  <span class="hljs-number">2</span>b2be16 修改文件，制造合并冲突
+  test2  <span class="hljs-number">420f</span>721 第二次本地提交
+  testing e051a6f [remote_name/testing: ahead <span class="hljs-number">1</span>] 测试追踪分支情况
+* test3  <span class="hljs-number">4f</span>db7bd [remote_name/master] 测试本地提交
+
+可以看到test3 是master的跟踪分支。
+testing分支领先<span class="hljs-number">1</span>。表示有本地有一个commit没有push到服务器上。</code></pre><h4 id="7、分支拉取"><a href="#7、分支拉取" class="headerlink" title="7、分支拉取"></a>7、分支拉取</h4><pre><code class="hljs bash">git pull  == git fetch + git merge
+git fetch 不会修改当前工作区的文件。它只会获取数据然后让你自己合并。</code></pre><h4 id="8、上传分支"><a href="#8、上传分支" class="headerlink" title="8、上传分支"></a>8、上传分支</h4><pre><code class="hljs bash">git push origin localbranch:remotebranch
+如果添加了远程分支就直接push了。</code></pre><h3 id="2、reset-撤销"><a href="#2、reset-撤销" class="headerlink" title="2、reset (撤销)"></a>2、reset (撤销)</h3><p><a href="#link">参考🔗</a></p><p><img src="http://image.beenli.cn/img/20200428/CUvCyfwWR8h9.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="1、reset-—hard"><a href="#1、reset-—hard" class="headerlink" title="1、reset —hard"></a>1、reset —hard</h4><p>reset —hard：重置stage区和工作目录(会在重置 <strong>HEAD</strong> 和<strong>branch</strong>的同时，重置stage区和工作目录里的内容)</p><p>即回到上一次commit的位置。，全部清空。</p><h4 id="2、reset-—soft"><a href="#2、reset-—soft" class="headerlink" title="2、reset —soft"></a>2、reset —soft</h4><p>reset —soft：保留工作目录和暂存区中的内容，并把重置 HEAD 所带来的新的差异放进暂存区</p><p>即你之前commit的文件，退回到<code>stage</code>。需要重新提交。</p><h4 id="3、reset-—mixed"><a href="#3、reset-—mixed" class="headerlink" title="3、reset [—mixed]"></a>3、reset [—mixed]</h4><p>reset: 保留工作目录，并清空暂存区</p><p>也就是你要重新add，然后commit。</p><div id="link"></div><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[1] <a href="https://blog.csdn.net/qq_15037231/article/details/79137753" rel="external nofollow noreferrer">分支用法</a></p><p>[2] <a href="https://www.jianshu.com/p/c2ec5f06cf1a" rel="external nofollow noreferrer">reset用法</a></p><p>[3] <a href="https://www.runoob.com/manual/git-guide/" rel="external nofollow noreferrer">简明教程</a></p><p>[4] <a href="https://baijiahao.baidu.com/s?id=1664197276209808372&amp;wfr=spider&amp;for=pc" rel="external nofollow noreferrer">动态过程</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Software</category>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Linux常用命令</title>
     <url>/posts/d0edc1ed/</url>
     <content><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol><li><p>建立软链接<a href="https://man.linuxde.net/ln:link" rel="external nofollow noreferrer">ln</a></p><pre><code class="hljs bash">ln -s [源文件] [链接文件] (创建软链接)</code></pre><p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p><pre><code class="hljs bash">ln -s ~/oslab/gdb /usr/<span class="hljs-built_in">local</span>/bin/gdb</code></pre><p class="note note-info">ln -snf ~/oslab/xxx /usr/local/bin/gdb(修改)</p><hr></li><li><p>移动文件<a href="https://man.linuxde.net/mv" rel="external nofollow noreferrer">mv</a></p><pre><code class="hljs bash">mv [<span class="hljs-built_in">source</span>] [target]</code></pre><p>例如：</p><ol><li>​ <code>mv ~/oslab/oslab/* ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li><li><code>mv a.txt b.tax</code> 把文件名a.txt改为b.txt</li></ol><hr></li><li><p>设置权限<a href="https://man.linuxde.net/chmod" rel="external nofollow noreferrer">chmod</a>；<a href="https://man.linuxde.net/chown" rel="external nofollow noreferrer">chown</a></p><p><code>r</code> 读取权限，数字代号为<code>4</code>;<br><code>w</code> 写入权限，数字代号为<code>2</code>；<br><code>x</code> 执行或切换权限，数字代号为<code>1</code>；<br><code>-</code> 不具任何权限，数字代号为<code>0</code>；</p></li></ol><div class="table-container"><table><thead><tr><th style="text-align:center">7</th><th style="text-align:center">rwx</th></tr></thead><tbody><tr><td style="text-align:center"><strong>6</strong></td><td style="text-align:center"><strong>rw-</strong></td></tr><tr><td style="text-align:center"><strong>5</strong></td><td style="text-align:center"><strong>r-x</strong></td></tr><tr><td style="text-align:center"><strong>4</strong></td><td style="text-align:center"><strong>r—</strong></td></tr><tr><td style="text-align:center"><strong>3</strong></td><td style="text-align:center"><strong>-wx</strong></td></tr><tr><td style="text-align:center"><strong>2</strong></td><td style="text-align:center"><strong>-w-</strong></td></tr><tr><td style="text-align:center"><strong>1</strong></td><td style="text-align:center"><strong>—x</strong></td></tr><tr><td style="text-align:center"><strong>0</strong></td><td style="text-align:center"><strong>—-</strong></td></tr></tbody></table></div><pre><code class="hljs bash">chmod u+x,g+w f0　　			 //为文件f0设置自己可以执行，组员可以写入的权限
@@ -307,42 +385,6 @@ chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子�
       </categories>
       <tags>
         <tag>toolkits</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>SSH</title>
-    <url>/posts/782a8ece/</url>
-    <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
-ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v40J7WztY0xm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以设置密码，也可以为空（既然为了免密那就设置为空吧，不然没意义了）</p><p>文件路径可选。默认放在<code>~/.ssh/</code></p></li><li><p>上传公钥到服务器上<a href="#link"><sup>1</sup></a></p><p>有两种办法：</p><ol><li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p></li><li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p><p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p></li></ol></li><li><p>免密登录服务器</p><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)</code></pre><p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p></li><li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p><ol><li><p>随便选择个文件夹，写一个config文件</p></li><li><pre><code class="lang-bash">Host vps                              # 一个便于你区别这是哪台机器的名字
-    HostName 47.95.247.18               
-    User git                          # 登录主机的用户名称
-    Port 22                                      
-    IdentityFile ~/.ssh/id_rsa        # 密钥所在的文件位置
-</code></pre></li><li><p><code>ssh -F [config file] vps</code>(指定配置文件位置)就可以直接登录你设置的那台主机</p></li></ol></li></ol><hr><h5 id="可能遇到的问题3"><a href="#可能遇到的问题3" class="headerlink" title="可能遇到的问题3"></a>可能遇到的问题<a href="#link"><sup>3</sup></a></h5><ol><li><p>Authentication refused: bad ownership or modes for directory /root/.ssh</p><blockquote><p>ls -l /root/.ssh</p><p>发现改目录的所有者不是root。只用改成root即可</p><p>chown -R root.root /root/.ssh</p></blockquote></li></ol><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://blog.csdn.net/jeikerxiao/article/details/84105529" rel="external nofollow noreferrer">SSH 三步解决免密登录</a></p><p>[2] <a href="https://blog.csdn.net/ky1in93/article/details/83093981" rel="external nofollow noreferrer">ssh配置config快速登录</a></p><p>[3] <a href="https://www.howtogeek.com/168156/fixing-authentication-refused-bad-ownership-or-modes-for-directory/" rel="external nofollow noreferrer">解决权限问题</a></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Network</category>
-      </categories>
-      <tags>
-        <tag>protocols</tag>
       </tags>
   </entry>
   <entry>
@@ -382,6 +424,42 @@ NOT rd, rs(将rs各位取反赋值给rd)</code></pre><hr><p><img src="https://im
         <category>RISC-V</category>
         <category>spec</category>
       </categories>
+  </entry>
+  <entry>
+    <title>SSH</title>
+    <url>/posts/782a8ece/</url>
+    <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
+ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v40J7WztY0xm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以设置密码，也可以为空（既然为了免密那就设置为空吧，不然没意义了）</p><p>文件路径可选。默认放在<code>~/.ssh/</code></p></li><li><p>上传公钥到服务器上<a href="#link"><sup>1</sup></a></p><p>有两种办法：</p><ol><li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p></li><li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p><p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p></li></ol></li><li><p>免密登录服务器</p><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)</code></pre><p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p></li><li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p><ol><li><p>随便选择个文件夹，写一个config文件</p></li><li><pre><code class="lang-bash">Host vps                              # 一个便于你区别这是哪台机器的名字
+    HostName 47.95.247.18               
+    User git                          # 登录主机的用户名称
+    Port 22                                      
+    IdentityFile ~/.ssh/id_rsa        # 密钥所在的文件位置
+</code></pre></li><li><p><code>ssh -F [config file] vps</code>(指定配置文件位置)就可以直接登录你设置的那台主机</p></li></ol></li></ol><hr><h5 id="可能遇到的问题3"><a href="#可能遇到的问题3" class="headerlink" title="可能遇到的问题3"></a>可能遇到的问题<a href="#link"><sup>3</sup></a></h5><ol><li><p>Authentication refused: bad ownership or modes for directory /root/.ssh</p><blockquote><p>ls -l /root/.ssh</p><p>发现改目录的所有者不是root。只用改成root即可</p><p>chown -R root.root /root/.ssh</p></blockquote></li></ol><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://blog.csdn.net/jeikerxiao/article/details/84105529" rel="external nofollow noreferrer">SSH 三步解决免密登录</a></p><p>[2] <a href="https://blog.csdn.net/ky1in93/article/details/83093981" rel="external nofollow noreferrer">ssh配置config快速登录</a></p><p>[3] <a href="https://www.howtogeek.com/168156/fixing-authentication-refused-bad-ownership-or-modes-for-directory/" rel="external nofollow noreferrer">解决权限问题</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Network</category>
+      </categories>
+      <tags>
+        <tag>protocols</tag>
+      </tags>
   </entry>
   <entry>
     <title>Tasks and Functions</title>
@@ -648,57 +726,17 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
       </tags>
   </entry>
   <entry>
-    <title>Gate-and-switch-level modeling</title>
-    <url>/posts/aff089ac/</url>
-    <content><![CDATA[<h1 id="Gate-and-switch-level-modeling"><a href="#Gate-and-switch-level-modeling" class="headerlink" title="Gate-and-switch-level modeling"></a><center>Gate-and-switch-level modeling</center></h1><h2 id="1、verilog-std-1364-20051"><a href="#1、verilog-std-1364-20051" class="headerlink" title="1、verilog-std-1364-20051"></a>1、verilog-std-1364-2005<a href="#link"><sup>1</sup></a></h2><blockquote><p>There are <code>14 logic gates</code> and <code>12 switches</code> predefined in the Verilog HDL to provide the gate- and switch-level modeling facility. Modeling with logic gates and switches has the following advantages:</p></blockquote><p>— Gates provide a much closer one-to-one <code>mapping</code> between the actual circuit and the model.<br>— There is no <code>continuous assignment</code> equivalent to the <code>bidirectional transfer gate</code>.</p><p>Verilog1364-2005标准规定了26个基本原件，其中14个门级原件，12个开关级原件。</p><p>对于这些原件不需要定义直接调用。</p><h2 id="2、门级建模2"><a href="#2、门级建模2" class="headerlink" title="2、门级建模2"></a>2、门级建模<a href="#link"><sup>2</sup></a></h2><p><img src="http://image.beenli.cn/global/20200405/86dMFOGFTOna.png?imageslim" srcset="/img/loading.gif" alt="内置门级元件"></p><ol><li><p>多输入门：</p><pre><code class="hljs verilog">n_input_gate_instance ::= [ name_of_gate_instance ] 
-( output_terminal , input_terminal { , input_terminal } ) 
-
-<span class="hljs-keyword">and</span> A1(out1, in1, in2);
-<span class="hljs-keyword">or</span>  O1(outa, inb, inc, ind);
-<span class="hljs-keyword">xor</span> X1(outx, inx, iny, inz, inw);</code></pre></li><li><p>多输出门调用:</p><pre><code class="hljs verilog">n_output_gate_instance ::= [ name_of_gate_instance ] 
-( output_terminal { , output_terminal } , input_terminal ) 
-
-<span class="hljs-keyword">buf</span> BUF_1(bufout1, bufout2, bufout3, bufin);
-<span class="hljs-keyword">not</span> NOT_1(out1, out2, in);</code></pre></li><li><p>三态门调用:</p><pre><code class="hljs verilog">enable_gate_instance ::= [ name_of_gate_instance ] 
-( output_terminal , input_terminal , enable_terminal )
-
-<span class="hljs-keyword">bufif1</span> BF1(data_bus, data, enable);</code></pre></li><li><p>二个电阻</p><p>The instance declaration of a pullup or a pulldown source shall begin with one of the following keywords: <code>pullup</code> , <code>pulldown</code></p><pre><code class="hljs verilog">pull_gate_instance ::= [ name_of_gate_instance ] ( output_terminal )  
-
-<span class="hljs-keyword">pullup</span>   (<span class="hljs-keyword">strong1</span>)  p1 (neta), p2 (netb);
-
-In <span class="hljs-keyword">this</span> example, the  p1  <span class="hljs-keyword">instance</span> drives  neta  <span class="hljs-keyword">and</span> the  p2  <span class="hljs-keyword">instance</span> drives netb  <span class="hljs-keyword">with</span> <span class="hljs-keyword">strong</span> strength.</code></pre></li><li><p>注意: 门级原件的端口列表都固定好了，可以不用定义中间连接信号类型(wire)</p><hr></li></ol><h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a>示例：</h3><pre><code class="hljs verilog"><span class="hljs-comment">// 门级建模实现最小项表达式</span>
-<span class="hljs-comment">// F(a, b, c) = m1 + m2 + m3 + m6 + m7 = (!a)c + b</span>
-<span class="hljs-keyword">module</span> zuixiaoxiang(out, a, b, c);
-    <span class="hljs-keyword">input</span> a, b, c;
-    <span class="hljs-keyword">output</span> out;
-    <span class="hljs-keyword">wire</span> s1, s2;
-    <span class="hljs-keyword">not</span> U1(s1, a);
-    <span class="hljs-keyword">and</span> U2(s2, s1, c);
-    <span class="hljs-keyword">or</span> U3(out, s2, b);
-<span class="hljs-keyword">endmodule</span></code></pre><p><img src="http://image.beenli.cn/global/20200405/ADk6SPgKBGVt.jpg?imageslim" srcset="/img/loading.gif" alt="门级"></p><h2 id="3、开关级建模"><a href="#3、开关级建模" class="headerlink" title="3、开关级建模"></a>3、开关级建模</h2><ol><li>MOS switches</li></ol><div class="table-container"><table><thead><tr><th><strong>cmos</strong></th><th><strong>pmos</strong></th><th><strong>nmos</strong></th></tr></thead><tbody><tr><td><strong>rcmos</strong></td><td><strong>rnmos</strong></td><td><strong>rpmos</strong></td></tr></tbody></table></div><blockquote><p>rmos : 代表晶体管导通时源漏有较高的阻抗(<code>impedance</code>)</p></blockquote><pre><code class="hljs verilog">The following example declares a <span class="hljs-keyword">pmos</span> switch:
-
-<span class="hljs-keyword">pmos</span>  p1 (out, data, control);
-
-The <span class="hljs-keyword">output</span> is  out , the data <span class="hljs-keyword">input</span> is  data , <span class="hljs-keyword">and</span> the control <span class="hljs-keyword">input</span> is 
-control<span class="hljs-variable">.The</span> <span class="hljs-keyword">instance</span> name is  p1 .</code></pre><ol><li>Bidirectional pass switches(双向开关)</li></ol><div class="table-container"><table><thead><tr><th><strong>tran</strong></th><th><strong>tranif1</strong></th><th><strong>tranif0</strong></th></tr></thead><tbody><tr><td><strong>rtran</strong></td><td><strong>rtranif1</strong></td><td><strong>rtranif0</strong></td></tr></tbody></table></div><blockquote><p>The bidirectional pass switches shall not delay signals propagating through them. When tranif0, tranif1,rtranif0, or rtranif1 devices are turned off, they shall block signals; and when they are turned on, they shall pass signals. The tran and rtran devices cannot be turned off, and they shall always pass signals.(双向开关没有传播延时)</p></blockquote><pre><code class="hljs verilog">The following example declares an <span class="hljs-keyword">instance</span> of <span class="hljs-keyword">tranif1</span>:
-
-<span class="hljs-keyword">tranif1</span>  t1 (inout1,inout2,control);
-
-The bidirectional terminals are  inout1  <span class="hljs-keyword">and</span>  inout2 . The control <span class="hljs-keyword">input</span> is  control . The <span class="hljs-keyword">instance</span> name is t1 .</code></pre><hr><h3 id="示例：-1"><a href="#示例：-1" class="headerlink" title="示例："></a>示例：</h3><pre><code class="hljs verilog"><span class="hljs-comment">// 2输入与门</span>
-<span class="hljs-comment">// time:2020-04-05</span>
-<span class="hljs-keyword">module</span> and2_1(out, a, b);
-    <span class="hljs-keyword">input</span> a,b;
-    <span class="hljs-keyword">output</span> out;
-    <span class="hljs-keyword">wire</span> s1, s2;
-    <span class="hljs-keyword">supply0</span> Gnd;
-    <span class="hljs-keyword">supply1</span> Vdd;
-    <span class="hljs-keyword">pmos</span> U1(s1, Vdd, a);
-    <span class="hljs-keyword">pmos</span> U2(s1, Vdd, b);
-    <span class="hljs-keyword">nmos</span> U3(s1, s2, a);
-    <span class="hljs-keyword">nmos</span> U4(s2, Gnd, b);
-    <span class="hljs-keyword">pmos</span> U5(out, Vdd, s1);
-    <span class="hljs-keyword">nmos</span> U6(out, Gnd, s1);
-<span class="hljs-keyword">endmodule</span></code></pre><p><img src="http://image.beenli.cn/img/20200405/UWkPoOqPACnO.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>quarter II 综合不了，没办法直接看viewer。只能把书上的图扒来了。</p><hr><h4 id="终于找到了一款RTL级，gate级，开关级debugger和viewer的软件"><a href="#终于找到了一款RTL级，gate级，开关级debugger和viewer的软件" class="headerlink" title="终于找到了一款RTL级，gate级，开关级debugger和viewer的软件"></a>终于找到了一款RTL级，gate级，开关级debugger和viewer的软件</h4><p><a href="http://www.concept.de/SpiceVision.html" rel="external nofollow noreferrer">trainsistor-level debugger and viewer</a></p><p>但是目前下载不了，得找客服联系。不知有人有用过这款软件没有。有的话请你一定告诉我。</p><h2 id="Renference"><a href="#Renference" class="headerlink" title="Renference"></a>Renference</h2><div id="link"></div><p>[1] <a href="https://standards.ieee.org/standard/1364-2005.html" rel="external nofollow noreferrer">verilog-std-1364-2005</a></p><p>[2] <a href="">蔡觉平.2015.Verilog HDL 数字集成电路高级程序设计 31P</a></p><script>
+    <title>jupyter notebook</title>
+    <url>/posts/2641cf45/</url>
+    <content><![CDATA[<center>jupyter notebook</center><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><ul><li>安装python</li><li>安装pip</li><li>（安装ipython）</li><li>安装jupyter notebook(pip install jupyter notebook)</li></ul><h3 id="2、jupyter命令"><a href="#2、jupyter命令" class="headerlink" title="2、jupyter命令"></a>2、jupyter命令</h3><ul><li><p>查看已经安装的核</p><pre><code class="hljs taggerscript">jupyter kernelspec list 
+Available kernels:
+  py38       C:<span class="hljs-symbol">\U</span>sers<span class="hljs-symbol">\w</span>anli<span class="hljs-symbol">\A</span>ppData<span class="hljs-symbol">\R</span>oaming<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>y38
+  python3    C:<span class="hljs-symbol">\P</span>rogramData<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>ython3</code></pre></li><li><p>移除已经安装的核</p><pre><code class="hljs routeros">jupyter kernelspec <span class="hljs-builtin-name">remove</span> [kernelname]</code></pre></li><li><p>安装核</p><pre><code class="hljs brainfuck"><span class="hljs-comment">python</span> <span class="hljs-literal">-</span><span class="hljs-comment">m</span> <span class="hljs-comment">ipykernel</span> <span class="hljs-comment">install</span> <span class="hljs-title">[</span>--<span class="hljs-comment">user</span><span class="hljs-title">]</span> --<span class="hljs-comment">name</span> <span class="hljs-title">[</span><span class="hljs-comment">kernelname</span><span class="hljs-title">]</span></code></pre></li></ul><h3 id="3、conda创建虚拟环境"><a href="#3、conda创建虚拟环境" class="headerlink" title="3、conda创建虚拟环境"></a>3、conda创建虚拟环境</h3><ul><li><p>查看已经有的环境</p><pre><code class="hljs taggerscript">$ conda env list
+# conda environments:
+#
+base                  *  D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda
+py38                     D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda<span class="hljs-symbol">\e</span>nvs<span class="hljs-symbol">\p</span>y38</code></pre></li><li><p>安装新的环境</p><pre><code class="hljs routeros">conda create -n py36 <span class="hljs-attribute">python</span>=3.6</code></pre></li><li><p>激活环境/推出环境</p><pre><code class="hljs maxima">conda <span class="hljs-built_in">activate</span> envname
+conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id="4、遇到的问题"><a href="#4、遇到的问题" class="headerlink" title="4、遇到的问题"></a>4、遇到的问题</h3><ol><li><p>jupyter ImportError: DLL load failed: 找不到指定的程序。(kernel error)</p><ul><li><p>where jupyter</p><p>我发现我有两个jupyter, 两个python</p></li><li><p>试过了网上好多办法都不管用(大多叫你添加环境变量)</p></li><li><p>最终我把其中一个jupyter(有问题的)卸载了，用另外一个就好了。</p></li></ul></li></ol><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -718,11 +756,11 @@ The bidirectional terminals are  inout1  <span class="hljs-keyword">and</span>  
           });
       </script>]]></content>
       <categories>
-        <category>Digital IC</category>
-        <category>verilog</category>
+        <category>Software</category>
+        <category>jupyter</category>
       </categories>
       <tags>
-        <tag>specification</tag>
+        <tag>toolkits</tag>
       </tags>
   </entry>
   <entry>
@@ -757,44 +795,6 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       <categories>
         <category>RISC-V</category>
         <category>environment</category>
-      </categories>
-      <tags>
-        <tag>toolkits</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>jupyter notebook</title>
-    <url>/posts/2641cf45/</url>
-    <content><![CDATA[<center>jupyter notebook</center><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><ul><li>安装python</li><li>安装pip</li><li>（安装ipython）</li><li>安装jupyter notebook(pip install jupyter notebook)</li></ul><h3 id="2、jupyter命令"><a href="#2、jupyter命令" class="headerlink" title="2、jupyter命令"></a>2、jupyter命令</h3><ul><li><p>查看已经安装的核</p><pre><code class="hljs taggerscript">jupyter kernelspec list 
-Available kernels:
-  py38       C:<span class="hljs-symbol">\U</span>sers<span class="hljs-symbol">\w</span>anli<span class="hljs-symbol">\A</span>ppData<span class="hljs-symbol">\R</span>oaming<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>y38
-  python3    C:<span class="hljs-symbol">\P</span>rogramData<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>ython3</code></pre></li><li><p>移除已经安装的核</p><pre><code class="hljs routeros">jupyter kernelspec <span class="hljs-builtin-name">remove</span> [kernelname]</code></pre></li><li><p>安装核</p><pre><code class="hljs brainfuck"><span class="hljs-comment">python</span> <span class="hljs-literal">-</span><span class="hljs-comment">m</span> <span class="hljs-comment">ipykernel</span> <span class="hljs-comment">install</span> <span class="hljs-title">[</span>--<span class="hljs-comment">user</span><span class="hljs-title">]</span> --<span class="hljs-comment">name</span> <span class="hljs-title">[</span><span class="hljs-comment">kernelname</span><span class="hljs-title">]</span></code></pre></li></ul><h3 id="3、conda创建虚拟环境"><a href="#3、conda创建虚拟环境" class="headerlink" title="3、conda创建虚拟环境"></a>3、conda创建虚拟环境</h3><ul><li><p>查看已经有的环境</p><pre><code class="hljs taggerscript">$ conda env list
-# conda environments:
-#
-base                  *  D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda
-py38                     D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda<span class="hljs-symbol">\e</span>nvs<span class="hljs-symbol">\p</span>y38</code></pre></li><li><p>安装新的环境</p><pre><code class="hljs routeros">conda create -n py36 <span class="hljs-attribute">python</span>=3.6</code></pre></li><li><p>激活环境/推出环境</p><pre><code class="hljs maxima">conda <span class="hljs-built_in">activate</span> envname
-conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id="4、遇到的问题"><a href="#4、遇到的问题" class="headerlink" title="4、遇到的问题"></a>4、遇到的问题</h3><ol><li><p>jupyter ImportError: DLL load failed: 找不到指定的程序。(kernel error)</p><ul><li><p>where jupyter</p><p>我发现我有两个jupyter, 两个python</p></li><li><p>试过了网上好多办法都不管用(大多叫你添加环境变量)</p></li><li><p>最终我把其中一个jupyter(有问题的)卸载了，用另外一个就好了。</p></li></ul></li></ol><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Software</category>
-        <category>jupyter</category>
       </categories>
       <tags>
         <tag>toolkits</tag>
@@ -856,82 +856,6 @@ conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id
       </categories>
       <tags>
         <tag>specification</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>iverilog</title>
-    <url>/posts/bc753b52/</url>
-    <content><![CDATA[<h2 id="vim-iverilog-gtkwave"><a href="#vim-iverilog-gtkwave" class="headerlink" title="vim + iverilog + gtkwave "></a><center>vim + iverilog + gtkwave</center></h2><h3 id="1、What-is-Icarus-Verilog"><a href="#1、What-is-Icarus-Verilog" class="headerlink" title="1、What is Icarus Verilog"></a>1、What is Icarus Verilog</h3><blockquote><p><em>Icarus Verilog</em> is a <strong>Verilog simulation and synthesis</strong> tool. It operates as a compiler, compiling source code written in Verilog (IEEE-1364) into some target format. For batch simulation, the compiler can generate an intermediate form called <em>vvp assembly</em>. This intermediate form is executed by the <code>vvp</code>command. For synthesis, the compiler generates netlists in the desired format.<a href="#refer-anchor"><sup>1</sup></a></p></blockquote><p>​ 从官网的描述我们可以看到: 它是一个<code>仿真器</code>和<code>综合器</code>。</p><p>​ 有趣的是：开发者是一名软件工程师</p><p>​ a software engineer specializing in device drivers and embedded systems</p><h3 id="2、Why-we-choose-Icarus-Verilog"><a href="#2、Why-we-choose-Icarus-Verilog" class="headerlink" title="2、Why we choose Icarus Verilog"></a>2、Why we choose Icarus Verilog</h3><ol><li>软件非常小，没有图形界面。跑跑小的程序足够了</li><li>软件扩展性特别好。我现在还没有去探索。<a href="http://iverilog.icarus.com/page/plug-ins" rel="external nofollow noreferrer">详情见</a></li><li>软件完全开源。如果有兴趣可以探索是如何把RTL代码转换为netlist的</li></ol><h3 id="3、How-to-use-it"><a href="#3、How-to-use-it" class="headerlink" title="3、How to  use it"></a>3、How to use it</h3><ol><li><p>像在quarter II 或者其他IDE一样，你可以在任意一款编辑器上编写Verilog源代码</p><p><img src="vim_iverilog.jpg" srcset="/img/loading.gif" alt="Verilog"></p></li><li><p>然后在编辑器里一键运行脚本，或者在终端运行。</p><blockquote><p>终端主要记住几个命令即可: (<a href="">后面很会详细说明</a>)</p></blockquote><pre><code class="hljs c">iverilog -o filename filename.v   	<span class="hljs-comment">// 编译源文件 【-o 指定生成的文件名称】</span>
-vvp filename						<span class="hljs-comment">// 仿真testbench</span>
-gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</span></code></pre></li></ol><h3 id="4、Instance-case"><a href="#4、Instance-case" class="headerlink" title="4、Instance case"></a>4、Instance case</h3><ol><li><blockquote><p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)</p></blockquote><pre><code class="hljs verilog"><span class="hljs-comment">// 模8计数器。存储为count8.v</span>
-<span class="hljs-keyword">module</span> count8(clk, rst_n, cnt);
-    <span class="hljs-keyword">input</span> clk, rst_n;
-    <span class="hljs-keyword">output</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt;
-    <span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt;
-    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk <span class="hljs-keyword">or</span> <span class="hljs-keyword">negedge</span> rst_n)
-    <span class="hljs-keyword">begin</span>
-	<span class="hljs-keyword">if</span>(!rst_n)
-	    cnt &lt;= <span class="hljs-number">4'b0000</span>;
-	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cnt[<span class="hljs-number">3</span>])
-	    cnt &lt;=<span class="hljs-number">4'b0000</span>;
-	<span class="hljs-keyword">else</span>
-	    cnt &lt;= cnt + <span class="hljs-number">1'b1</span>;
-    <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">endmodule</span></code></pre></li><li><blockquote><p>编译一下</p></blockquote><pre><code class="hljs bash">iverilog  -o counter8 counter8.v</code></pre><p>​ <img src="synthesize.png" srcset="/img/loading.gif" alt="image-20200403162524369"></p><p>​ 可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p></li><li><blockquote><p>如果想查看电路图。好像只能在quarter II里面viewer一下了。还没发现专门从netlist生成电路图的程序。</p></blockquote><p><img src="RTLviewer.png" srcset="/img/loading.gif" alt="image-20200403163232250"></p></li><li><blockquote><p>编写测试代码</p></blockquote><pre><code class="hljs verilog"><span class="hljs-meta">`<span class="hljs-meta-keyword">include</span> "count8.v"</span>
-<span class="hljs-meta">`<span class="hljs-meta-keyword">timescale</span> 1ns/1ns</span>
-<span class="hljs-keyword">module</span> count8_tb;
-    <span class="hljs-comment">// 数据结构声明</span>
-    <span class="hljs-keyword">reg</span> clk;
-    <span class="hljs-keyword">reg</span> rst_n;
-    <span class="hljs-keyword">wire</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt;
-
-    <span class="hljs-comment">// 实例化待测试模块</span>
-    count8 U1(clk, rst_n, cnt);
-
-    <span class="hljs-comment">// 测试激励信号</span>
-    <span class="hljs-keyword">always</span>
-	#<span class="hljs-number">50</span> clk = ~ clk;
-    <span class="hljs-keyword">initial</span>
-    <span class="hljs-keyword">begin</span>
-	clk = <span class="hljs-number">1'b0</span>;
-	rst_n = <span class="hljs-number">1'b0</span>;
-	#<span class="hljs-number">20</span> rst_n = <span class="hljs-number">1'b0</span>;
-	#<span class="hljs-number">200</span> rst_n = <span class="hljs-number">1'b1</span>;
-    <span class="hljs-keyword">end</span>
-
-    <span class="hljs-comment">// 输出响应</span>
-    <span class="hljs-keyword">initial</span>
-    <span class="hljs-keyword">begin</span>
-	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1000</span>)
-	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
-    <span class="hljs-built_in">$dumpfile</span>(<span class="hljs-string">"count8_tb.vcd"</span>); 	<span class="hljs-comment">// 很关键，把仿真的数据存储到文件,待会波形图要用</span>
-    <span class="hljs-built_in">$dumpvars</span>(<span class="hljs-number">0</span>, count8_tb); 		<span class="hljs-comment">// 设置要观察的变量</span>
-    <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">endmodule</span></code></pre></li><li><blockquote><p>编译，仿真，生成波形图</p></blockquote><pre><code class="hljs bash">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</code></pre><p><img src="simulate.png" srcset="/img/loading.gif" alt="image-20200403170800780"></p><p>注意:</p><ol><li><p>由于仿真程序没有设定停止时间。程序会一直执行。</p></li><li><p>如果你想自动停止（可以在testbench上加上<code># 500$stop</code>,那么程序仿真500个tick就停止)</p></li><li><p>如果你没有加停止指令。只能手动停止<code>ctrl+c</code>然后你可以打印当前仿真的时间。如果不够</p><p>你可以继续仿真。如果可以了就<code>finish</code></p></li><li><p>最后用<code>gtkwave</code> 查看你刚刚仿真生成的<code>count8_tb.vcd</code>文件。</p></li></ol><p><img src="gtkwave.png" srcset="/img/loading.gif" alt="image-20200403171326769"></p></li><li><blockquote><p>如果你喜欢用<code>modelsim</code>也可以。</p></blockquote><p>也很简单，只需要建个项目，把你写的源文件放进去编译，仿真一下就可以了。</p><p><a href="https://wenku.baidu.com/view/cd93f34ecf84b9d528ea7a95.html" rel="external nofollow noreferrer">具体教程见</a></p><p><img src="modelsim.png" srcset="/img/loading.gif" alt="image-20200403171721915"></p></li></ol><div id="refer-anchor"></div><h2 id="references"><a href="#references" class="headerlink" title="references"></a>references</h2><p>[1] <a href="http://iverilog.icarus.com/" rel="external nofollow noreferrer">iverilog</a></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Digital IC</category>
-        <category>tools</category>
-      </categories>
-      <tags>
-        <tag>toolkits</tag>
       </tags>
   </entry>
   <entry>
@@ -1022,6 +946,82 @@ gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</
       </categories>
       <tags>
         <tag>circuits</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>iverilog</title>
+    <url>/posts/bc753b52/</url>
+    <content><![CDATA[<h2 id="vim-iverilog-gtkwave"><a href="#vim-iverilog-gtkwave" class="headerlink" title="vim + iverilog + gtkwave "></a><center>vim + iverilog + gtkwave</center></h2><h3 id="1、What-is-Icarus-Verilog"><a href="#1、What-is-Icarus-Verilog" class="headerlink" title="1、What is Icarus Verilog"></a>1、What is Icarus Verilog</h3><blockquote><p><em>Icarus Verilog</em> is a <strong>Verilog simulation and synthesis</strong> tool. It operates as a compiler, compiling source code written in Verilog (IEEE-1364) into some target format. For batch simulation, the compiler can generate an intermediate form called <em>vvp assembly</em>. This intermediate form is executed by the <code>vvp</code>command. For synthesis, the compiler generates netlists in the desired format.<a href="#refer-anchor"><sup>1</sup></a></p></blockquote><p>​ 从官网的描述我们可以看到: 它是一个<code>仿真器</code>和<code>综合器</code>。</p><p>​ 有趣的是：开发者是一名软件工程师</p><p>​ a software engineer specializing in device drivers and embedded systems</p><h3 id="2、Why-we-choose-Icarus-Verilog"><a href="#2、Why-we-choose-Icarus-Verilog" class="headerlink" title="2、Why we choose Icarus Verilog"></a>2、Why we choose Icarus Verilog</h3><ol><li>软件非常小，没有图形界面。跑跑小的程序足够了</li><li>软件扩展性特别好。我现在还没有去探索。<a href="http://iverilog.icarus.com/page/plug-ins" rel="external nofollow noreferrer">详情见</a></li><li>软件完全开源。如果有兴趣可以探索是如何把RTL代码转换为netlist的</li></ol><h3 id="3、How-to-use-it"><a href="#3、How-to-use-it" class="headerlink" title="3、How to  use it"></a>3、How to use it</h3><ol><li><p>像在quarter II 或者其他IDE一样，你可以在任意一款编辑器上编写Verilog源代码</p><p><img src="vim_iverilog.jpg" srcset="/img/loading.gif" alt="Verilog"></p></li><li><p>然后在编辑器里一键运行脚本，或者在终端运行。</p><blockquote><p>终端主要记住几个命令即可: (<a href="">后面很会详细说明</a>)</p></blockquote><pre><code class="hljs c">iverilog -o filename filename.v   	<span class="hljs-comment">// 编译源文件 【-o 指定生成的文件名称】</span>
+vvp filename						<span class="hljs-comment">// 仿真testbench</span>
+gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</span></code></pre></li></ol><h3 id="4、Instance-case"><a href="#4、Instance-case" class="headerlink" title="4、Instance case"></a>4、Instance case</h3><ol><li><blockquote><p>编写源代码(最好用有高亮的编辑器notepad、sublime、VScode、VIM)</p></blockquote><pre><code class="hljs verilog"><span class="hljs-comment">// 模8计数器。存储为count8.v</span>
+<span class="hljs-keyword">module</span> count8(clk, rst_n, cnt);
+    <span class="hljs-keyword">input</span> clk, rst_n;
+    <span class="hljs-keyword">output</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt;
+    <span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt;
+    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk <span class="hljs-keyword">or</span> <span class="hljs-keyword">negedge</span> rst_n)
+    <span class="hljs-keyword">begin</span>
+	<span class="hljs-keyword">if</span>(!rst_n)
+	    cnt &lt;= <span class="hljs-number">4'b0000</span>;
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cnt[<span class="hljs-number">3</span>])
+	    cnt &lt;=<span class="hljs-number">4'b0000</span>;
+	<span class="hljs-keyword">else</span>
+	    cnt &lt;= cnt + <span class="hljs-number">1'b1</span>;
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">endmodule</span></code></pre></li><li><blockquote><p>编译一下</p></blockquote><pre><code class="hljs bash">iverilog  -o counter8 counter8.v</code></pre><p>​ <img src="synthesize.png" srcset="/img/loading.gif" alt="image-20200403162524369"></p><p>​ 可以看到已经编译成功，生成了<code>count8</code>文件。即上述命令-o后面指定的。</p></li><li><blockquote><p>如果想查看电路图。好像只能在quarter II里面viewer一下了。还没发现专门从netlist生成电路图的程序。</p></blockquote><p><img src="RTLviewer.png" srcset="/img/loading.gif" alt="image-20200403163232250"></p></li><li><blockquote><p>编写测试代码</p></blockquote><pre><code class="hljs verilog"><span class="hljs-meta">`<span class="hljs-meta-keyword">include</span> "count8.v"</span>
+<span class="hljs-meta">`<span class="hljs-meta-keyword">timescale</span> 1ns/1ns</span>
+<span class="hljs-keyword">module</span> count8_tb;
+    <span class="hljs-comment">// 数据结构声明</span>
+    <span class="hljs-keyword">reg</span> clk;
+    <span class="hljs-keyword">reg</span> rst_n;
+    <span class="hljs-keyword">wire</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt;
+
+    <span class="hljs-comment">// 实例化待测试模块</span>
+    count8 U1(clk, rst_n, cnt);
+
+    <span class="hljs-comment">// 测试激励信号</span>
+    <span class="hljs-keyword">always</span>
+	#<span class="hljs-number">50</span> clk = ~ clk;
+    <span class="hljs-keyword">initial</span>
+    <span class="hljs-keyword">begin</span>
+	clk = <span class="hljs-number">1'b0</span>;
+	rst_n = <span class="hljs-number">1'b0</span>;
+	#<span class="hljs-number">20</span> rst_n = <span class="hljs-number">1'b0</span>;
+	#<span class="hljs-number">200</span> rst_n = <span class="hljs-number">1'b1</span>;
+    <span class="hljs-keyword">end</span>
+
+    <span class="hljs-comment">// 输出响应</span>
+    <span class="hljs-keyword">initial</span>
+    <span class="hljs-keyword">begin</span>
+	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1000</span>)
+	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
+    <span class="hljs-built_in">$dumpfile</span>(<span class="hljs-string">"count8_tb.vcd"</span>); 	<span class="hljs-comment">// 很关键，把仿真的数据存储到文件,待会波形图要用</span>
+    <span class="hljs-built_in">$dumpvars</span>(<span class="hljs-number">0</span>, count8_tb); 		<span class="hljs-comment">// 设置要观察的变量</span>
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">endmodule</span></code></pre></li><li><blockquote><p>编译，仿真，生成波形图</p></blockquote><pre><code class="hljs bash">iverilog -o count8_tb count8_tb.v &amp; vvp count8_tb &amp; gtkwave count8_tb.vcd</code></pre><p><img src="simulate.png" srcset="/img/loading.gif" alt="image-20200403170800780"></p><p>注意:</p><ol><li><p>由于仿真程序没有设定停止时间。程序会一直执行。</p></li><li><p>如果你想自动停止（可以在testbench上加上<code># 500$stop</code>,那么程序仿真500个tick就停止)</p></li><li><p>如果你没有加停止指令。只能手动停止<code>ctrl+c</code>然后你可以打印当前仿真的时间。如果不够</p><p>你可以继续仿真。如果可以了就<code>finish</code></p></li><li><p>最后用<code>gtkwave</code> 查看你刚刚仿真生成的<code>count8_tb.vcd</code>文件。</p></li></ol><p><img src="gtkwave.png" srcset="/img/loading.gif" alt="image-20200403171326769"></p></li><li><blockquote><p>如果你喜欢用<code>modelsim</code>也可以。</p></blockquote><p>也很简单，只需要建个项目，把你写的源文件放进去编译，仿真一下就可以了。</p><p><a href="https://wenku.baidu.com/view/cd93f34ecf84b9d528ea7a95.html" rel="external nofollow noreferrer">具体教程见</a></p><p><img src="modelsim.png" srcset="/img/loading.gif" alt="image-20200403171721915"></p></li></ol><div id="refer-anchor"></div><h2 id="references"><a href="#references" class="headerlink" title="references"></a>references</h2><p>[1] <a href="http://iverilog.icarus.com/" rel="external nofollow noreferrer">iverilog</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>tools</category>
+      </categories>
+      <tags>
+        <tag>toolkits</tag>
       </tags>
   </entry>
   <entry>
