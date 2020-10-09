@@ -1,102 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>12-hour clock using six BCD digits</title>
-    <url>/posts/8cc45ed0/</url>
-    <content><![CDATA[<blockquote><p>problem link：<a href="https://hdlbits.01xz.net/wiki/Count_clock" rel="external nofollow noreferrer">https://hdlbits.01xz.net/wiki/Count_clock</a></p></blockquote><h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><blockquote><p>时钟是每个人每天都会用到的工具，那怎么用电子电路搭建一个12-hour(带有am/pm指示)的时钟呢？</p></blockquote><h2 id="Problem-description"><a href="#Problem-description" class="headerlink" title="Problem description"></a>Problem description</h2><blockquote><p><a name="reset">选择一系列合适的计数器</a>。你的计数器统一被快时钟(fast-running clock)驱动, 还带有一个脉冲使能输入，该脉冲会在任何需要时钟加1的时候到来（i.e.，每秒来一次)</p><ul><li><code>reset</code>：重置时钟到12：00：00 AM</li><li><code>pm</code> is 0 for AM and 1 for PM</li><li><code>hh:mm:ss</code>：都各自代表两位BCD(用四位二进制表达一位十进制)数；</li><li><code>hh</code>(hours)：01-12；<code>mm</code>(minutes)：00-59；<code>ss</code>(seconds)：00-59</li><li><code>reset</code>比<code>enable</code>有更高的权限，即使在使能信号无效的时候也可以值位。</li><li>👇：从11:59:59 AM 到12:00:00 PM翻转和同步复位，使能的行为。</li></ul><p><img src="https://image.beenli.cn/img/20201006/8D0uEm3C0lTU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></blockquote><p><font color="blue">Hint</font>：Note that <code>11:59:59 PM</code>(晚上转钟) advances to <code>12:00:00 AM</code>, and <code>12:59:59 PM</code>（中午快1点了) advances to <code>01:00:00 PM</code>. There is no 00:00:00.</p><h2 id="Template"><a href="#Template" class="headerlink" title="Template"></a>Template</h2><pre><code class="hljs verilog"><span class="hljs-comment">// Module Declaration</span>
-<span class="hljs-keyword">module</span> top_module(
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,
-    <span class="hljs-keyword">input</span> ena,
-    <span class="hljs-keyword">output</span> pm,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] hh,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] mm,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] ss); 
-   
-<span class="hljs-keyword">endmodule</span></code></pre><h2 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h2><h3 id="①-1位BCD计数器"><a href="#①-1位BCD计数器" class="headerlink" title="① 1位BCD计数器"></a>① 1位BCD计数器</h3><blockquote><ol><li><p>复位到0：为分钟，秒计数器服务</p><pre><code class="hljs verilog"><span class="hljs-comment">/************** 1位BCD计数器,复位到0;实现0-9的循环 ***************/</span>
-<span class="hljs-keyword">module</span> bcdreset0 (
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,        <span class="hljs-comment">// Synchronous active-high reset</span>
-    <span class="hljs-keyword">input</span> enable,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] q);
-    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
-        <span class="hljs-keyword">if</span>(reset) q &lt;= <span class="hljs-number">4'h0</span>;
-        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!enable) q &lt;= q;
-        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(q == <span class="hljs-number">4'h9</span>) q &lt;= <span class="hljs-number">4'h0</span>;
-        	<span class="hljs-keyword">else</span> q &lt;= q + <span class="hljs-number">4'h1</span>;
-    <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">endmodule</span></code></pre></li><li><p>复位到2：<a href="#reset">为小时低位服务(x-&gt;2)</a>[⭐此处有特殊情况]</p><pre><code class="hljs verilog"><span class="hljs-comment">/************************* 1位BCD计数器，复位到2；实现0-9的循环 *************************/</span>
-<span class="hljs-comment">/************** 个位为2时：当高位为1，下一次应该是1；但是当高位为0，下一次为3 **************/</span>
-<span class="hljs-keyword">module</span> bcdreset2 (
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,        <span class="hljs-comment">// Synchronous active-high reset</span>
-    <span class="hljs-keyword">input</span> flag,			<span class="hljs-comment">// 指示当前为特殊情况，即为12的时候</span>
-    <span class="hljs-keyword">input</span> enable,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] q);
-    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
-        <span class="hljs-keyword">if</span>(reset) q &lt;= <span class="hljs-number">4'h2</span>;
-        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!enable) q &lt;= q;
-        	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(flag) q &lt;= <span class="hljs-number">4'h1</span>;				<span class="hljs-comment">// 特殊情况</span>
- 				<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(q == <span class="hljs-number">4'h9</span>) q &lt;= <span class="hljs-number">4'h0</span>;
-       				<span class="hljs-keyword">else</span> q &lt;= q + <span class="hljs-number">4'h1</span>;
-    <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">endmodule</span></code></pre></li><li><p>复位到1：<a href="#reset">为小时高位服务(x-&gt;1)</a>[⭐此处有特殊情况]</p><pre><code class="hljs verilog"><span class="hljs-comment">/*********** 1位BCD计数器，复位到2；实现0-1的循环 *************/</span>
-<span class="hljs-comment">/*********** 每次使能到来，小时高位要么从0-&gt;1；要么从1-&gt;0;逻辑对应代码第11行***********/</span>
-<span class="hljs-keyword">module</span> bcd_zero_one(
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,
-    <span class="hljs-keyword">input</span> enable,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] q);
-    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
-        <span class="hljs-keyword">if</span> (reset) q &lt;= <span class="hljs-number">4'h1</span>;   	<span class="hljs-comment">// (复位为12； 高位为1）</span>
-        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!enable) q &lt;= q;
-        	<span class="hljs-keyword">else</span> q[<span class="hljs-number">0</span>] &lt;= ~q[<span class="hljs-number">0</span>]; 	<span class="hljs-comment">// 0变为1，1变为0(0000-&gt;0001)</span>
-    <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">endmodule</span></code></pre></li></ol></blockquote><h3 id="②-两位BCD计数器"><a href="#②-两位BCD计数器" class="headerlink" title="② 两位BCD计数器"></a>② 两位BCD计数器</h3><blockquote><ol><li><p>秒，分钟计数器：实现0-59循环；复位为0</p><pre><code class="hljs verilog"><span class="hljs-comment">/**************** 两位BCD(8-bit)数表示0-59 ;循环到59时能不能下一个计数到0 **************/</span>
-<span class="hljs-keyword">module</span> zero2fifty_nine(
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,
-    <span class="hljs-keyword">input</span> ena,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] ss);
-    <span class="hljs-keyword">wire</span> ena_ten, reset_ten;
-    <span class="hljs-keyword">assign</span> reset_ten = (((ss == <span class="hljs-number">8'h59</span>) &amp; ena) | reset)? <span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;⭐<span class="hljs-comment">// 当计数到59且下一个使能到来时，把高位置为到0；因为低位肯定回到0;如果不reset，那么肯定为60</span>
-    <span class="hljs-keyword">assign</span> ena_ten = ((ss[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] == <span class="hljs-number">4'h9</span>) &amp; ena)?<span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;	⭐	    <span class="hljs-comment">// 个位到9(重点:必须使能到来)才能使能十位(假设现在为29分:00秒,分钟的十位使能必须在60s后才会到来;但是不并上使能,那么下一秒将是39分:01秒</span>
-    decade_counter one (clk, reset, ena, ss[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]);					<span class="hljs-comment">// 4位二进制表示个位的0-9</span>
-    decade_counter ten (clk, reset_ten, ena_ten, ss[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]);			<span class="hljs-comment">// 4位二进制表示十位的0-9</span>
-<span class="hljs-keyword">endmodule</span>    
-</code></pre></li><li><p>小时计数器：实现1-12循环，复位为12</p><pre><code class="hljs verilog"><span class="hljs-comment">/************* 两位BCD(8-bit)数表示1-12;循环到12时能不能下一个计数到1 ***************/</span>
-<span class="hljs-comment">/* ⭐(flag12) 小时个位为2时：当高位为1(12)，下一次应该是1；但是当高位为0(02)，下一次为3  */</span>
-<span class="hljs-keyword">module</span> one2twelve(
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,
-    <span class="hljs-keyword">input</span> ena,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] hh);
-    <span class="hljs-keyword">wire</span> ena_ten, flag12;
-    <span class="hljs-keyword">assign</span> ena_ten = (ena &amp; ((hh == <span class="hljs-number">8'h9</span>)|(hh == <span class="hljs-number">8'h12</span>)))? <span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;					<span class="hljs-comment">// 小时高位的改变信号(09-&gt;10;12-&gt;01)</span>
-    <span class="hljs-keyword">assign</span> flag12 = (hh == <span class="hljs-number">8'h12</span>);														<span class="hljs-comment">// 指示当前为12</span>
-    BCDreset2 one (clk, reset, flag12, ena, hh[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]);									<span class="hljs-comment">// 4位二进制表示个位的0-9</span>
-    BCDzero_one ten (clk, reset, ena_ten, hh[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]); 									<span class="hljs-comment">// 4位二进制表示十位的0-1</span>
-<span class="hljs-keyword">endmodule</span></code></pre></li></ol></blockquote><h3 id="③-实例化三个②"><a href="#③-实例化三个②" class="headerlink" title="③ 实例化三个②"></a>③ 实例化三个②</h3><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> top_module(
-    <span class="hljs-keyword">input</span> clk,
-    <span class="hljs-keyword">input</span> reset,
-    <span class="hljs-keyword">input</span> ena,
-    <span class="hljs-keyword">output</span> pm,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] hh,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] mm,
-    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] ss); 
-	<span class="hljs-keyword">wire</span> ena_hr, ena_min, ena_pm;
-    one2twelve hour (clk, reset, ena_hr, hh);
-    zero2fifty_nine minite(clk, reset, ena_min, mm);					
-    zero2fifty_nine second(clk, reset, ena, ss);
-    <span class="hljs-keyword">assign</span> ena_min = (ss==<span class="hljs-number">8'h59</span>)?<span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;								<span class="hljs-comment">// 当59s时才使能分钟计数器;</span>
-    <span class="hljs-keyword">assign</span> ena_hr = ((mm == <span class="hljs-number">8'h59</span>) &amp; (ss == <span class="hljs-number">8'h59</span>))? <span class="hljs-number">1'd1</span>: <span class="hljs-number">1'd0</span>;		<span class="hljs-comment">// 当59分59s才使能小时计数器</span>
-    <span class="hljs-keyword">assign</span> ena_pm = ena_hr &amp; (hh == <span class="hljs-number">8'h11</span>);						  		<span class="hljs-comment">// 当11时59分59s才能改变pm⭐</span>
-    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
-        <span class="hljs-keyword">if</span> (reset) pm &lt;= <span class="hljs-number">1'd0</span>;
-        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(ena_pm) pm &lt;= ~pm;   									<span class="hljs-comment">// 每当时钟转到11:59:59pm都会变换一次</span>
-        	<span class="hljs-keyword">else</span> pm &lt;= pm;
-    <span class="hljs-keyword">end</span>
-<span class="hljs-keyword">endmodule</span></code></pre><script>
+    <title>AMBA AHB spec(1)--bus scheme</title>
+    <url>/posts/d26415ba/</url>
+    <content><![CDATA[<blockquote><p>The blog is derived from the translation of <code>ARM IHI 0011A</code> AHB specification Copyright © 1999 ARM Limited</p><p>链接：<a href="https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw" rel="external nofollow noreferrer">https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw</a> 提取码：mmme</p></blockquote><h1 id="0-Overall-framwork"><a href="#0-Overall-framwork" class="headerlink" title="0 Overall framwork"></a>0 Overall framwork</h1><p><img src="https://image.beenli.cn/img/20201009/UXpaBaxtcInK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="1-Bus-interconnection"><a href="#1-Bus-interconnection" class="headerlink" title="1 Bus interconnection"></a>1 Bus interconnection</h1><blockquote><p>AHB总线协议被设计成带有一个中心选择器(central multiplexor)的互连方案。</p><ul><li>主设备驱动地址和控制信号，信号指示它们想要执行的传输。</li><li>并且仲裁器决定哪个主设备能够把他们的信号路由给所有的从设备；</li><li>还需要一个中心译码器控制读数据(read data)和回应信号(response signal)多选器，它从涉及这次传输的从设备中选择合适的信号。</li></ul><p><img src="https://image.beenli.cn/img/20201009/fekjU3fX5vOK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></blockquote><h1 id="2-Overview-of-operation"><a href="#2-Overview-of-operation" class="headerlink" title="2 Overview of operation"></a>2 Overview of operation</h1><blockquote><p>在一次传输开始(commence)之前，master必须被授予访问总线(granted access to the bus)。这个过程由master向仲裁器发起一个请求信号开始(assert a request signal)。然后仲裁器指示何时将授予master总线使用权。</p><p>得到授予的master通过驱动地址和控制信号开始一次AHB transfer。这些信号提供了关于<code>地址</code>，<code>方向</code>，<code>传输宽度</code>和<code>这次传输是否是burst的一部分的指示信号(indiction)</code>。两种不同形式的burst transfer都被允许：</p><ul><li>递增的突发(incrementing burst)，它不包装在地址边界</li><li>包装的突发(wrapping burst)，包裹在特殊的地址边界</li></ul><p>写数据总线把数据从master搬运到slave；但读数据总线把数据从Slave搬运到master。</p><p>每次传输都包括如下两个部分：</p><ul><li>一个地址和控制周期(an address and control cycle)</li><li>一个或多个数据周期(one or more cycle for the data)</li></ul></blockquote><p>由于地址不能被扩展(extended)，所有所有的从设备必须在此期间取样地址。但是数据可以用<code>HREADY</code>信号扩展。当该信号为低时导致<code>等待状态</code>(wait states)被塞进这次传输里面；因此允许slave有额外的时间取提供或者采样数据。</p><p>在传输中，slave通过<code>response signal</code>传达状态信息，<code>HRESP[1:0]</code>：</p><ul><li><strong>OkAY</strong>：指示传输进展正常，当HREADY变高时，该信号指示传输成功完成(complete successfully)</li><li><strong>ERROR</strong>：指示传输❌发生，传输失败</li><li><strong>RETRY and SPLIT</strong>：两者都表示传输不能立刻完成，但是master应该继续尝试传输。</li></ul><p><font color="blue">notes:</font>在正常操作中，允许master在仲裁器授予其它master访问总线前完成一次burst的所有传输。但是，为了避免过多的(excessive)仲裁延迟，有可能仲裁器会打断一次burst，在这种情况下，master必须重新向仲裁器申请总线以完成burst中剩余的传输。</p><h1 id="3-Basic-transfer"><a href="#3-Basic-transfer" class="headerlink" title="3 Basic transfer"></a>3 Basic transfer</h1><h2 id="3-1-simple-without-wait"><a href="#3-1-simple-without-wait" class="headerlink" title="3.1 simple without wait"></a>3.1 simple without wait</h2><blockquote><p>一次AHB传输包含两个不同的部分(two distinct sections)：</p><ul><li>The address phase, which lasts only a single cycle</li><li>The data phase, which may require several cycles. This is achieved using the HREADY signal.</li></ul><p><img src="https://image.beenli.cn/img/20201009/ilQdeYFuyKhz.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center><strong>👆没有等待状态的简单传输</strong></center><ul><li>master在<code>HCLK</code>上升沿把地址和控制信号驱动到bus上</li><li>slave在下一个上升沿采样地址和控制信号</li><li>在slave采样完成之后，它开始驱动合适的回应信号，然后response被master在三个上升沿采样。</li></ul></blockquote><hr><p><font color="blue">notes:</font> 事实上，任何传输的地址相与前一个传输的数据相发生在同一时期。正是因为这种重叠，它们构成了总线流水特性，为高性能操作提供契机，同时为slave对接收的数据做出反应提供了足够的时间。</p><h2 id="3-2-simple-with-wait"><a href="#3-2-simple-with-wait" class="headerlink" title="3.2 simple with wait"></a>3.2 <a name="extend">simple with wait</a></h2><p><img src="https://image.beenli.cn/img/20201009/LaEzji7jaCvB.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><font color="gree">notes:</font> Ⅰ、对于写操作，master需要在扩展周期一直保持稳定的数据；Ⅱ、对于读操作，slave不需要一直提供有效数据，直到传输将要完成。</p><h2 id="3-3-multiple-transfers"><a href="#3-3-multiple-transfers" class="headerlink" title="3.3 multiple transfers"></a>3.3 multiple transfers</h2><center><strong>扩展对下次传输的地址相的side-effect</strong></center><p><img src="https://image.beenli.cn/img/20201009/vaC3e2oTfz4L.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>地址A和地址C的传输没有等待状态</li><li>地址B的传输有一个等待状态</li><li>地址B传输中的数据phase扩展对地址C传输的地址phase扩展有影响。</li></ul><h1 id="4-Transfer-type"><a href="#4-Transfer-type" class="headerlink" title="4 Transfer type"></a>4 Transfer type</h1><blockquote><p>每一种传输都可以被归类为以下四种中的一种，用<code>HTRANS[1:0]</code>信号指示</p></blockquote><div class="table-container"><table><thead><tr><th>HTRANS[1:0]</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>00</td><td>IDLE</td><td>①没有数据传输请求。IDLE用在master获得授权，但不想开始数据传输时。②slave必须总是对这种传输提供一个没有等待状态的<code>OKAY</code>响应，并且该传输应该被slave忽略掉</td></tr><tr><td>01</td><td>BUSY</td><td>①该状态允许master在burst中间插入<code>IDLE</code>周期；该状态表明master正在继续一次burst；但是下一个传输不能立即发生。⭐当master使用该类型时，地址和控制信号一定反应(reflect)burst的下一次传输。②传输应该被slave忽视，slave一定总是提供零等待状态的<code>OKAY</code>回应，跟IDLE同样的方式</td></tr><tr><td>10</td><td>NONSEQ</td><td>①指示burst的第一次传输或者一个单次传输；地址和控制信号与上次传输没有关系。②总线上单一传输(single transfer)与burst传输中的第一个传输同样对待，因此传输类型为<code>NONSEQUENTIAL</code></td></tr><tr><td>11</td><td>SEQ</td><td>①busrt中除了第一次传输剩余的所有传输都是<code>SEQENTIAL</code>;并且地址与上次传输有关。控制信息与上次传输相同，地址信息=上次地址信息+数据大小(in byte)。②在wrapping中，<a href="#boundry">地址包裹在地址边界(warps at the address boundry)</a>，地址边界=beats的数量(4,8或者16)*<a href="#size">数据大小(in byte)</a></td></tr></tbody></table></div><p><img src="https://image.beenli.cn/img/20201009/k5ITwMzdBWxc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="5-Burst-operation"><a href="#5-Burst-operation" class="headerlink" title="5 Burst operation"></a>5 Burst operation</h1><blockquote><p>4，8，16节拍的bursts在AHB协议中有定义，除此之外还有没有定义长度的bursts和单个的传输；递增和包裹的阵发传输都被支持：</p><ul><li>递增的阵发访问顺序的位置，突发中的每个传输的地址只是先前地址的一个增量。</li><li>对于封装阵发，如果传输的起始地址没有对齐阵发的总字节数(size * beats)，那么传输地址将包裹当达到边界时(trap when the boundary is reached)。例如，一个4-beat的包裹阵发以字(4-byte)访问将封装在16-byte的边界。因此如果传输的起始地址为Ox34，那么它由四次传输组成，每次地址为Ox34, Ox38, Ox3C, Ox30</li></ul></blockquote><p align="right"><strong>Table 4-1 Burst signal encoding</strong></p><div class="table-container"><table><thead><tr><th>HBURS[2:0]</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>000</td><td>SINGLE</td><td>Single transfer</td></tr><tr><td>001</td><td>INCR</td><td>没有指定长度的递增阵发</td></tr><tr><td>010</td><td>WRAP4</td><td>4-beat wrapping burst</td></tr><tr><td>011</td><td>INCR4</td><td>4-beat incrementing burst</td></tr><tr><td>100</td><td>WRAP8</td><td>8-beat wrapping burst</td></tr><tr><td>101</td><td>INCR8</td><td>8-beat incrementing burst</td></tr><tr><td>110</td><td>WRAP16</td><td>16-beat wrapping burst</td></tr><tr><td>111</td><td>INCR16</td><td>16-beat incrementing burst</td></tr></tbody></table></div><ul><li>阵发不能跨越1KB的地址边界(即A[9:0]=0)。因此对于master不要尝试开始一个固定长度递增阵发，让这个界限被跨越。</li><li>使用没有指定长度的阵发，并且只有一个长度为1的阵法来代替single transfers。</li><li>一个递增阵发可以是任何长度,但是上限被1KB设定</li></ul><p><font color="blue">notes:</font> ①阵发的大小是每个阵发节拍的数量，不是传送的字节数。一个burst传送的总的数据量=节拍数*每个节拍数据量(HSIZE[2:0])②：<a name="boundary">在一次burst中的所有传输必须对齐地址边界</a>，（边界等于传输的大小)；例如，字传输必须对齐字地址边界(A[1:0]=00字地址的地两位为0；即表示地址是4的倍数)，半字传输必须对齐半字地址边界( A[0] = 0(地址的最后一位为0;即表示地址是2的倍数))。</p><h2 id="5-1-early-termination"><a href="#5-1-early-termination" class="headerlink" title="5.1 early termination"></a>5.1 early termination</h2><blockquote><p>有很多情形，阵发不能完成；因此对于slave的设计中，充分利用阵发信息在阵发提前终止时采取正确的行动很重要。slave可以通过监视<code>HTRANS</code>信号确定阵发何时提前终止，确保阵发开始后的每一个传输都被贴上<code>SEQUENTIAL</code>或者<code>BUSY</code>标签。如果带有<code>NONSEQUENTIAL</code>或者<code>IDLE</code>的传输出现，那表明新的阵发开始并且之前的阵发一定被终止了。</p><p>如果master不能完成一个阵发，因为它失去了总线拥有权，那么它必须在它下次获得权限时合适地重新建立阵发。例如，如果一个master仅仅完成了4-beat阵发中的一个beat，那么它下次必须使用<code>undefined-length</code>阵发来完成剩余的三个阵发。</p></blockquote><h2 id="5-2-4-beat"><a href="#5-2-4-beat" class="headerlink" title="5.2 4-beat"></a>5.2 4-beat</h2><p><img src="https://image.beenli.cn/img/20201009/qnnwUkLNDIRe.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20201009/XCK6FrNsexKT.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><font color="red">notes:</font> 因为是传送大小4-byte的4-beat阵发；①for warping：地址要封装在16-byte的边界内；因此地址为Ox3C的传输后紧跟的是地址为Ox30的传输。②：for increment: 它可以跨越16-byte边界。</p><hr><h2 id="5-3-8-beat"><a href="#5-3-8-beat" class="headerlink" title="5.3 8-beat"></a>5.3 8-beat</h2><p><img src="https://image.beenli.cn/img/20201009/Gdcib8auNtiX.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到地址边界为：8*4=32；那么整个地址空间被分割成很多包含32个字节的块；00-1F; 20-3F; 40-5F….；由于起始地址为OX34——&gt;被封装在<code>Ox20-3F</code>这块里面；</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/IcKa2VOByjNm.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><hr><h2 id="5-4-xx-beat"><a href="#5-4-xx-beat" class="headerlink" title="5.4 xx-beat"></a>5.4 xx-beat</h2><center><strong>Undefined-length bursts</strong></center><p><img src="https://image.beenli.cn/img/20201009/pztUIO5T2M9B.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>两个半字传输从地址Ox20开始，地址每次增加2</li><li>三个字传输从地址Ox5C开始，地址传输增加4</li></ul><h1 id="6-Control-signals"><a href="#6-Control-signals" class="headerlink" title="6 Control signals"></a>6 Control signals</h1><blockquote><p>和传输类型和阵发类型一样，每次传输都有许多控制信号，这些信号提供了传输的额外信息。这些控制信号有着和地址总线完全相同的时序。但是，它们必须在整个阵发期间保持恒定.(remain constant)</p></blockquote><h2 id="6-1-Transfer-direction"><a href="#6-1-Transfer-direction" class="headerlink" title="6.1 Transfer direction"></a>6.1 Transfer direction</h2><blockquote><p>当<code>HWRITE</code>为高，信号指示一个写传送，并且master在写数据总线上广播数据(<code>HWDATA[31:0]</code>)。当其为低时，一个读传送将执行，slave必须在读数据总线上生成数据(<code>HRDATA[31:0]</code>)。</p></blockquote><h2 id="6-2-Transfer-size"><a href="#6-2-Transfer-size" class="headerlink" title="6.2 Transfer size"></a>6.2 <a name="size">Transfer size</a></h2><p><code>Hsize[2:0]</code>指示传送的大小。</p><p><img src="https://image.beenli.cn/img/20201009/PIOE3teyQpGn.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>这个大小(transfer size)用于和<code>HBURST[2:0]</code>信号联结起来决定wrapping bursts的地址边界</p></blockquote><h2 id="6-3-Protection-control"><a href="#6-3-Protection-control" class="headerlink" title="6.3 Protection control"></a>6.3 Protection control</h2><blockquote><p>控制保护信号<code>HPROT[3:0]</code>，提供了关于总线访问的额外信息，主要是为了想要实现某种保护的模块使用。</p><p>这个信号指示这次传输为：</p><ul><li>取操作码\ 数据访问</li><li>特权模式访问\ 用户模式访问</li></ul><p>对于带有内存管理单元的master，这些信号还可以指示当前的访问是否可缓存(cacheable or bufferable)</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/lB70hNmFcAKN.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><font color="blue">notes:</font> 并不是所有的master都有能力生成正确保护信息，因此推荐slave不要使用<code>HPROT</code>信号的信息，除非严格需要(strictly necessary)。</p><h1 id="7-Address-decoding❓"><a href="#7-Address-decoding❓" class="headerlink" title="7 Address decoding❓"></a>7 Address decoding❓</h1><blockquote><p>中心化的地址译码器(central address decoder)为总线上每一个slave提供一个选择信号，<code>HSELx</code>。选择信号是高阶地址信号的组合译码，简单地址译码方案鼓励使用来避免复杂译码逻辑，并且可以保证高速操作。</p><p>当<code>HREADY</code>信号为高时(指示当前传输完成)，slave一定仅采样地址，控制信号和<code>HSELx</code>。在特点情景下，<code>HSELx</code>信号可能在<code>HREADY</code>为低的时被声明(发出)，但是所选slave在当前传输完成时将会改变。</p><p>❓能够分配给单个slave的最小地址空间为<code>1kB</code>。所有的master都被设计成不允许执行跨越1KB边界的递增传输(incrementing transfers)，因此确保burst永远不会越过地址译码边界。</p><p>在系统设计不包含一个完全填充的内存映射的情况下，一个额外的默认slave应被实现，以提供一个响应时，任何不存在的地址位置被访问。如果<code>NONSEQUENTIAL</code>或者<code>SEQUENTIAL</code>传输尝试一个不存在的地址位置，那么默认的slave应该提供一个<code>ERROR</code>响应。<code>IDLE</code>或者<code>BUSY</code>传输尝试一个不存在的地址位置时，应该返回零等待状态的<code>OKAY</code>响应。默认slave的功能通常由decoder的一部分完成。</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/XInRU3i6fHtN.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="8-Slave-response"><a href="#8-Slave-response" class="headerlink" title="8 Slave response"></a>8 Slave response</h1><blockquote><p>在master开始一个传输后，slave随即判断传输改怎样进展，在AHB spec中没有[当传输开始后，master可以取消传输]的规定。</p><p>无论slave何时被访问，它一定提供一个response,指示传输的状态。<code>HREADY</code>信号用于扩展传输，它还和响应信号<code>HRESP[1:0]</code>组合提供传输状态。</p><p>slave可以用多种方法完成传输：</p><ol><li>立即完成</li><li>插入一个或多个等待状态匀出时间来完成</li><li>发送一个<code>error</code>信号告知传输失败</li><li>延迟传输的完成，但是允许master和slave让出总线，腾给其它传输使用。</li></ol></blockquote><h2 id="8-1-transfer-done"><a href="#8-1-transfer-done" class="headerlink" title="8.1 transfer done"></a>8.1 transfer done</h2><blockquote><p><a href="#extend"><code>HREADY</code>信号用于扩展AHB传输的数据部分。</a>当拉低该信号时表明传输被扩展，当拉高该信号表示传输完成</p><p><font color="red">note:</font> 为了计算访问总线的延迟时间，每个master必须有一个预先确定的等待状态的最大数目，它将在退出总线之前插入。我们推荐但不强制：每个slave不要插入超过16个wait states，以防任何单个访问🔒住总线过多的时钟周期。</p></blockquote><h2 id="8-2-transfer-response"><a href="#8-2-transfer-response" class="headerlink" title="8.2 transfer response"></a>8.2 transfer response</h2><blockquote><p>通常，slave使用<code>HREADY</code>信号来插入合适的数量的<code>wait states</code>，并在传输完成时置高<code>HREADY</code>，返回<code>OKAY</code>response，指示传输成功完成。</p><p><code>ERROR</code> response用于指示某种形式的传输失败。很典型的是保护错误，例如尝试写入只能读的存储区域。</p><p><code>SPLIT</code>和<code>RETRY</code>响应组合让slave能延迟传输的完成，但是释放总线给其它master用。这些响应组合通常仅仅被那些访问延迟长的master使用，充分利用这些响应码可以确保其它的master申请bus不会等待太长的时间。</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/qakoEUczkIsS.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><font color="red">note:</font> 当slave发现还不能立刻给出响应结果，需要插入几个等待周期时，它应该响应<code>OKAY</code></p><h2 id="8-3-Two-cycle-response"><a href="#8-3-Two-cycle-response" class="headerlink" title="8.3 Two-cycle response"></a>8.3 Two-cycle response</h2><blockquote><p>只有<code>OKAY</code>响应才可能出现在单周期中。<code>ERROR</code>，<code>SPLIT</code>和<code>RETRY</code>响应至少需要两个周期。为了用这些响应中的任何一个来完成传输，在倒数第二个周期，slave驱动<code>HRESP[1:0]</code>指示ERROR, RETRY or SPLIT，同时驱动HREADY低电平来扩展一个额外的周期。在最后一个周期<code>HREADY</code>驱动到高电平结束这次传输，但是<code>HRESP[1:0]</code>仍然保持不变指示ERROR, RETRY or SPLIT。</p><p>如果slave需要多于两个周期来提供ERROR, RETRY or SPLIT响应，那么额外的等待状态在传输的开始被插入。等待期间HREADY=0，响应设置为<code>OKAY</code></p><p>由于总线流水线的特性，需要两个周期的响应。这时slave开始发射 ERROR, SPLIT or RETRY中的任何一个响应，然后下一次传输的地址已经被广播到总线上。两周期的响应给master足够的时间取消地址，在下一次传输开始前驱动<code>HTRANS[1:0]</code>到IDLE。</p><p>对于SPLIT和RETRY响应，接下来的传输一定被取消，因为在当前传输完成前不能进行此传输。但是，对于ERROR响应，其中当前传输没有重复时，完成接下来传输的是可选的。</p></blockquote><h3 id="8-3-1-retry"><a href="#8-3-1-retry" class="headerlink" title="8.3.1 retry"></a>8.3.1 retry</h3><p><img src="https://image.beenli.cn/img/20201007/qIJ2WDNn39pv.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>master开始一个地址A的传输</li><li>在这次传输的响应收到前，它开始新的传输A+4</li><li>在地址A的slave不能立刻完成改次传输，因此它回复<code>RETRY</code>响应；这个响应告诉master地址A的传输不能完成，所以地址A+4的传输被取消并用IDLE传输替代。</li></ul><hr><h3 id="8-3-2-Error"><a href="#8-3-2-Error" class="headerlink" title="8.3.2 Error"></a>8.3.2 Error</h3><p><img src="https://image.beenli.cn/img/20201007/v0mXUKMwCtur.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>slave需要一个周期决定响应(此期间HRESP指示OKAY)</li><li>然后slave用两周期的ERROR响应终止该传输</li></ul><h2 id="8-4-Error-response"><a href="#8-4-Error-response" class="headerlink" title="8.4 Error response"></a>8.4 Error response</h2><blockquote><p>如果一个slave提供一个错误响应，然后master可以选择取消在突发的剩余传输。但是，这不是一个严格的要求，并且master继续在突发中传输剩余的数据也是可以接受的。</p></blockquote><h2 id="8-5-Split-and-retry"><a href="#8-5-Split-and-retry" class="headerlink" title="8.5 Split and retry"></a>8.5 Split and retry</h2><blockquote><p>分割和重试响应提供了一种机制，当slave不能立即为传输提供数据时，可以释放总线。这两种机制都允许在总线上的传输完成，因此允许高优先级的master访问总线。</p><p>两者的不同在于仲裁器分配总线的方法：</p><ul><li>对于retry：仲裁继续使用正常的优先级策略，因此只有更高优先级的master能获得总线</li><li>对于split：仲裁器调整优先策略，以至于任何申请的master都有机会获得，即使是那些低优先级的。<a name="split">为了完成SPLIT的传输，仲裁器必须被通知slave何时准备好了数据。</a></li></ul><p>SPLIT传输需要同时在仲裁器和slave上增加复杂度，但是它的优势在于它完全释放总线给其它masters, 与此相对的是retry，它只释放总线给优先级更高的master。</p><p>master应该用同样的方式对待SPLIT和RETRY。它应该继续申请总线，尝试传输直到它要么成功完成，要么它以ERROR响应提前终止了。</p></blockquote><h1 id="9-Data-buses"><a href="#9-Data-buses" class="headerlink" title="9 Data buses"></a>9 Data buses</h1><blockquote><p>为了AHB系统实现不需要使用<code>三态驱动器</code>(tristate drivers)，我们需要独立的读和写数据总线。最小的数据总线宽度被指定为32 bits，但是可以增加。</p></blockquote><h2 id="9-1-HWDATA-31-0"><a href="#9-1-HWDATA-31-0" class="headerlink" title="9.1 HWDATA[31:0]"></a>9.1 HWDATA[31:0]</h2><blockquote><p>写数据总线在写传输期间由master驱动。如果传输被扩展，master保持数据有效直到传输完成(由HREADY 变高指示)</p><p>对于比起总线宽度还窄的传输，比如在32位总线上传输16位，那么master只用驱动适当的<code>字节通道</code>（byte lanes)。slave负责为写进的数据选通正确的字节通道。👇表格说明哪个字节通道分别在大端和小端系统中被激活。如果需要，此信息可以扩展为更宽的数据总线实现。对于传输大小小于数据总线宽度的阵发传输，每一拍有不同的激活字节通道。</p><p>激活字节通道取决于系统是大端还是小端，但是AHB没有指定所需的端。因此，对于系统中的master和slave保持相同的端很重要。</p></blockquote><h2 id="9-2-HRDATA-31-0"><a href="#9-2-HRDATA-31-0" class="headerlink" title="9.2 HRDATA[31:0]"></a>9.2 HRDATA[31:0]</h2><blockquote><p>读数据总线在读传输中被对应的slave驱动。如果slave扩展传送，那么slave仅仅需要提供有效的数据在传输的最后一个周期，用HREADY=1指示</p><p>对于比总线宽度更窄的传输，slave仅仅需要在激活的字节通道上提供有效的数据。master负责从正确的字节道中选择数据</p><p>slave只要当传输带有OKAY响应完成时提供有效数据。 SPLIT, RETRY and ERROR responses不需要提供有效读数据。</p><p><img src="https://image.beenli.cn/img/20201007/utIIQ2a1FJji.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></blockquote><h2 id="9-3-Endianness"><a href="#9-3-Endianness" class="headerlink" title="9.3 Endianness"></a>9.3 Endianness</h2><blockquote><p>为了让系统功能正确，所有模块使用同样的端很重要，并且所有的数据路由或者桥也用一样的。</p><p>动态端不支持，因为绝大多嵌入书系统，这将导致大量冗余的硅开销(silicon overhead that is redundant)</p><p>对于某块设计者，我们推荐只有那些可被用在许多地方的模块才应该设计成大小端，要么带有可配置的引脚(pin)或者内部控制位取选择端的大小。对于更多特定应用的模块，固定端为小端或者大端可以节省功耗，提高接口性能。</p></blockquote><h1 id="10-Arbitration"><a href="#10-Arbitration" class="headerlink" title="10 Arbitration"></a>10 Arbitration</h1><blockquote><p>仲裁机制被用来确保任何时候只有一个master访问总线。仲裁器通过观察一些不同的请求，判断当前请求中最高优先级的master来完成这一功能。仲裁也接受来自slave的请求，<a href="#split">请求完成SPLIT传输。</a></p><p>任何不能完成SPLIT传输的slave都不需要知道仲裁的过程，除非它们需要观测这样的事实——一连串的传输可能无法完成如果总线所有权改变了。</p></blockquote><h2 id="10-1-Signal-description"><a href="#10-1-Signal-description" class="headerlink" title="10.1 Signal description"></a>10.1 Signal description</h2><ul><li><strong>HBUSREQx </strong>：总线请求信号；每个master有单独的请求信号连接到仲裁器，最多有16个独立的master。</li><li><strong>HLOCKx </strong>：锁信号与请求信号被master同时发出；它指示我将要执行大量不可分割的传输，并且一旦带🔒传输的第一个传输开始，仲裁一定不要授权其它的master。该信号一定在它访问的地址之前至少一个周期发出，以免仲裁改变了授权信号。</li><li><strong>HGRANTx </strong>：授权信号由仲裁生成，指示当前申请总线的master中优先级最高的，考虑锁传输和SPLIT传输在内。</li><li><strong>HMASTER[3:0]</strong>：指示当前谁有权利使用总线。该信号还被用来当作地址控制多选器的控制信号。master的号码还被能够执行SPLIT传输的slaves使用，来向仲裁指示哪一个master能够完成SPLIT交易</li><li><strong>HMASTLOCK</strong>：仲裁器通过发出该信号指示当前传输是带🔒传输序列的一部分，其与地址和控制信号有相同的时序。</li><li><strong>HSPLIT[15:0] </strong>：能够处理split的slave使用16bit的<code>SPLIT Complete bus</code>来指示哪个master能够完成split交易。仲裁器需要这个信息来授权master去完成该次传输。</li></ul><h2 id="10-2-Requesting-bus-access"><a href="#10-2-Requesting-bus-access" class="headerlink" title="10.2 Requesting bus access"></a>10.2 Requesting bus access</h2><blockquote><p>master使用<code>HBUSREQx</code>信号来请求访问总线，并可能在任何周期发起请求。仲裁器将在时钟上升沿取样请求信号然后使用内部优先级算法决定哪个master将成为下一个有权利访问总线的。</p><p>正常来说仲裁器只会当阵发完成后才授权一个不同的master。但是，如果需要，仲裁器能提前终止一次阵发来让更高优先级的master访问。</p><p>如果master需要锁访问，那么它必须发送HCLOKx信号来向仲裁器指示：不该有其它的master被授权。</p><p>当有一个master被授权总线并正在执行一个固定长度长度的阵发，它没必要持续请求总线来完成阵发。仲裁器观察阵发的进程并使用<code>HBURST[2:0]</code>信号知道master请求了多少次传输。如果master希望在当前正在进行的burst之后再执行第二次burst，那么它应该在当前burst期间重新发出请求信号</p><p>如果一个master在阵发中途失去了总线访问权，那么它必须重新发出<code>HBUSREQx</code>请求来重新获得总线访问权。</p><p>对于没有定义长度的burst，master必须持续发出请求知道它开始了最后一次传输(until it has started the last transfer)。在没有定义长度阵发的末尾，仲裁器不能预测何时去改变仲裁。</p><p>当master不请求总线时，它可能被授予该总线。这种情况发生在没有master请求总线并且仲裁器授予访问权给一个默认的master。因此，如果master不需要访问总线，它应该驱动传输类型<code>HTRANS</code>指示当前传输为<code>IDLE</code>。</p></blockquote><h2 id="10-3-Granting-bus-access"><a href="#10-3-Granting-bus-access" class="headerlink" title="10.3 Granting bus access"></a>10.3 Granting bus access</h2><h3 id="10-3-1-granting-with-wait"><a href="#10-3-1-granting-with-wait" class="headerlink" title="10.3.1 granting with wait"></a>10.3.1 granting with wait</h3><blockquote><p>仲裁程序通过声明适当的<code>HGRANTx</code>信号来指示当前请求总线中哪个master是最高优先级的。当当前传输完成，有<code>HREADY</code>为高来指示，之后master将被授权并且仲裁器会改变<code>HMASTER[3:0]</code>信号来指示这个master的号码。</p><p><img src="https://image.beenli.cn/img/20201008/FPXL0rH173Vy.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>当master发出<code>HBUSREQx</code>后几个周期，仲裁器才授权(<code>HGRANTx</code>置高)</li><li>master只有等到<code>HGRANTx</code>和<code>HREADY</code>都为高才开始传送地址。同时<code>HMASTER[3:0]</code>指示该master</li><li>地址被slave采样，当<code>HREADY</code>为高时才传送下一个地址。</li></ul></blockquote><h3 id="10-3-2-Data-bus-owner"><a href="#10-3-2-Data-bus-owner" class="headerlink" title="10.3.2 Data bus owner"></a>10.3.2 Data bus owner</h3><blockquote><p><img src="https://image.beenli.cn/img/20201008/AWHDyOGLSx92.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>数据总线拥有权滞后于地址总线。(👆落后T5和T6两周期)</li><li>无论传输何时完成(由HREADY为高指示)，那么拥有地址总线的master(👆#2在T7可以传送写数据)将能够使用数据总线，并一直占有数据总线直到传输完成。</li></ul></blockquote><h3 id="10-3-3-handover-after-burst"><a href="#10-3-3-handover-after-burst" class="headerlink" title="10.3.3 handover after burst"></a>10.3.3 handover after burst</h3><blockquote><p><img src="https://image.beenli.cn/img/20201008/7W4Hcztx7uQz.png?imageslim" srcset="/img/loading.gif" alt=""></p><ul><li>仲裁器在倒数第二个地址被采样完(👆T5)改变<code>HGRANTx</code>信号，新的<code>HGRANTx</code>信号将和阵发的最后一个地址信号在相同时刻被采样(👆只有HREADY为高时才采样成功即T7；此时HMASTER也改为#2)。</li></ul></blockquote><h3 id="10-3-4-hgrant-and-hmaster"><a href="#10-3-4-hgrant-and-hmaster" class="headerlink" title="10.3.4 hgrant and hmaster"></a>10.3.4 hgrant and hmaster</h3><blockquote><p><img src="https://image.beenli.cn/img/20201008/i0vyocIqRNLC.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>因为有中央复用器，每一个master都能够驱动它们想要立刻执行的传输的地址，并且它们直到被授予总线才需要等待。</li><li><code>HGRANTx</code>信号仅仅被master用于决定它们何时拥有总线，因此什么时候它应该考虑地址已经被适当的slave取样。</li></ul></blockquote><h2 id="10-4-Early-burst-termination"><a href="#10-4-Early-burst-termination" class="headerlink" title="10.4 Early burst termination"></a>10.4 Early burst termination</h2><blockquote><p>正常来说，仲裁器不用移交总线给一个新的master，直到阵发传输的结束。但是，如果仲裁器认为阵发应该提前终止为了避免访问总线时间过长，那么它可能在阵发完成之前转换授权给另外一个master。</p></blockquote><h2 id="10-5-default-bus-master"><a href="#10-5-default-bus-master" class="headerlink" title="10.5 default bus master"></a>10.5 default bus master</h2><blockquote><p>每个系统一定包含一个默认的master，它在其它master都不能访问总线时被授予使用。当被授予时，默认master一定只能进行<code>IDLE</code>的传输。</p><p>如果没有master请求总线，那么仲裁器要么授权默认的master，要么授予可能从访问总线低延迟获益最大的master。</p><p>授予对总线默认的master访问权还提供了一种有用的机制，以确保总线上不会启动新的传输，是在进入低功率工作模式之前执行的一个有用的步骤</p><p>⭐如果所有其它master都在等待分割传输完成，则必须授予默认master。</p></blockquote><h1 id="11-Split-transfer"><a href="#11-Split-transfer" class="headerlink" title="11 Split transfer"></a>11 Split transfer</h1><blockquote><p>SPLIT传输通过分离<code>master向slave提供地址的操作</code>和<code>slave向master提供正确数据的操作</code>，来提高总的总线利用率。</p><p>当一次传输发生时，slave如果相信该次传输需要花费很多周期去执行，那么它将发送SPLIT响应。这个信号告诉仲裁器当前尝试传输的master不应该被授权直到slave表示它已经准备好完成传输。因此仲裁器需要观测响应信号并在内部屏蔽来自已被分割(have been SPLIT)的master的任何请求</p><p>在一次传输的地址相中，仲裁器产生一个标签或者master编号HMASTER[3:0]，指示正在执行传输的master。任何发出SPLIT响应的slave必须能够指示它们有能力完成传输，并且它通过记录HMASTER[3:0]信号上的master编号来做到这一点</p><p>随后，当slave完成了传输，它根据master编号在<code>HSPLITx[15:0]</code>上向仲裁器发出合适的位。仲裁器然后使用该信息unmask(停止屏蔽)对应master的请求信号并在适当的适合(in due course)master被授权访问来重启之前的传输。仲裁器每周期都取样HSPLITx信号，因此slave只需要发出合适的位持续一个周期以便仲裁器能够识别它。</p><p>在带有多个有能力发送SPLIT的slave系统中，来自每个slave的HSPLITx信号被或操作到一起，产生一个最终结果的HSPLIT信号给仲裁器。</p><p>在大多数系统中，可能用不到16个master的最大容量。因此仲裁器只需要一根HSPLIT总线，其位数与master个数相同。但是，我们推荐所有有能力发送split的slave都被设计成支持最多的16个master。</p></blockquote><h2 id="11-1-split-transfer-seq"><a href="#11-1-split-transfer-seq" class="headerlink" title="11.1 split transfer seq"></a>11.1 split transfer seq</h2><blockquote><p>SPLIT交易的基本阶段如下：</p><ol><li>master以和其他任何传输相同的方式开启传输，并发射地址和控制信息。</li><li>如果slave能够立刻提供数据，它可能这样做。如果slave决定它可能需要多个周期获得数据，它将给出一个SPLIT响应。在每次传输中，仲裁器广播一个号码或者标签—指示正在使用总线的master。slave必须记录这个号码，后面用这个信息重启这个传输。</li><li>仲裁器授权其它master，并且SPLIT响应的动作允许master切换的发生。如果所有其它的master也收到了SPLIT响应，那么默认的master被授权。</li><li>当slave准备好完成传输时，它发出合适的HSPLITx中的位给仲裁器指示哪个master被授权访问总线。</li><li>仲裁器每个周期都会观察HSPLITx信号，并且当HSPLITx中任何一位被声明时，仲裁器恢复该master的优先级(因为之前被屏蔽了)</li><li>最终仲裁器授权该master，好让它能够重新尝试这次传输。如果一个更高优先级的master正在使用，上述场景可能不会立刻发生。</li><li>当传输最终发生时，slave用OKAY响应结束这次传输。</li></ol></blockquote><h2 id="11-2-multiple-split-trans❓"><a href="#11-2-multiple-split-trans❓" class="headerlink" title="11.2 multiple split trans❓"></a>11.2 multiple split trans❓</h2><blockquote><p>该总线协议仅允许每个master有一个<code>滞外交易/未完成事物</code>(outstanding transaction)。如果任何master模块能够处理不止一个滞外交易，他需要为每个它能处理的滞外交易提供一组额外的请求和授权信号。在协议级别上，单个模块可以作为许多不同的master出现，每一个master只能有一个滞外交易。</p><p>❓但是，一个有能力处理SPLIT的slave可能接收比它所能并发处理更多的传输请求。如果这种情况发生，slave发送SPLIT响应，但没有记录与传输对应的地址和控制信息是可接受的，slave只是必须记录master的编号。通过为所有之前有split传输关联的master声明HSPLITx中合适的位，然后slave指示它可以处理另一个传输，但是slave没有记录地址和控制信息。</p><p>然后仲裁器能够重新授权master访问，它们也就能够重新尝试传输，给予slave所要求的地址和控制信息。这意外着master在它最终被允许完成它请求的传输前需要被授权许多时间(a number of time)。</p></blockquote><h2 id="11-3-preventing-deadlock"><a href="#11-3-preventing-deadlock" class="headerlink" title="11.3 preventing deadlock"></a>11.3 preventing deadlock</h2><blockquote><p>SPLIT和RETRY响应使用时一定要避免死锁。单个传输不可能锁住AHB,因为每个slave一定被指派在预先规定的周期内去完成传输。但是，如果大量不同的master尝试访问同一个slave，这个slave以不能处理的方式发射SPLIT和RETRY响应时可能发生死锁。</p></blockquote><h3 id="11-3-1-Split"><a href="#11-3-1-Split" class="headerlink" title="11.3.1 Split"></a>11.3.1 Split</h3><blockquote><p>对于能够发射split响应的slave，总线死锁通过确保slave能够经受得住系统中每个master的请求来避免(最多16个)。slave没必要保存每次传输的地址和控制信息，它仅仅需要记录这样的事实：一次传输请求已经发出，并且一个SPLIT响应也发出。最终所有的master都将在一个较低优先级，然后slave可以有序地处理这些请求，向仲裁器指示它正在处理哪个请求，因此保证所有的请求最终都被完成。</p><p>当一个slave有许多未完成的请求，它可以选择以任何次序去处理它们，尽管slave一定要注意<code>锁定的传输</code>(locked transfer)必须在任何其它传输可以继续之前完成。</p><p>理想情况下，master的未完成传输量不应该超过它所能支持的传输量，但是需要这种机制来防止总线死锁。</p></blockquote><h3 id="11-3-2-Retry"><a href="#11-3-2-Retry" class="headerlink" title="11.3.2 Retry"></a>11.3.2 Retry</h3><blockquote><p>对于发送<code>RETRY</code>响应的slave每次只能由一个master访问。这不是由总线的协议强制执行的，应该由系统体系结构确保。大多数情况下，发送RETRY响应的slave可能是那些一次只有一个master访问的外围设备，所以能够被更高级别协议确保。</p><p>对多master访问RETRY slaves的硬件保护不是本协议的要求，但可按下一段所述实现。在总线级别上，只要求slave一定要在预定数量的时钟周期内驱动HREADY到高电平。</p></blockquote><p>如果需要硬件保护，那么可以在RETRY slave本身上实现。当一个slave发射一个RETRY，它能采样master号码。在该时刻和传输最终被完成之间，slave检查每个传输尝试，以确保是相同的master号码。如果它检测到主编号不同，那么它可以采取另一种操作过程，例如：</p><ul><li>ERROR响应</li><li>发送仲裁器一个信号</li><li>系统级别中断(a system level interrupt)</li><li>系统重置(a complete system reset)</li></ul><h2 id="11-4-Bus-handover"><a href="#11-4-Bus-handover" class="headerlink" title="11.4 Bus handover"></a>11.4 Bus handover</h2><blockquote><p>协议要求master在接收分割(split)或重试(retry)响应后,立即执行一次IDLE传输好让总线被转交给另一个master。</p><p><img src="https://image.beenli.cn/img/20201008/Xp2VmFI5Vsgp.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>T1之后传输的地址出现在总线上；在T2和T3时钟沿后slave返回两个周期SPLIT响应</li><li>第一个响应周期结束，T3，master检测到传输被分割(be SPLIT)所以它改变下一次传输的控制信号为IDLE。</li><li>同时在T3，仲裁器采样响应信号并发现传输将是SPLIT。然后仲裁器能够调整仲裁优先级，并且grant信号在接下来的一个周期发生改变，以至于新的master能够被授权地址总线在T4之后。</li><li>⭐新master被保证立刻访问，因为IDLE传输总是在一个周期完成。</li></ul></blockquote><h1 id="12-Reset"><a href="#12-Reset" class="headerlink" title="12 Reset"></a>12 Reset</h1><blockquote><p><code>HRESETn</code>是AHB文档中唯一的低电平有效的信号，并且是所有总线元件的主要复位。复位可异步声明，但是在HCLK上升沿之后同步失效(deasserted)。</p><p>在复位期间，所有master确保地址和控制信号都在有效状态并且<code>HTRANS[1:0]</code>指示IDLE。</p></blockquote><h1 id="13-Data-bus-width"><a href="#13-Data-bus-width" class="headerlink" title="13 Data bus width"></a>13 Data bus width</h1><blockquote><p>在不提高操作频率下，提高总线带宽的一种方法是提高总线数据通道宽度。金属层的增加和大片内存储块的使用(例如嵌入的DRAM)都是鼓励更宽总线的使用的驱动因素。</p><p>指定一个固定宽度的总线意味着，在许多情况下总线的宽度对于应用不是最优的。因此，我们采用灵活的总线宽度，但是任然保证模块在设计之间具有高度的可移植性(highly portable)</p><p><a href="#size">AHB协议允许数据总线为8，16，32，64，128，256，512或者1024bits</a>。但是，我们推荐最小总线宽度为32bits,预计最大256bits将对绝大多数应用都是足够的。</p><p>对于读和写传输，接收模块必须从总线上正确的字节通道选择数据。不需要跨所有字节通道复制数据。</p></blockquote><h1 id="14-narrow-slave-on-wide-bus"><a href="#14-narrow-slave-on-wide-bus" class="headerlink" title="14 narrow slave on wide bus"></a>14 narrow slave on wide bus</h1><blockquote><p>👇图展示了一个原本被设计成处理32位数据总线的slave模块，是如何被轻松转换为处理64位总线。这仅仅需要额外的外部逻辑，而不需要任何内部设计的改变，因此这项技术也可以被用到硬宏单元。</p></blockquote><p><img src="https://image.beenli.cn/img/20201008/Lrfh7n73r7V5.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>对于输出，当转化窄的总线到一个宽的总线，做下面中的一条：</p><ul><li>将数据复制到宽总线的两个部分(像👆)</li><li>使用额外层次逻辑确保总线只有合适的半部分改变。这可以节约能耗。</li></ul><h1 id="15-wide-slave-on-narrow-slave"><a href="#15-wide-slave-on-narrow-slave" class="headerlink" title="15 wide slave on narrow slave"></a>15 wide slave on narrow slave</h1><blockquote><p>👇图展示了一个宽接口的slave被实现在一个窄的总线上。</p></blockquote><p><img src="https://image.beenli.cn/img/20201008/YzRiClD91a4p.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -116,11 +23,41 @@
           });
       </script>]]></content>
       <categories>
-        <category>Digital IC</category>
-        <category>HDL Bits</category>
+        <category>RISC-V</category>
+        <category>spec</category>
       </categories>
       <tags>
-        <tag>circuits</tag>
+        <tag>specification</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AMBA AHB spec(2)--bus interface</title>
+    <url>/posts/d1f5324a/</url>
+    <content><![CDATA[<blockquote><p>The blog is derived from the translation of <code>ARM IHI 0011A</code> AHB specification Copyright © 1999 ARM Limited</p><p>链接：<a href="https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw" rel="external nofollow noreferrer">https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw</a> 提取码：mmme</p></blockquote><h1 id="0-Convention"><a href="#0-Convention" class="headerlink" title="0 Convention"></a>0 Convention</h1><h2 id="0-1-timing-parameters"><a href="#0-1-timing-parameters" class="headerlink" title="0.1 timing parameters"></a>0.1 timing parameters</h2><blockquote><p>generic timing parameters that are required to analyze an AMBA design</p><p>• <strong>Tis</strong> - input setup time</p><p>• <strong>Tih</strong> - input hold time</p><p>• <strong>Tov</strong> - output valid time</p><p>• <strong>Toh</strong> - output hold time.</p></blockquote><h2 id="0-2-timing-diagrams"><a href="#0-2-timing-diagrams" class="headerlink" title="0.2 timing diagrams"></a>0.2 timing diagrams</h2><p><img src="https://image.beenli.cn/img/20201009/TFbsAcJR31hk.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><font color="blue">Notes：</font><ul><li>总线和信号中的阴影区域是未定义的，所以可以假定他们在这个区域的值是任意的。它们实际的值不重要，不影响正常的操作。</li><li>单比特信号有时在同一时刻被显示为<code>HIGH</code>和<code>LOW</code>，它们和<code>总线变化</code>(👆Bus change)相似。如果单比特信号像这样显示，意味着它的值不影响附带的描述(accompanying description)</li></ul></blockquote><h1 id="1-Slave"><a href="#1-Slave" class="headerlink" title="1 Slave"></a>1 Slave</h1><blockquote><p>slave对系统内master发起的传输做出响应。slave使用解码器传来的<code>HSELx</code>信号来决定合适对传输做出响应。所有其它被传输需要的信号，例如地址和控制信号，都有master产生。</p></blockquote><h2 id="17-1-Interface-diagram"><a href="#17-1-Interface-diagram" class="headerlink" title="17.1 Interface diagram"></a>17.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201008/qyvxmE48Sr2g.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="17-2-Timing-diagrams"><a href="#17-2-Timing-diagrams" class="headerlink" title="17.2 Timing diagrams"></a>17.2 Timing diagrams</h2><h3 id="17-2-1-Reset"><a href="#17-2-1-Reset" class="headerlink" title="17.2.1 Reset"></a>17.2.1 Reset</h3><p><img src="https://image.beenli.cn/img/20201009/EA3CJd2Uw70d.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p><strong>Tihrst</strong>：reset输入信号保持时间[在时钟边沿后还得保持一段时间保证被采样到] (ih=input hold time; rst=HRESETn)</p></li><li><p><strong>Tisrst</strong>：reset输入信号建立时间[在时钟边沿之前维持valid一段必要的时间，让主触发器能够采样到✔的值]</p></li></ul><h3 id="17-2-2-Normal-signals"><a href="#17-2-2-Normal-signals" class="headerlink" title="17.2.2 Normal signals"></a>17.2.2 Normal signals</h3><hr><p><img src="https://image.beenli.cn/img/20201009/U6kJ4KxjPY3w.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><strong>Tovrdy</strong>：输出信号HREADY的有效时间</li></ul><h3 id="17-2-3-Additional-signals"><a href="#17-2-3-Additional-signals" class="headerlink" title="17.2.3 Additional signals"></a>17.2.3 Additional signals</h3><p><img src="https://image.beenli.cn/img/20201009/sIpc22HODUqP.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2-Master"><a href="#2-Master" class="headerlink" title="2 Master"></a>2 Master</h1><blockquote><p>在AMBA系统中，master有最复杂的总线接口。通常来说，一个AMBA系统设计者会使用预先设计好的master(可能是处理器核，协处理器等)，因此没必要担心master接口的细节。</p></blockquote><h2 id="2-1-Interface-diagram"><a href="#2-1-Interface-diagram" class="headerlink" title="2.1 Interface diagram"></a>2.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201009/HtNGaKLwi8H5.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="3-Arbiter"><a href="#3-Arbiter" class="headerlink" title="3 Arbiter"></a>3 Arbiter</h1><blockquote><p>在AMBA系统中仲裁器的角色：控制哪个master有权访问总线。每个master有一个通向仲裁器的<code>REQUESET/GRANT</code>接口，仲裁器使用一个优先级策略决定当前请求总线的所有master中哪个优先级最高。</p><p>每个master也会产生一个<code>HLOCKx</code>信号，用来向master指示我需要对总线独占访问。(exclusive access to the bus)</p><p>优先级别策略的细节没有规定，而是每个应用自己决定。对于仲裁器使用其它的信号(例如AMBA或non-AMBA)去影响正在使用的优先级策略是可以接受的。</p></blockquote><h2 id="3-1-Interface-diagram"><a href="#3-1-Interface-diagram" class="headerlink" title="3.1 Interface diagram"></a>3.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201009/Le7fV3wAczDf.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="4-Decoder"><a href="#4-Decoder" class="headerlink" title="4 Decoder"></a>4 Decoder</h1><blockquote><p>AMBA系统中的<code>decoder</code>用于完成一个中心化地址译码的功能，通过使它们独立于系统内存映射(system memory map)来提高外设可移植性。</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/XynQ4f67E9KN.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>RISC-V</category>
+        <category>spec</category>
+      </categories>
+      <tags>
+        <tag>specification</tag>
       </tags>
   </entry>
   <entry>
@@ -254,6 +191,129 @@ git fetch 不会修改当前工作区的文件。它只会获取数据然后让�
       </categories>
       <tags>
         <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>12-hour clock using six BCD digits</title>
+    <url>/posts/8cc45ed0/</url>
+    <content><![CDATA[<blockquote><p>problem link：<a href="https://hdlbits.01xz.net/wiki/Count_clock" rel="external nofollow noreferrer">https://hdlbits.01xz.net/wiki/Count_clock</a></p></blockquote><h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><blockquote><p>时钟是每个人每天都会用到的工具，那怎么用电子电路搭建一个12-hour(带有am/pm指示)的时钟呢？</p></blockquote><h2 id="Problem-description"><a href="#Problem-description" class="headerlink" title="Problem description"></a>Problem description</h2><blockquote><p><a name="reset">选择一系列合适的计数器</a>。你的计数器统一被快时钟(fast-running clock)驱动, 还带有一个脉冲使能输入，该脉冲会在任何需要时钟加1的时候到来（i.e.，每秒来一次)</p><ul><li><code>reset</code>：重置时钟到12：00：00 AM</li><li><code>pm</code> is 0 for AM and 1 for PM</li><li><code>hh:mm:ss</code>：都各自代表两位BCD(用四位二进制表达一位十进制)数；</li><li><code>hh</code>(hours)：01-12；<code>mm</code>(minutes)：00-59；<code>ss</code>(seconds)：00-59</li><li><code>reset</code>比<code>enable</code>有更高的权限，即使在使能信号无效的时候也可以值位。</li><li>👇：从11:59:59 AM 到12:00:00 PM翻转和同步复位，使能的行为。</li></ul><p><img src="https://image.beenli.cn/img/20201006/8D0uEm3C0lTU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></blockquote><p><font color="blue">Hint</font>：Note that <code>11:59:59 PM</code>(晚上转钟) advances to <code>12:00:00 AM</code>, and <code>12:59:59 PM</code>（中午快1点了) advances to <code>01:00:00 PM</code>. There is no 00:00:00.</p><h2 id="Template"><a href="#Template" class="headerlink" title="Template"></a>Template</h2><pre><code class="hljs verilog"><span class="hljs-comment">// Module Declaration</span>
+<span class="hljs-keyword">module</span> top_module(
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,
+    <span class="hljs-keyword">input</span> ena,
+    <span class="hljs-keyword">output</span> pm,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] hh,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] mm,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] ss); 
+   
+<span class="hljs-keyword">endmodule</span></code></pre><h2 id="Answer"><a href="#Answer" class="headerlink" title="Answer"></a>Answer</h2><h3 id="①-1位BCD计数器"><a href="#①-1位BCD计数器" class="headerlink" title="① 1位BCD计数器"></a>① 1位BCD计数器</h3><blockquote><ol><li><p>复位到0：为分钟，秒计数器服务</p><pre><code class="hljs verilog"><span class="hljs-comment">/************** 1位BCD计数器,复位到0;实现0-9的循环 ***************/</span>
+<span class="hljs-keyword">module</span> bcdreset0 (
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,        <span class="hljs-comment">// Synchronous active-high reset</span>
+    <span class="hljs-keyword">input</span> enable,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] q);
+    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+        <span class="hljs-keyword">if</span>(reset) q &lt;= <span class="hljs-number">4'h0</span>;
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!enable) q &lt;= q;
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(q == <span class="hljs-number">4'h9</span>) q &lt;= <span class="hljs-number">4'h0</span>;
+        	<span class="hljs-keyword">else</span> q &lt;= q + <span class="hljs-number">4'h1</span>;
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">endmodule</span></code></pre></li><li><p>复位到2：<a href="#reset">为小时低位服务(x-&gt;2)</a>[⭐此处有特殊情况]</p><pre><code class="hljs verilog"><span class="hljs-comment">/************************* 1位BCD计数器，复位到2；实现0-9的循环 *************************/</span>
+<span class="hljs-comment">/************** 个位为2时：当高位为1，下一次应该是1；但是当高位为0，下一次为3 **************/</span>
+<span class="hljs-keyword">module</span> bcdreset2 (
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,        <span class="hljs-comment">// Synchronous active-high reset</span>
+    <span class="hljs-keyword">input</span> flag,			<span class="hljs-comment">// 指示当前为特殊情况，即为12的时候</span>
+    <span class="hljs-keyword">input</span> enable,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] q);
+    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+        <span class="hljs-keyword">if</span>(reset) q &lt;= <span class="hljs-number">4'h2</span>;
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!enable) q &lt;= q;
+        	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(flag) q &lt;= <span class="hljs-number">4'h1</span>;				<span class="hljs-comment">// 特殊情况</span>
+ 				<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(q == <span class="hljs-number">4'h9</span>) q &lt;= <span class="hljs-number">4'h0</span>;
+       				<span class="hljs-keyword">else</span> q &lt;= q + <span class="hljs-number">4'h1</span>;
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">endmodule</span></code></pre></li><li><p>复位到1：<a href="#reset">为小时高位服务(x-&gt;1)</a>[⭐此处有特殊情况]</p><pre><code class="hljs verilog"><span class="hljs-comment">/*********** 1位BCD计数器，复位到2；实现0-1的循环 *************/</span>
+<span class="hljs-comment">/*********** 每次使能到来，小时高位要么从0-&gt;1；要么从1-&gt;0;逻辑对应代码第11行***********/</span>
+<span class="hljs-keyword">module</span> bcd_zero_one(
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,
+    <span class="hljs-keyword">input</span> enable,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] q);
+    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+        <span class="hljs-keyword">if</span> (reset) q &lt;= <span class="hljs-number">4'h1</span>;   	<span class="hljs-comment">// (复位为12； 高位为1）</span>
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!enable) q &lt;= q;
+        	<span class="hljs-keyword">else</span> q[<span class="hljs-number">0</span>] &lt;= ~q[<span class="hljs-number">0</span>]; 	<span class="hljs-comment">// 0变为1，1变为0(0000-&gt;0001)</span>
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">endmodule</span></code></pre></li></ol></blockquote><h3 id="②-两位BCD计数器"><a href="#②-两位BCD计数器" class="headerlink" title="② 两位BCD计数器"></a>② 两位BCD计数器</h3><blockquote><ol><li><p>秒，分钟计数器：实现0-59循环；复位为0</p><pre><code class="hljs verilog"><span class="hljs-comment">/**************** 两位BCD(8-bit)数表示0-59 ;循环到59时能不能下一个计数到0 **************/</span>
+<span class="hljs-keyword">module</span> zero2fifty_nine(
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,
+    <span class="hljs-keyword">input</span> ena,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] ss);
+    <span class="hljs-keyword">wire</span> ena_ten, reset_ten;
+    <span class="hljs-keyword">assign</span> reset_ten = (((ss == <span class="hljs-number">8'h59</span>) &amp; ena) | reset)? <span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;⭐<span class="hljs-comment">// 当计数到59且下一个使能到来时，把高位置为到0；因为低位肯定回到0;如果不reset，那么肯定为60</span>
+    <span class="hljs-keyword">assign</span> ena_ten = ((ss[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] == <span class="hljs-number">4'h9</span>) &amp; ena)?<span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;	⭐	    <span class="hljs-comment">// 个位到9(重点:必须使能到来)才能使能十位(假设现在为29分:00秒,分钟的十位使能必须在60s后才会到来;但是不并上使能,那么下一秒将是39分:01秒</span>
+    decade_counter one (clk, reset, ena, ss[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]);					<span class="hljs-comment">// 4位二进制表示个位的0-9</span>
+    decade_counter ten (clk, reset_ten, ena_ten, ss[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]);			<span class="hljs-comment">// 4位二进制表示十位的0-9</span>
+<span class="hljs-keyword">endmodule</span>    
+</code></pre></li><li><p>小时计数器：实现1-12循环，复位为12</p><pre><code class="hljs verilog"><span class="hljs-comment">/************* 两位BCD(8-bit)数表示1-12;循环到12时能不能下一个计数到1 ***************/</span>
+<span class="hljs-comment">/* ⭐(flag12) 小时个位为2时：当高位为1(12)，下一次应该是1；但是当高位为0(02)，下一次为3  */</span>
+<span class="hljs-keyword">module</span> one2twelve(
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,
+    <span class="hljs-keyword">input</span> ena,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] hh);
+    <span class="hljs-keyword">wire</span> ena_ten, flag12;
+    <span class="hljs-keyword">assign</span> ena_ten = (ena &amp; ((hh == <span class="hljs-number">8'h9</span>)|(hh == <span class="hljs-number">8'h12</span>)))? <span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;					<span class="hljs-comment">// 小时高位的改变信号(09-&gt;10;12-&gt;01)</span>
+    <span class="hljs-keyword">assign</span> flag12 = (hh == <span class="hljs-number">8'h12</span>);														<span class="hljs-comment">// 指示当前为12</span>
+    BCDreset2 one (clk, reset, flag12, ena, hh[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>]);									<span class="hljs-comment">// 4位二进制表示个位的0-9</span>
+    BCDzero_one ten (clk, reset, ena_ten, hh[<span class="hljs-number">7</span>:<span class="hljs-number">4</span>]); 									<span class="hljs-comment">// 4位二进制表示十位的0-1</span>
+<span class="hljs-keyword">endmodule</span></code></pre></li></ol></blockquote><h3 id="③-实例化三个②"><a href="#③-实例化三个②" class="headerlink" title="③ 实例化三个②"></a>③ 实例化三个②</h3><pre><code class="hljs verilog"><span class="hljs-keyword">module</span> top_module(
+    <span class="hljs-keyword">input</span> clk,
+    <span class="hljs-keyword">input</span> reset,
+    <span class="hljs-keyword">input</span> ena,
+    <span class="hljs-keyword">output</span> pm,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] hh,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] mm,
+    <span class="hljs-keyword">output</span> [<span class="hljs-number">7</span>:<span class="hljs-number">0</span>] ss); 
+	<span class="hljs-keyword">wire</span> ena_hr, ena_min, ena_pm;
+    one2twelve hour (clk, reset, ena_hr, hh);
+    zero2fifty_nine minite(clk, reset, ena_min, mm);					
+    zero2fifty_nine second(clk, reset, ena, ss);
+    <span class="hljs-keyword">assign</span> ena_min = (ss==<span class="hljs-number">8'h59</span>)?<span class="hljs-number">1'd1</span>:<span class="hljs-number">1'd0</span>;								<span class="hljs-comment">// 当59s时才使能分钟计数器;</span>
+    <span class="hljs-keyword">assign</span> ena_hr = ((mm == <span class="hljs-number">8'h59</span>) &amp; (ss == <span class="hljs-number">8'h59</span>))? <span class="hljs-number">1'd1</span>: <span class="hljs-number">1'd0</span>;		<span class="hljs-comment">// 当59分59s才使能小时计数器</span>
+    <span class="hljs-keyword">assign</span> ena_pm = ena_hr &amp; (hh == <span class="hljs-number">8'h11</span>);						  		<span class="hljs-comment">// 当11时59分59s才能改变pm⭐</span>
+    <span class="hljs-keyword">always</span> @ (<span class="hljs-keyword">posedge</span> clk) <span class="hljs-keyword">begin</span>
+        <span class="hljs-keyword">if</span> (reset) pm &lt;= <span class="hljs-number">1'd0</span>;
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(ena_pm) pm &lt;= ~pm;   									<span class="hljs-comment">// 每当时钟转到11:59:59pm都会变换一次</span>
+        	<span class="hljs-keyword">else</span> pm &lt;= pm;
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">endmodule</span></code></pre><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>HDL Bits</category>
+      </categories>
+      <tags>
+        <tag>circuits</tag>
       </tags>
   </entry>
   <entry>
@@ -481,80 +541,6 @@ chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子�
       </tags>
   </entry>
   <entry>
-    <title>Unprivileged Spec(1)--RV32I</title>
-    <url>/posts/6c2bdcd1/</url>
-    <content><![CDATA[<center>RV32I Base Integer Instruction Set</center><h1 id="1-Preface"><a href="#1-Preface" class="headerlink" title="1 Preface"></a>1 Preface</h1><blockquote><ul><li>RV32I是为了足够成为编译器目标并能支持现代操作系统环境而设计的一个基本整数指令集。它也为了减少硬件实现的最小需求而设计。RV32I包含40个独立的指令，尽管一些简单的实现可能用单一的系统硬件指令（a single <a href="#system">SYSTEM hardware instruction</a>)代替ECALL/EBREAK指令，它总是捕获异常(always traps)并且可能将FENCE指令实现为NOP，以减少指令数到38个。RV32I能够模拟几乎任何的ISA扩展（除了A扩展，它需要额外硬件支持原子操作(atomicity）</li></ul><ul><li>在实践中，包含机器模式特权架构的硬件实现将需要9个CSR指令。</li></ul><ul><li>基本整数指令集的子集也许对于教学目的很有用(pedagogical purposes), 但是基础已经被定义，对实现其子集的真正的硬件除了忽略非对齐内存访问并把所有的SYSTEM instruction视为单一的异常(single trap)，我们不应该有什么其它的动机。</li></ul><hr><p>关于RV32I的大多注释也适用于RV64I base。</p></blockquote><h1 id="2-Programmer’s-Model"><a href="#2-Programmer’s-Model" class="headerlink" title="2 Programmer’s Model"></a>2 Programmer’s Model</h1><blockquote><p>对于RV32I非特权状态一共有32个寄存器(都是32位宽，i.e. ,XLEN=32)：<code>x0~x31</code>;x0被硬编码到0。另外31个寄存器保存的值可以被解释为：Ⅰ、布尔值的集合，Ⅱ、补码的有符号二进制整数，Ⅲ、无符号二进制整数</p><p>有一个额外的非特权寄存器，<code>pc</code>(program counter)：保存当前指令的地址</p></blockquote><ul><li>在Base Integer ISA中，没有指定的栈指针或者子例程返回地址链接寄存器(link register)；指令编码允许任何寄存器被用于这个目的；但是，标准软件调用惯例(calling convention)使用寄存器<code>x1</code>保存调用的返回地址，<code>x5</code>作为备用链接寄存器。标准调用例程使用<code>x2</code>作为栈指针(stack pointer)</li><li>硬件可以使用<code>x1</code>或<code>x2</code>来加速函数调用和返回(因为可以尽早解码)；<a href="#jal">详情见<code>JAL</code>和<code>JALR</code>指令</a></li><li>可选的压缩16-bit指令格式基于这样的假设设计的：<code>x1</code>：返回地址寄存器；<code>x2</code>:栈指针。使用其他约定的软件将正常运行，但可能有较大的代码大小。</li></ul><hr><p><strong><font color="red">notes：</font></strong></p><ul><li>可用架构寄存器(available architectural registers)的数量能够对<code>代码大小</code>，<code>性能</code>，<code>能耗</code>产生重大影响。尽管16个寄存器对于运行编译代码的整数ISA来说是足够的，但是在长度为16位使用3-address格式的指令中编码拥有16个寄存器完整的ISA是不可能的。(⭐PS:16个寄存器，address至少4位，三地址就12位，那么只剩下4位区分不同的指令了,即最多16条不同的指令)。</li><li>尽管2-address是可能的。但它增加指令条数并且降低效率。我们想要避免立即数指令的大小来简化硬件实现，一旦32-bit的指令大小被采用，支持32个整数寄存器就很显而易见了。一个更大数量的整数寄存器也有助于提高高性能代码的性能，可广泛使用<code>循环展开</code>（loop unrolling)、<code>软件流水线</code>(software pipelining)和<code>缓存平铺</code>(cache tiling)。❓</li><li>基于上面这些原因，我们为基础ISA选择了一个常规大小（conventional size)——32个整数寄存器。动态寄存器使用趋向于被一些经常访问的寄存器主宰，并且<code>regfile</code>(寄存器堆)的实现可被优化以减少频繁访问寄存器的访问能量(access energy)。</li><li>可选的16位压缩指令格式绝大部分只使用8个寄存器，因此能提供稠密的指令编码(dense instruction encoding),但是如果想要的话，额外的指令集扩展能支持更大的寄存器空间(要么扁平的要么分层次的)。</li></ul><h1 id="3-Base-Instruction-Formats"><a href="#3-Base-Instruction-Formats" class="headerlink" title="3 Base Instruction Formats"></a>3 Base Instruction Formats</h1><blockquote><p>有4种核心的指令格式：R/I/S/U。指令长度都是32位，并且必须在内存中以4字节为边界对齐。指令地址非对齐的异常，常常是由于分支的发生(taken branch)或者非条件跳转的目标地址不是4字节对齐。</p></blockquote><ul><li><p>对于解码一个保留指令的行为是没有规定的(unspecified)</p></li><li><p>RISC-V ISA保持源寄存器(<code>rs1</code>和<code>rs2</code>)和目标寄存器(<code>rd</code>)的位置在所有指令格式中相同以简化解码。除了使用在CSR指令中的5bit的立即数，立即数总是<code>sign-extended</code>，通常是打包到指令中最左边的可用位，这样分配以减少硬件的复杂程度。特别是，对于所有立即数的符号位总是在最高位(也就是Ins[31])来加速符号扩展电路。</p><p><img src="https://image.beenli.cn/img/20200930/F4vpswvD8a17.jpg?imageslim" srcset="/img/loading.gif" alt="mark"><br><strong><i></i></strong></p><center><strong><i>imm[x]指的是当前位在扩展成32位立即数中的位置</i></strong></center><p></p><ul><li>实际应用中，大部分立即数要么很小，要么需要所有的位数(XLEN bits)。我们选择非对称立即数分割：常规指令中立即数占12bits;特殊的 load-upper-immediate 指令中立即数占20bits。这样做是为了给常规指令更多的opcode空间。</li></ul></li></ul><h1 id="4-Immediate-Encoding"><a href="#4-Immediate-Encoding" class="headerlink" title="4 Immediate Encoding"></a>4 Immediate Encoding</h1><blockquote><p>指令格式还有两个变种(variants)：B/J，它们基于立即数的处理衍生出来。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/NR78wxr6Nbb8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>S和B仅有的区别：在B格式中12bit立即数域乘以2用于编码分支偏移。而不是像传统做法那样，将指令编码中的所有立即数位用硬件左移一位,中间的位数(imm[10:1])和符号位保留在固定位置，而S格式中的最低位(inst[7])在B格式中编码一个高阶位。</li><li>U和J的仅有区别：U要向左移12位；而J只用移动1位。在U和J指令立即数中指令的位置尽量跟其他格式的指令或者它们互相重叠。</li></ul><p><img src="https://image.beenli.cn/img/20200930/CoSeYfK4wdG4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="5-Computational"><a href="#5-Computational" class="headerlink" title="5 Computational "></a>5 <a name="compute">Computational</a></h1><blockquote><p>大多数的<code>整数算术指令</code>(Integer computational instruction)对保存在整数寄存器中的<code>XLEN</code>位的值进行操作。整数计算指令要么被编码为使用I格式的寄存器-立即数操作；要么使用R格式的寄存器-寄存器操作。对于这两种类型指令的目的寄存器都是<code>rd</code>。没有整型计算指令会导致算术异常</p></blockquote><ul><li><p>基本指令集不包括对整数算术运算上做<code>溢出检查</code>(overflow checks)支持的特殊指令集。因为许多溢出检查能够更便宜地(cheaply)使用RISC-V分支来实现</p></li><li><p>对<code>无符号加法</code>的溢出检查仅仅需要在加法指令后加上一条额外的分支指令</p><pre><code class="hljs assembly">add t0,t1,t2
-blut t0, t1, overflow</code></pre></li><li><p>对于有符号加法：如果一个操作数的符号已知，溢出检查仅需要加法之后的一个分支（覆盖了带有立即数操作数的常见加法情形）</p><pre><code class="hljs assembly">addi t0, t1, +imm
-blt t0, t1, overflow</code></pre></li><li><p>对于常规的<code>有符号加法</code>，加法之后需要三条额外的指令。利用当且仅当另一个操作数为负时，该和应小于其中一个操作数的观察。</p><pre><code class="hljs assembly">add t0, t1, t2
-slti t3, t2, 0
-slt t4, t0, t1
-bne t3, t4, overflow</code></pre></li><li><p>在RV64I中，32位有符号的加法溢出可以通过比较ADD和ADDW操作的结果来进一步优化。(ADDW肯定不会溢出)</p></li></ul><h2 id="Register-Immediate"><a href="#Register-Immediate" class="headerlink" title="Register-Immediate"></a><a name="arith">Register-Immediate</a></h2><p><img src="https://image.beenli.cn/img/20200930/9lWr2QpMilov.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>ADDI</code>：将12位立即数符号扩展后与<code>rs1</code>中的值相加，算术溢出忽略，结果的低32位存到<code>rd</code>寄存器中。</p><pre><code class="hljs assembly">/* 两条指令等效 */
-ADDI rd, rs1, 0
-MV rd , rs1(汇编伪指令：将rs1中的值复制给rd)</code></pre></li><li><p><code>SLTI</code>(set less than immediate): 当寄存器<code>rs1</code>中的值小于立即数（俩者都视为有符号数)，将寄存器<code>rd</code>置为1；否则置0。<code>SLTIU</code>: 功能一样，但是把比较的对象视为无符号数。</p><pre><code class="hljs assembly">/* 两条指令等效 */
-SLTIU rd, rs1, 1(当rs1等于0,rd为1,否则为0)
-SEQZ rd, rs</code></pre></li><li><p><code>ANDI, ORI, XORI</code>: 三个逻辑运算符，分别对rs1和立即数执行<code>按位</code>(bitwise)的与，或，异或运算。</p><pre><code class="hljs assembly">/* 两条指令等效 */
-XORI rd, rs1, -1(-1的补码为全1)
-NOT rd, rs(将rs各位取反赋值给rd)</code></pre><hr><p><img src="https://image.beenli.cn/img/20200930/ohbIXFmmows6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p><code>移位</code>被编码一种特殊的I类型指令格式。</p><ul><li>被移位的操作数为<code>rs1</code>；移位的位数被编码在立即数域的低五位上。</li><li>👉移类型被编码在第30位上；</li><li><code>SLLI</code>(shift left logical)：0被移动到低位</li><li><code>SRLI</code>: 0被移动到高位</li><li><code>SRAI</code>: (shift right arithmetic): 原符号位复制到空出的高位</li></ul></blockquote><hr><p><img src="https://image.beenli.cn/img/20200930/HH9oFeg4OyQC.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><code>LUI</code>(load upper immediate): 用于构建32位常数并使用U格式指令。把U-immediate的值放在目的寄存器的高20位，其它低位用0填充。</li><li><code>AUIPC</code>(add upper immediate to pc)：用于构建与pc相关的地址，并使用U格式指令。形成32位的偏移(高20位来自立即数，低12位用0填充)，把这个偏移加到AUIPC指令的地址上，然后把结果放到<code>rd</code>中。（rd = pc-4+im)<ul><li>AUIPC指令支持<code>双指令序列</code>(two-instruction sequences)访问相对PC的任意偏移(for both control-flow transfers and data accesses)</li><li>一个AUIPC和JALR中12位偏移的组合能够转换控制给任意32位的PC相对地址(PC-relative address)，而一个ALIPC加上一个常规load和store指令中的12位立即数偏移能供访问任意32位PC相对地址的数据地址(PC-relative data address)</li><li>当前PC值可以通过设置立即数为0获得，尽管JAL+4指令也能获得本地PC(JAL下一指令)，它可能在简单微架构中造成流水线崩溃，或者在更复杂的微架构中污染BTB(❓)</li></ul></li></ol><h2 id="Register-Register"><a href="#Register-Register" class="headerlink" title="Register-Register"></a>Register-Register</h2><blockquote><p>RV32I定义了几个R型算术运算。所有的运算都读取<code>rs1</code>,<code>rs2</code>寄存器的值作为源操作数，把结果写回<code>rd</code>寄存器。<code>funct7</code>和<code>funct3</code>域选择合适的运算。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/cdJ8aBabLVTk.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><a href="#arith">意义同👆。</a></p><h2 id="NOP-Instruction"><a href="#NOP-Instruction" class="headerlink" title="NOP Instruction"></a>NOP Instruction</h2><p><img src="https://image.beenli.cn/img/20200930/QOhQFMEFTYs1.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>NOP指令：不会改变任何架构上可见的状态。出来推进PC，增加任何适用的性能计数器。NOP被编码为`ADDI x0, x0, 0</li><li>NOPs可以被用来对齐代码段与重要的微架构地址边界。或者为内联代码修改(inline code modification)流出空间。尽管有许多可能的方法去编码NOP,我们使用了规范的NOP编码来允许微架构优化以及更易读的反汇编输出。其它的NOP编码可以用作指示指令(HINT instruction)</li><li>选择ADDI作为NOP编码是因为它在跨一系列系统执行时最可能占用最少的资源;除此之外，该指令仅读取一个寄存器。并且，一个ADDI功能单元在超标量设计中更容易可用，因为adds是最常见的运算</li><li>地址生成单元可以使用相同的硬件够执行ADDI，该硬件被用于base+offset地址计算，而register-register ADD，逻辑运算或移位运算操作需要额外的硬件。</li></ul><h1 id="6-Control-Transfer"><a href="#6-Control-Transfer" class="headerlink" title="6 Control Transfer"></a>6 Control Transfer</h1><blockquote><p>RV32I提供两种控制转义指令：<code>无条件跳转</code>，<code>条件分支</code></p><p>RV32I控制转义指令没有架构上可见的<code>延迟槽</code>(delay slot)</p></blockquote><h2 id="Unconditional-Jumps"><a href="#Unconditional-Jumps" class="headerlink" title="Unconditional Jumps"></a>Unconditional Jumps</h2><p><img src="https://image.beenli.cn/img/20200930/qCmY8sLbKGDK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>JAL</code>(jump and link)指令使用<code>J-type</code>格式，J-immediate以两字节的倍数编码一个有符号偏移。(in multiple of 2 bytes；则该偏移要乘以2)。偏移符号扩展，然后加上当前指令的地址形成<code>跳转目标地址</code>(jump target address)。Jumps因此能够访问±1 MiB范围。JAL存储下一条指令的地址(pc+4)到<code>rd</code>；</p><p>标准软件调用约定使用x1作为返回地址寄存器，x5作为备用链接寄存器。</p><p><img src="https://image.beenli.cn/img/20200930/VUjOV9BMhinO.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>JALR</code>(jump and link register)：间接跳转指令：使用<code>I-type</code>，目标地址通过把符号扩展的12比特立即数加到rs1上，然后置结果的最低位为0获得；下一条指令的地址(pc+4)写到寄存器rd。如果结果不需要，可以把<code>x0</code>当作目的寄存器。</p><p>如果目标地址没有对齐四字节边界，jar和jarl指令将产生<code>指令地址非对齐</code>异常。</p><p>返回地址<code>预测栈</code>(prediction stack)是高性能取值单元的一个常见特点，要求准确检测用于过程调用和返回的指令是有效的。</p><ul><li>对于RISC-V,关于指令使用的线索通过寄存器号的使用被简单的编码。</li><li>JAL指令应该把返回地址压进返回地址栈(RAS)中，当且仅当<code>rd = x1/x5</code>；</li><li>JALR指令应该push/pop a RAS</li></ul><p><img src="https://image.beenli.cn/img/20200930/WC8l9YmmyroI.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>link is true when the register is either x1 or x5</center><h2 id="Conditional-Branches"><a href="#Conditional-Branches" class="headerlink" title="Conditional Branches"></a>Conditional Branches</h2><blockquote><p>所有分支指令使用<code>B-type</code>格式。</p><p>12比特的立即数用2字节的倍数编码有符号偏移</p><p>立即数符号扩展后与当前指令地址相加，可以访问的地址范围：<code>±4 KiB</code></p></blockquote><p><img src="https://image.beenli.cn/img/20200930/PR0CJpoojIFU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>BEQ</code>:branch equal;&nbsp;&nbsp;<code>BNE</code>: branch not equal;&nbsp;&nbsp;<code>BLT</code>: branch less than;&nbsp;&nbsp;<code>BGE</code>: branch greater than;</p><ul><li>应该对软件进行优化，使顺序代码路径成为最常见的路径，并将较不经常使用的分支代码路径置于行外。软件还应该假设，至少在第一次遇到分支时，预测向后跳转的分支发生，向前跳转的分支不发生。动态预测器应该快速学习任何可预测的分支行为。</li><li>不像一些其它的架构，RISC-V中对于<code>非条件分支</code>应该总是使用<code>jump</code>(JAL with rd=x0)指令而不是条件总是满足的有条件分支指令</li><li>RISC-V跳转也是与pc相关的，并且比分支支持更大的偏置范围，而且不会污染条件分支预测表。</li></ul><h1 id="7-Load-and-Store-😳"><a href="#7-Load-and-Store-😳" class="headerlink" title="7 Load and Store(😳)"></a>7 Load and Store(😳)</h1><blockquote><p>RV32I是一个装载和存储架构：只有<code>load</code>和<code>store</code>指令能够访问内存，算术指令只能操作CPU寄存器。</p></blockquote><ul><li>RV32I提供了32-bit的地址空间，用字节编码。</li><li><code>EEI</code>定义了地址空间的那部分可以被哪些指令合法访问。(e.g.，一些地址可能只能被读，或仅支持按字访问)</li><li>目的寄存器为<code>x0</code>的装载指令将抛出异常，即使装载的值被丢弃也会造成其它的副作用。</li></ul><blockquote><p>In RISC-V，endianness is byte-address invariant</p></blockquote><ul><li><p>如果一个字节以某种顺序(at some endianness)存储到内存某个地址处，那么以字节大小从那个地址以任意的顺序(in any endianness)装载的结果是存储的值。</p></li><li><p>小端(little-endian): 多字节存储时把寄存器最低为字节写到内存字节地址的最低为，随后寄存器的其它字节以权重升序写入。（权重越大的字节占据的内存地址越大）</p></li></ul><hr><p><img src="https://image.beenli.cn/img/20200930/gJvyXMYKv7Ov.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>装载和存储指令用于在寄存器和内存中转换数据。</p><p>Loads: <code>I-type</code></p><p>Stores: <code>S-type</code></p><p>有效地址：立即数符号扩展加上基址寄存器<code>rs1</code></p><p>目的地址：Ⅰ、for load:从内存取值到<code>rd</code>;Ⅱ、for store：复制<code>rs2</code>的值到内存</p></blockquote><h1 id="8-Memory-Ordering"><a href="#8-Memory-Ordering" class="headerlink" title="8 Memory Ordering"></a>8 Memory Ordering</h1><p><img src="https://image.beenli.cn/img/20200930/8gVkNfBMa1IW.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p><code>FENCE</code>：用于排序被其它RISC-V线程，外部设备或者协处理器可见的设备I/O和存储器访问。</p></li><li><p>任何设备输入(I)，设备输出(O)，存储器读取(R),存储器写(W)的组合能够被排序成任何相同的组合。</p></li><li>通俗地说，没有其它线程或者外部设备能够在<code>fence</code>之前的指令集进行任何操作之前，观测到在<code>fence</code>后者的指令集合所做的任何操作。就像一个屏障一样，前面的操作只有先完成，后面的指令结果才能被其它处理器观察到。</li><li>memory-mapped I/O设备很典型地被没有cache的loads和store访问，它们使用I和O而不是R和W。</li><li>指令集扩展也可以描述新的I/O指令，使用fence指令中I和O位进行排序</li></ul><p><img src="https://image.beenli.cn/img/20200930/6dnc1SCYbwDA.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>fence mode域在ins[31:28]；当fm=0000时排序所有的内存操作。</li><li>可选的<code>FENCE.TSO</code>指令其fm=1000；predecessor=RW,并且successor=RW。TSO命令它的前面集合中的所有加载操作先于它的后继集合中的所有内存操作；它的前面集合中的所有存储操作(store operation)都要先于它的后继集合中的所有存储操作</li></ul><h1 id="9-Call-and-Breakpoints"><a href="#9-Call-and-Breakpoints" class="headerlink" title="9 Call and Breakpoints"></a>9 Call and Breakpoints</h1><blockquote><p><a name="system">SYSTEM instruction</a>：被用于访问需要特权访问的系统功能，使用<code>I-type</code>。</p><p>分为两大类：</p><ul><li>自动读-修改-写(read-modify-write)<code>控制状态寄存器</code>(CSRs)。</li><li>潜在的特权指令(potentially privileged instructions)</li></ul><p>系统指令被定义成运行稍简单的实现总是捕获异常给单一的<code>软件异常处理器</code>(software trap handle)；更加复杂的实现可能需要执行更多条系统指令</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/Wf33chpE3JIQ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>这两个指令会向<code>配套执行环境</code>(supporting execution environment)引起一个精确的<code>请求异常</code>(requested trap)。</p><h2 id="ECALL"><a href="#ECALL" class="headerlink" title="ECALL"></a>ECALL</h2><blockquote><p><code>ECALL</code>：向运行环境提出服务请求(service request)</p><p>EEl将定义服务请求的参数如何传递，但通常这些都是在整数寄存器中指定的位置</p></blockquote><h2 id="EBREAK"><a href="#EBREAK" class="headerlink" title="EBREAK"></a>EBREAK</h2><blockquote><p><code>EBREAK</code>：返回控制权给调试器环境(debugging environment)</p></blockquote><h1 id="10-Hint"><a href="#10-Hint" class="headerlink" title="10 Hint"></a>10 Hint</h1><blockquote><p>RV32I为<code>HINT</code>指令保留了大的编码空间，通常是用来和微架构沟通性能提示。HINTs被编码为<a href="#compute">整数计算指令</a>,其中<code>rd=x0</code>。因此，像nop指令一样，HINTs不会改变架构可见的状态，除了增加pc和任何适用的性能计数器。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/nVtEvPja9AXi.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>RISC-V</category>
-        <category>spec</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>SSH</title>
-    <url>/posts/782a8ece/</url>
-    <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
-ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v40J7WztY0xm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以设置密码，也可以为空（既然为了免密那就设置为空吧，不然没意义了）</p><p>文件路径可选。默认放在<code>~/.ssh/</code></p></li><li><p>上传公钥到服务器上<a href="#link"><sup>1</sup></a></p><p>有两种办法：</p><ol><li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p></li><li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p><p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p></li></ol></li><li><p>免密登录服务器</p><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)</code></pre><p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p></li><li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p><ol><li><p>随便选择个文件夹，写一个config文件</p></li><li><pre><code class="lang-bash">Host vps                              # 一个便于你区别这是哪台机器的名字
-    HostName 47.95.247.18               
-    User git                          # 登录主机的用户名称
-    Port 22                                      
-    IdentityFile ~/.ssh/id_rsa        # 密钥所在的文件位置
-</code></pre></li><li><p><code>ssh -F [config file] vps</code>(指定配置文件位置)就可以直接登录你设置的那台主机</p></li></ol></li></ol><hr><h5 id="可能遇到的问题3"><a href="#可能遇到的问题3" class="headerlink" title="可能遇到的问题3"></a>可能遇到的问题<a href="#link"><sup>3</sup></a></h5><ol><li><p>Authentication refused: bad ownership or modes for directory /root/.ssh</p><blockquote><p>ls -l /root/.ssh</p><p>发现改目录的所有者不是root。只用改成root即可</p><p>chown -R root.root /root/.ssh</p></blockquote></li></ol><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://blog.csdn.net/jeikerxiao/article/details/84105529" rel="external nofollow noreferrer">SSH 三步解决免密登录</a></p><p>[2] <a href="https://blog.csdn.net/ky1in93/article/details/83093981" rel="external nofollow noreferrer">ssh配置config快速登录</a></p><p>[3] <a href="https://www.howtogeek.com/168156/fixing-authentication-refused-bad-ownership-or-modes-for-directory/" rel="external nofollow noreferrer">解决权限问题</a></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Network</category>
-      </categories>
-      <tags>
-        <tag>protocols</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Tasks and Functions</title>
     <url>/posts/71407778/</url>
     <content><![CDATA[<h1 id="Tasks-and-Functions"><a href="#Tasks-and-Functions" class="headerlink" title="Tasks and Functions"></a><center>Tasks and Functions</center></h1><h2 id="1、What-are-they-good-for"><a href="#1、What-are-they-good-for" class="headerlink" title="1、What are they good for"></a>1、What are they good for</h2><blockquote><p>Tasks and functions provide the ability to execute common procedures from several different places in a description. They also provide a means of breaking up large procedures into smaller ones to make it easier to read and debug the source descriptions.</p></blockquote><p>从std 1364-2005的这段描述中，我们可以总结出以下用处:</p><ol><li>减少重复工作，代码复用。</li><li>把大的过程拆解成几个小的任务和函数，更加易读和找bug</li></ol><h2 id="2、Distinctions-between-tasks-and-functions"><a href="#2、Distinctions-between-tasks-and-functions" class="headerlink" title="2、Distinctions between tasks and functions"></a>2、Distinctions between tasks and functions</h2><ol><li><p>A function shall execute in one simulation time unit; a task can contain time-controlling statements.</p><p>函数应该瞬间返回结果，不能有延时；而任务可以带有延时控制语句。</p></li><li><p>A function cannot enable a task; a task can enable other tasks and functions.</p><p>函数不能调用任务；但是任务可以调用其他任务或者函数。</p></li><li><p>A function shall have at least one input type argument and shall not have an output or inout type argument; a task can have zero or more arguments of any type.</p><p>函数应该至少有一个<code>输入参数</code>并且不能有输出或者输入输出参数。</p><p>任务可以有零个或者任意个任何种类的参数。</p></li><li><p>A function shall return a single value; a task shall not return a value.</p><p>函数应该返回一个单一的值；任务不能返回值(只能通过把处理放在参数上带回)</p><hr><p class="note note-primary">The purpose of a function is to respond to an input value by returning a single value. A task can support multiple goals and can calculate multiple result values. However, only the output or inout type arguments pass result values back from the invocation of a task. A function is used as an operand in an expression; the value of that operand is the value returned by the function.</p><ul><li><p>函数的目的：对于输入给出一个返回结果</p></li><li><p>任务支持多个结果，但是只有<code>输出</code>或者<code>输入输出</code>参数能够传递这种结果</p></li><li><p>函数可以在表达式中用作一个操作数。（其值就是函数返回的结果。是不是很像C)</p></li></ul></li><li><p>例如：</p><pre><code class="hljs verilog">switch_bytes(old_word, new_word);	<span class="hljs-comment">//task会把运算结果放在new_word上</span>
@@ -704,6 +690,42 @@ result = factorial(n);
       </tags>
   </entry>
   <entry>
+    <title>SSH</title>
+    <url>/posts/782a8ece/</url>
+    <content><![CDATA[<h2 id="SSH-Protocol"><a href="#SSH-Protocol" class="headerlink" title="SSH Protocol"></a><center>SSH Protocol</center></h2><blockquote><p><strong>Secure Shell</strong> (<strong>SSH</strong>) is a <a href="https://en.wikipedia.org/wiki/Cryptography" rel="external nofollow noreferrer">cryptographic</a> <a href="https://en.wikipedia.org/wiki/Network_protocol" rel="external nofollow noreferrer">network protocol</a> for operating network services securely over an unsecured network.<a href="https://en.wikipedia.org/wiki/Secure_Shell#cite_note-rfc4251-1" rel="external nofollow noreferrer">[1]</a> Typical applications include remote <a href="https://en.wikipedia.org/wiki/Command-line_interface" rel="external nofollow noreferrer">command-line</a>, <a href="https://en.wikipedia.org/wiki/Login" rel="external nofollow noreferrer">login</a>, and remote command execution, but any <a href="https://en.wikipedia.org/wiki/Network_service" rel="external nofollow noreferrer">network service</a> can be secured with SSH.</p></blockquote><p>摘自维基百科。主要为远程登录建立安全的通道。</p><h3 id="1、简要的工作原理"><a href="#1、简要的工作原理" class="headerlink" title="1、简要的工作原理"></a>1、简要的工作原理</h3><p><code>ssh</code>有两种工作方式</p><ol><li><p>基于口令验证</p><p>只要知道帐号和口令，就可以登录到远程主机。所有传输的数据都会被加密，但缺点是：不能保证你正在连接的服务器就是你想连接的服务器。以下是登录验证流程：</p><p><img src="http://image.beenli.cn/img/20200408/sdKikYkDIiNa.jpg?imageslim" srcset="/img/loading.gif" alt="口令验证"></p></li><li><p>基于密钥验证</p><p><img src="http://image.beenli.cn/img/20200408/XLDkiwcJXaOS.jpg?imageslim" srcset="/img/loading.gif" alt="密钥验证"></p></li></ol><h3 id="2、操作过程-本地win10-服务器centos"><a href="#2、操作过程-本地win10-服务器centos" class="headerlink" title="2、操作过程(本地win10+服务器centos)"></a>2、操作过程(本地win10+服务器centos)</h3><ol><li><p>本地生成密钥对</p><pre><code class="hljs bash"><span class="hljs-string">"Git Bash Hear"</span>
+ssh-keygen -t rsa</code></pre><p><img src="http://image.beenli.cn/img/20200408/v40J7WztY0xm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以设置密码，也可以为空（既然为了免密那就设置为空吧，不然没意义了）</p><p>文件路径可选。默认放在<code>~/.ssh/</code></p></li><li><p>上传公钥到服务器上<a href="#link"><sup>1</sup></a></p><p>有两种办法：</p><ol><li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p></li><li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p><p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p></li></ol></li><li><p>免密登录服务器</p><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)</code></pre><p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p></li><li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p><ol><li><p>随便选择个文件夹，写一个config文件</p></li><li><pre><code class="lang-bash">Host vps                              # 一个便于你区别这是哪台机器的名字
+    HostName 47.95.247.18               
+    User git                          # 登录主机的用户名称
+    Port 22                                      
+    IdentityFile ~/.ssh/id_rsa        # 密钥所在的文件位置
+</code></pre></li><li><p><code>ssh -F [config file] vps</code>(指定配置文件位置)就可以直接登录你设置的那台主机</p></li></ol></li></ol><hr><h5 id="可能遇到的问题3"><a href="#可能遇到的问题3" class="headerlink" title="可能遇到的问题3"></a>可能遇到的问题<a href="#link"><sup>3</sup></a></h5><ol><li><p>Authentication refused: bad ownership or modes for directory /root/.ssh</p><blockquote><p>ls -l /root/.ssh</p><p>发现改目录的所有者不是root。只用改成root即可</p><p>chown -R root.root /root/.ssh</p></blockquote></li></ol><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://blog.csdn.net/jeikerxiao/article/details/84105529" rel="external nofollow noreferrer">SSH 三步解决免密登录</a></p><p>[2] <a href="https://blog.csdn.net/ky1in93/article/details/83093981" rel="external nofollow noreferrer">ssh配置config快速登录</a></p><p>[3] <a href="https://www.howtogeek.com/168156/fixing-authentication-refused-bad-ownership-or-modes-for-directory/" rel="external nofollow noreferrer">解决权限问题</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Network</category>
+      </categories>
+      <tags>
+        <tag>protocols</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VIM Plug-in</title>
     <url>/posts/b71407e8/</url>
     <content><![CDATA[<h2 id="VIM-Plugs"><a href="#VIM-Plugs" class="headerlink" title="VIM-Plugs"></a><center>VIM-Plugs</center></h2><h5 id="1、vim-plug-插件管理器"><a href="#1、vim-plug-插件管理器" class="headerlink" title="1、vim-plug: 插件管理器"></a>1、<a href="https://github.com/junegunn/vim-plug" rel="external nofollow noreferrer">vim-plug</a>: 插件管理器</h5><pre><code class="hljs CQL">call plug#begin('D:/App/vim/vim81/vimfiles/plugs')//插件安装目录(可以随意定)
@@ -756,41 +778,16 @@ snippet test
       </tags>
   </entry>
   <entry>
-    <title>git hooks自动部署hexo</title>
-    <url>/posts/fb29ac9a/</url>
-    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers</code></pre></li></ol></li></ol><p>vim /etc/sudoer<br></p><pre><code class="hljs stata">
-      `给git用户添加命令权限如下`
-    
-      保存后退出，修改回文件权限`chmod 440 /etc/sudoers`
-      
-      ![<span class="hljs-keyword">mark</span>](http:<span class="hljs-comment">//image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim)</span>
-
-2. 初始化git仓库
-
-   ```bash
-   <span class="hljs-keyword">su</span> git				<span class="hljs-comment">//切换至git用户</span>
-   <span class="hljs-keyword">mkdir</span> blog.git		<span class="hljs-comment">//创建仓库文件夹</span>
-   <span class="hljs-keyword">cd</span> blog.git			<span class="hljs-comment">//进入文件夹</span>
-   git init --bare		<span class="hljs-comment">//使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</span></code></pre><p></p><ol><li><p>创建网站目录</p><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录
-sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git
-(这一步很重要，否者后续提交没有权限)</code></pre></li><li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)
-<span class="hljs-built_in">cd</span> .ssh
-touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种</code></pre></li><li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录
-touch post-receive				 //创建post-receive文件
-chmod +x post-receive			 //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
-<span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span>
-
-GIT_REPO=/home/git/blog.git
-TMP_GIT_CLONE=/tmp/blog
-PUBLIC_WWW=/var/www/blog
-
-rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>
-git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span>
-rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*
-cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span></code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="hljs bash">deploy:
-    <span class="hljs-built_in">type</span>: git
-    repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span>
-    branch: master</code></pre></li></ol><hr><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://tding.top/archives/12a4e7e6.html" rel="external nofollow noreferrer">Hexo 博客部署到 VPS</a></p><p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" rel="external nofollow noreferrer">git hooks</a></p><script>
+    <title>riscv-gnu-toolchain 下载、编译</title>
+    <url>/posts/6c0abcd9/</url>
+    <content><![CDATA[<h2 id="1、前言"><a href="#1、前言" class="headerlink" title="1、前言"></a>1、前言</h2><p><a href="https://hub.fastgit.org/riscv/riscv-gnu-toolchain" rel="external nofollow noreferrer">riscv-gnu-toolchain</a> 是学习 <code>risc-v</code> 的前提，但是网上对这方面的介绍很少，并且工具链种类繁多，很可能让我们摸不清头脑。</p><h2 id="2、下载篇"><a href="#2、下载篇" class="headerlink" title="2、下载篇"></a>2、下载篇</h2><blockquote><p>由于<code>riscv-gnu-toolchain</code>包含有好多第三方库，整个项目文件很大[官方说的是6.65GB]，加上国内GitHub堪比🐢速，你多半是不可能按官方教程下下来。</p></blockquote><div class="table-container"><table><thead><tr><th>项目名称</th><th>项目描述</th><th>项目用途</th></tr></thead><tbody><tr><td><a href="https://git.qemu.org/git/qemu.git" rel="external nofollow noreferrer">qemu</a></td><td>模拟器（类似bochs,PearPC)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-binutils-gdb.git" rel="external nofollow noreferrer">riscv-binutils</a></td><td>开发工具(compiler、assemble、linker、debugger…)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-dejagnu.git" rel="external nofollow noreferrer">riscv-dejagnu</a></td><td>测试其它程序的框架(framework)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-gcc.git" rel="external nofollow noreferrer">riscv-gcc</a></td><td>GNU Compiler Collection</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-binutils-gdb.git" rel="external nofollow noreferrer">riscv-gdb</a></td><td>同riscv-binutils</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-glibc" rel="external nofollow noreferrer">riscv-glibc</a></td><td>GNU C Library(system-API,其它的语言也通过它访问OS)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-newlib.git" rel="external nofollow noreferrer">riscv-newlib</a></td><td>一套开发工具（用的库有别于riscv-binutils)</td></tr></tbody></table></div><blockquote><p>binutils 和 newlib 之间的区别（坑待填o_o ….）</p></blockquote><h3 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><p>PC: x86</p><p>OS: Ubuntu 20.04.1 LTS</p><p>VM: wmware15.5Pro</p><hr><ol><li><p>下载源代码（推荐使用<code>hub.fastgit.org</code>镜像站，比原生站快几百倍）</p><pre><code class="hljs jboss-cli">git clone https:<span class="hljs-string">//hub.fastgit.org/riscv/riscv-gnu-toolchain</span>
+<span class="hljs-keyword">cd</span> riscv-gnu-toolchain
+git submodule update <span class="hljs-params">--init</span> <span class="hljs-params">--recursive</span></code></pre></li><li><p>安装依赖（其它系统查看官方readme)</p><pre><code class="hljs q">sudo apt-<span class="hljs-built_in">get</span> install autoconf automake autotools-<span class="hljs-built_in">dev</span> curl python3 libmpc-<span class="hljs-built_in">dev</span> libmpfr-<span class="hljs-built_in">dev</span> libgmp-<span class="hljs-built_in">dev</span> gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-<span class="hljs-built_in">dev</span> libexpat-<span class="hljs-built_in">dev</span></code></pre></li></ol><h3 id="下载失败解决方案"><a href="#下载失败解决方案" class="headerlink" title="下载失败解决方案"></a>下载失败解决方案</h3><ol><li><p>git clone qemu下载速度太慢导致失败（因为qemu没有把项目托管在GitHub上)</p><blockquote><p>链接：<a href="https://pan.baidu.com/s/1xGrafiu4I0yPAnE0iuTYzw" rel="external nofollow noreferrer">https://pan.baidu.com/s/1xGrafiu4I0yPAnE0iuTYzw</a><br>提取码：3iyy</p></blockquote><p>下载源码, 解压到相应的目录上即可。</p></li><li><p>其它模块没有拉下来。</p><p>在源项目下挨个手动克隆。</p><pre><code class="hljs awk">cd ~<span class="hljs-regexp">/riscv/</span>riscv-gnu-toolchain
+git clone https:<span class="hljs-regexp">//</span>hub.fastgit.org<span class="hljs-regexp">/riscv/</span>riscv-gcc.git</code></pre></li></ol><h2 id="3、编译篇"><a href="#3、编译篇" class="headerlink" title="3、编译篇"></a>3、编译篇</h2><h3 id="1、Newlib"><a href="#1、Newlib" class="headerlink" title="1、Newlib"></a>1、Newlib</h3><ul><li><p>建立一个安装路径：makdir /opt/riscv</p></li><li><p>[最好建立一个编译文件夹]：makdir build &amp;&amp; cd build</p></li><li><p>配置环境变量：export PATH=$PATH:/opt/riscv/bin(建议写到~/.bashrc上，永久有效</p><pre><code class="hljs jboss-cli"><span class="hljs-string">./configure</span> <span class="hljs-params">--prefix=/opt/riscv</span>
+make</code></pre></li></ul><h3 id="2、Linux"><a href="#2、Linux" class="headerlink" title="2、Linux"></a>2、Linux</h3><ul><li>跟上面相同的步骤，不过最好换一个干净的文件夹。</li></ul><ul><li><p>默认是安装RV64GC(64-bit), 即使在32-bit的构建环境中。</p><pre><code class="hljs jboss-cli"><span class="hljs-string">./configure</span> <span class="hljs-params">--prefix=/opt/riscv</span>
+make linux</code></pre></li></ul><ul><li><p>Alternatively：（构建32-bit RV32GC)</p><pre><code class="hljs routeros">./configure <span class="hljs-attribute">--prefix</span>=/opt/riscv <span class="hljs-attribute">--with-arch</span>=rv32gc <span class="hljs-attribute">--with-abi</span>=ilp32d
+make linux</code></pre></li><li><p>支持的架构有：rv32i、rv64i</p></li><li>标准扩展： (a)tomics, (m)ultiplication and division, (f)loat, (d)ouble, or (g)eneral for MAFD</li><li>支持的ABIs: ilp32 (32-bit soft-float), ilp32d (32-bit hard-float), ilp32f (32-bit with single-precision in registers and double in memory, niche use only), lp64 lp64f lp64d (same but with 64-bit long and pointers).</li></ul><h3 id="3、Linux-multilib"><a href="#3、Linux-multilib" class="headerlink" title="3、Linux multilib"></a>3、Linux multilib</h3><ul><li><p>同时支持32-bit和64-bit的Linux。</p><pre><code class="hljs jboss-cli"><span class="hljs-string">./configure</span> <span class="hljs-params">--prefix=/opt/riscv</span> <span class="hljs-params">--enable-multilib</span>
+make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>riscv64-unknown-linux-gnu-</code>, 但是能编译32位和64位程序。</p></blockquote></li></ul><h2 id="4、编译结果"><a href="#4、编译结果" class="headerlink" title="4、编译结果"></a>4、编译结果</h2><blockquote><p>经过漫长的等待，我终于编译Linux 64bit版本。</p></blockquote><p><img src="http://image.beenli.cn/img/20200801/kPGRS3PNVC3f.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200801/BoO9SyR2SFa9.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><a href="https://blog.csdn.net/weiqi7777/article/details/88045720?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-6.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-6.channel_param" rel="external nofollow noreferrer">riscv各种版本gcc工具链编译与安装</a></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -810,12 +807,11 @@ cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-v
           });
       </script>]]></content>
       <categories>
-        <category>Software</category>
-        <category>Git</category>
+        <category>RISC-V</category>
+        <category>environment</category>
       </categories>
       <tags>
-        <tag>git</tag>
-        <tag>Hexo</tag>
+        <tag>toolkits</tag>
       </tags>
   </entry>
   <entry>
@@ -857,16 +853,20 @@ conda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id
       </tags>
   </entry>
   <entry>
-    <title>riscv-gnu-toolchain 下载、编译</title>
-    <url>/posts/6c0abcd9/</url>
-    <content><![CDATA[<h2 id="1、前言"><a href="#1、前言" class="headerlink" title="1、前言"></a>1、前言</h2><p><a href="https://hub.fastgit.org/riscv/riscv-gnu-toolchain" rel="external nofollow noreferrer">riscv-gnu-toolchain</a> 是学习 <code>risc-v</code> 的前提，但是网上对这方面的介绍很少，并且工具链种类繁多，很可能让我们摸不清头脑。</p><h2 id="2、下载篇"><a href="#2、下载篇" class="headerlink" title="2、下载篇"></a>2、下载篇</h2><blockquote><p>由于<code>riscv-gnu-toolchain</code>包含有好多第三方库，整个项目文件很大[官方说的是6.65GB]，加上国内GitHub堪比🐢速，你多半是不可能按官方教程下下来。</p></blockquote><div class="table-container"><table><thead><tr><th>项目名称</th><th>项目描述</th><th>项目用途</th></tr></thead><tbody><tr><td><a href="https://git.qemu.org/git/qemu.git" rel="external nofollow noreferrer">qemu</a></td><td>模拟器（类似bochs,PearPC)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-binutils-gdb.git" rel="external nofollow noreferrer">riscv-binutils</a></td><td>开发工具(compiler、assemble、linker、debugger…)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-dejagnu.git" rel="external nofollow noreferrer">riscv-dejagnu</a></td><td>测试其它程序的框架(framework)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-gcc.git" rel="external nofollow noreferrer">riscv-gcc</a></td><td>GNU Compiler Collection</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-binutils-gdb.git" rel="external nofollow noreferrer">riscv-gdb</a></td><td>同riscv-binutils</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-glibc" rel="external nofollow noreferrer">riscv-glibc</a></td><td>GNU C Library(system-API,其它的语言也通过它访问OS)</td><td></td></tr><tr><td><a href="https://hub.fastgit.org/riscv/riscv-newlib.git" rel="external nofollow noreferrer">riscv-newlib</a></td><td>一套开发工具（用的库有别于riscv-binutils)</td></tr></tbody></table></div><blockquote><p>binutils 和 newlib 之间的区别（坑待填o_o ….）</p></blockquote><h3 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h3><p>PC: x86</p><p>OS: Ubuntu 20.04.1 LTS</p><p>VM: wmware15.5Pro</p><hr><ol><li><p>下载源代码（推荐使用<code>hub.fastgit.org</code>镜像站，比原生站快几百倍）</p><pre><code class="hljs jboss-cli">git clone https:<span class="hljs-string">//hub.fastgit.org/riscv/riscv-gnu-toolchain</span>
-<span class="hljs-keyword">cd</span> riscv-gnu-toolchain
-git submodule update <span class="hljs-params">--init</span> <span class="hljs-params">--recursive</span></code></pre></li><li><p>安装依赖（其它系统查看官方readme)</p><pre><code class="hljs q">sudo apt-<span class="hljs-built_in">get</span> install autoconf automake autotools-<span class="hljs-built_in">dev</span> curl python3 libmpc-<span class="hljs-built_in">dev</span> libmpfr-<span class="hljs-built_in">dev</span> libgmp-<span class="hljs-built_in">dev</span> gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-<span class="hljs-built_in">dev</span> libexpat-<span class="hljs-built_in">dev</span></code></pre></li></ol><h3 id="下载失败解决方案"><a href="#下载失败解决方案" class="headerlink" title="下载失败解决方案"></a>下载失败解决方案</h3><ol><li><p>git clone qemu下载速度太慢导致失败（因为qemu没有把项目托管在GitHub上)</p><blockquote><p>链接：<a href="https://pan.baidu.com/s/1xGrafiu4I0yPAnE0iuTYzw" rel="external nofollow noreferrer">https://pan.baidu.com/s/1xGrafiu4I0yPAnE0iuTYzw</a><br>提取码：3iyy</p></blockquote><p>下载源码, 解压到相应的目录上即可。</p></li><li><p>其它模块没有拉下来。</p><p>在源项目下挨个手动克隆。</p><pre><code class="hljs awk">cd ~<span class="hljs-regexp">/riscv/</span>riscv-gnu-toolchain
-git clone https:<span class="hljs-regexp">//</span>hub.fastgit.org<span class="hljs-regexp">/riscv/</span>riscv-gcc.git</code></pre></li></ol><h2 id="3、编译篇"><a href="#3、编译篇" class="headerlink" title="3、编译篇"></a>3、编译篇</h2><h3 id="1、Newlib"><a href="#1、Newlib" class="headerlink" title="1、Newlib"></a>1、Newlib</h3><ul><li><p>建立一个安装路径：makdir /opt/riscv</p></li><li><p>[最好建立一个编译文件夹]：makdir build &amp;&amp; cd build</p></li><li><p>配置环境变量：export PATH=$PATH:/opt/riscv/bin(建议写到~/.bashrc上，永久有效</p><pre><code class="hljs jboss-cli"><span class="hljs-string">./configure</span> <span class="hljs-params">--prefix=/opt/riscv</span>
-make</code></pre></li></ul><h3 id="2、Linux"><a href="#2、Linux" class="headerlink" title="2、Linux"></a>2、Linux</h3><ul><li>跟上面相同的步骤，不过最好换一个干净的文件夹。</li></ul><ul><li><p>默认是安装RV64GC(64-bit), 即使在32-bit的构建环境中。</p><pre><code class="hljs jboss-cli"><span class="hljs-string">./configure</span> <span class="hljs-params">--prefix=/opt/riscv</span>
-make linux</code></pre></li></ul><ul><li><p>Alternatively：（构建32-bit RV32GC)</p><pre><code class="hljs routeros">./configure <span class="hljs-attribute">--prefix</span>=/opt/riscv <span class="hljs-attribute">--with-arch</span>=rv32gc <span class="hljs-attribute">--with-abi</span>=ilp32d
-make linux</code></pre></li><li><p>支持的架构有：rv32i、rv64i</p></li><li>标准扩展： (a)tomics, (m)ultiplication and division, (f)loat, (d)ouble, or (g)eneral for MAFD</li><li>支持的ABIs: ilp32 (32-bit soft-float), ilp32d (32-bit hard-float), ilp32f (32-bit with single-precision in registers and double in memory, niche use only), lp64 lp64f lp64d (same but with 64-bit long and pointers).</li></ul><h3 id="3、Linux-multilib"><a href="#3、Linux-multilib" class="headerlink" title="3、Linux multilib"></a>3、Linux multilib</h3><ul><li><p>同时支持32-bit和64-bit的Linux。</p><pre><code class="hljs jboss-cli"><span class="hljs-string">./configure</span> <span class="hljs-params">--prefix=/opt/riscv</span> <span class="hljs-params">--enable-multilib</span>
-make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>riscv64-unknown-linux-gnu-</code>, 但是能编译32位和64位程序。</p></blockquote></li></ul><h2 id="4、编译结果"><a href="#4、编译结果" class="headerlink" title="4、编译结果"></a>4、编译结果</h2><blockquote><p>经过漫长的等待，我终于编译Linux 64bit版本。</p></blockquote><p><img src="http://image.beenli.cn/img/20200801/kPGRS3PNVC3f.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200801/BoO9SyR2SFa9.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><a href="https://blog.csdn.net/weiqi7777/article/details/88045720?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-6.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-6.channel_param" rel="external nofollow noreferrer">riscv各种版本gcc工具链编译与安装</a></p><script>
+    <title>Unprivileged Spec(1)--RV32I</title>
+    <url>/posts/6c2bdcd1/</url>
+    <content><![CDATA[<center>RV32I Base Integer Instruction Set</center><h1 id="1-Preface"><a href="#1-Preface" class="headerlink" title="1 Preface"></a>1 Preface</h1><blockquote><ul><li>RV32I是为了足够成为编译器目标并能支持现代操作系统环境而设计的一个基本整数指令集。它也为了减少硬件实现的最小需求而设计。RV32I包含40个独立的指令，尽管一些简单的实现可能用单一的系统硬件指令（a single <a href="#system">SYSTEM hardware instruction</a>)代替ECALL/EBREAK指令，它总是捕获异常(always traps)并且可能将FENCE指令实现为NOP，以减少指令数到38个。RV32I能够模拟几乎任何的ISA扩展（除了A扩展，它需要额外硬件支持原子操作(atomicity）</li></ul><ul><li>在实践中，包含机器模式特权架构的硬件实现将需要9个CSR指令。</li></ul><ul><li>基本整数指令集的子集也许对于教学目的很有用(pedagogical purposes), 但是基础已经被定义，对实现其子集的真正的硬件除了忽略非对齐内存访问并把所有的SYSTEM instruction视为单一的异常(single trap)，我们不应该有什么其它的动机。</li></ul><hr><p>关于RV32I的大多注释也适用于RV64I base。</p></blockquote><h1 id="2-Programmer’s-Model"><a href="#2-Programmer’s-Model" class="headerlink" title="2 Programmer’s Model"></a>2 Programmer’s Model</h1><blockquote><p>对于RV32I非特权状态一共有32个寄存器(都是32位宽，i.e. ,XLEN=32)：<code>x0~x31</code>;x0被硬编码到0。另外31个寄存器保存的值可以被解释为：Ⅰ、布尔值的集合，Ⅱ、补码的有符号二进制整数，Ⅲ、无符号二进制整数</p><p>有一个额外的非特权寄存器，<code>pc</code>(program counter)：保存当前指令的地址</p></blockquote><ul><li>在Base Integer ISA中，没有指定的栈指针或者子例程返回地址链接寄存器(link register)；指令编码允许任何寄存器被用于这个目的；但是，标准软件调用惯例(calling convention)使用寄存器<code>x1</code>保存调用的返回地址，<code>x5</code>作为备用链接寄存器。标准调用例程使用<code>x2</code>作为栈指针(stack pointer)</li><li>硬件可以使用<code>x1</code>或<code>x2</code>来加速函数调用和返回(因为可以尽早解码)；<a href="#jal">详情见<code>JAL</code>和<code>JALR</code>指令</a></li><li>可选的压缩16-bit指令格式基于这样的假设设计的：<code>x1</code>：返回地址寄存器；<code>x2</code>:栈指针。使用其他约定的软件将正常运行，但可能有较大的代码大小。</li></ul><hr><p><strong><font color="red">notes：</font></strong></p><ul><li>可用架构寄存器(available architectural registers)的数量能够对<code>代码大小</code>，<code>性能</code>，<code>能耗</code>产生重大影响。尽管16个寄存器对于运行编译代码的整数ISA来说是足够的，但是在长度为16位使用3-address格式的指令中编码拥有16个寄存器完整的ISA是不可能的。(⭐PS:16个寄存器，address至少4位，三地址就12位，那么只剩下4位区分不同的指令了,即最多16条不同的指令)。</li><li>尽管2-address是可能的。但它增加指令条数并且降低效率。我们想要避免立即数指令的大小来简化硬件实现，一旦32-bit的指令大小被采用，支持32个整数寄存器就很显而易见了。一个更大数量的整数寄存器也有助于提高高性能代码的性能，可广泛使用<code>循环展开</code>（loop unrolling)、<code>软件流水线</code>(software pipelining)和<code>缓存平铺</code>(cache tiling)。❓</li><li>基于上面这些原因，我们为基础ISA选择了一个常规大小（conventional size)——32个整数寄存器。动态寄存器使用趋向于被一些经常访问的寄存器主宰，并且<code>regfile</code>(寄存器堆)的实现可被优化以减少频繁访问寄存器的访问能量(access energy)。</li><li>可选的16位压缩指令格式绝大部分只使用8个寄存器，因此能提供稠密的指令编码(dense instruction encoding),但是如果想要的话，额外的指令集扩展能支持更大的寄存器空间(要么扁平的要么分层次的)。</li></ul><h1 id="3-Base-Instruction-Formats"><a href="#3-Base-Instruction-Formats" class="headerlink" title="3 Base Instruction Formats"></a>3 Base Instruction Formats</h1><blockquote><p>有4种核心的指令格式：R/I/S/U。指令长度都是32位，并且必须在内存中以4字节为边界对齐。指令地址非对齐的异常，常常是由于分支的发生(taken branch)或者非条件跳转的目标地址不是4字节对齐。</p></blockquote><ul><li><p>对于解码一个保留指令的行为是没有规定的(unspecified)</p></li><li><p>RISC-V ISA保持源寄存器(<code>rs1</code>和<code>rs2</code>)和目标寄存器(<code>rd</code>)的位置在所有指令格式中相同以简化解码。除了使用在CSR指令中的5bit的立即数，立即数总是<code>sign-extended</code>，通常是打包到指令中最左边的可用位，这样分配以减少硬件的复杂程度。特别是，对于所有立即数的符号位总是在最高位(也就是Ins[31])来加速符号扩展电路。</p><p><img src="https://image.beenli.cn/img/20200930/F4vpswvD8a17.jpg?imageslim" srcset="/img/loading.gif" alt="mark"><br><strong><i></i></strong></p><center><strong><i>imm[x]指的是当前位在扩展成32位立即数中的位置</i></strong></center><p></p><ul><li>实际应用中，大部分立即数要么很小，要么需要所有的位数(XLEN bits)。我们选择非对称立即数分割：常规指令中立即数占12bits;特殊的 load-upper-immediate 指令中立即数占20bits。这样做是为了给常规指令更多的opcode空间。</li></ul></li></ul><h1 id="4-Immediate-Encoding"><a href="#4-Immediate-Encoding" class="headerlink" title="4 Immediate Encoding"></a>4 Immediate Encoding</h1><blockquote><p>指令格式还有两个变种(variants)：B/J，它们基于立即数的处理衍生出来。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/NR78wxr6Nbb8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>S和B仅有的区别：在B格式中12bit立即数域乘以2用于编码分支偏移。而不是像传统做法那样，将指令编码中的所有立即数位用硬件左移一位,中间的位数(imm[10:1])和符号位保留在固定位置，而S格式中的最低位(inst[7])在B格式中编码一个高阶位。</li><li>U和J的仅有区别：U要向左移12位；而J只用移动1位。在U和J指令立即数中指令的位置尽量跟其他格式的指令或者它们互相重叠。</li></ul><p><img src="https://image.beenli.cn/img/20200930/CoSeYfK4wdG4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="5-Computational"><a href="#5-Computational" class="headerlink" title="5 Computational "></a>5 <a name="compute">Computational</a></h1><blockquote><p>大多数的<code>整数算术指令</code>(Integer computational instruction)对保存在整数寄存器中的<code>XLEN</code>位的值进行操作。整数计算指令要么被编码为使用I格式的寄存器-立即数操作；要么使用R格式的寄存器-寄存器操作。对于这两种类型指令的目的寄存器都是<code>rd</code>。没有整型计算指令会导致算术异常</p></blockquote><ul><li><p>基本指令集不包括对整数算术运算上做<code>溢出检查</code>(overflow checks)支持的特殊指令集。因为许多溢出检查能够更便宜地(cheaply)使用RISC-V分支来实现</p></li><li><p>对<code>无符号加法</code>的溢出检查仅仅需要在加法指令后加上一条额外的分支指令</p><pre><code class="hljs assembly">add t0,t1,t2
+blut t0, t1, overflow</code></pre></li><li><p>对于有符号加法：如果一个操作数的符号已知，溢出检查仅需要加法之后的一个分支（覆盖了带有立即数操作数的常见加法情形）</p><pre><code class="hljs assembly">addi t0, t1, +imm
+blt t0, t1, overflow</code></pre></li><li><p>对于常规的<code>有符号加法</code>，加法之后需要三条额外的指令。利用当且仅当另一个操作数为负时，该和应小于其中一个操作数的观察。</p><pre><code class="hljs assembly">add t0, t1, t2
+slti t3, t2, 0
+slt t4, t0, t1
+bne t3, t4, overflow</code></pre></li><li><p>在RV64I中，32位有符号的加法溢出可以通过比较ADD和ADDW操作的结果来进一步优化。(ADDW肯定不会溢出)</p></li></ul><h2 id="Register-Immediate"><a href="#Register-Immediate" class="headerlink" title="Register-Immediate"></a><a name="arith">Register-Immediate</a></h2><p><img src="https://image.beenli.cn/img/20200930/9lWr2QpMilov.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>ADDI</code>：将12位立即数符号扩展后与<code>rs1</code>中的值相加，算术溢出忽略，结果的低32位存到<code>rd</code>寄存器中。</p><pre><code class="hljs assembly">/* 两条指令等效 */
+ADDI rd, rs1, 0
+MV rd , rs1(汇编伪指令：将rs1中的值复制给rd)</code></pre></li><li><p><code>SLTI</code>(set less than immediate): 当寄存器<code>rs1</code>中的值小于立即数（俩者都视为有符号数)，将寄存器<code>rd</code>置为1；否则置0。<code>SLTIU</code>: 功能一样，但是把比较的对象视为无符号数。</p><pre><code class="hljs assembly">/* 两条指令等效 */
+SLTIU rd, rs1, 1(当rs1等于0,rd为1,否则为0)
+SEQZ rd, rs</code></pre></li><li><p><code>ANDI, ORI, XORI</code>: 三个逻辑运算符，分别对rs1和立即数执行<code>按位</code>(bitwise)的与，或，异或运算。</p><pre><code class="hljs assembly">/* 两条指令等效 */
+XORI rd, rs1, -1(-1的补码为全1)
+NOT rd, rs(将rs各位取反赋值给rd)</code></pre><hr><p><img src="https://image.beenli.cn/img/20200930/ohbIXFmmows6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><blockquote><p><code>移位</code>被编码一种特殊的I类型指令格式。</p><ul><li>被移位的操作数为<code>rs1</code>；移位的位数被编码在立即数域的低五位上。</li><li>👉移类型被编码在第30位上；</li><li><code>SLLI</code>(shift left logical)：0被移动到低位</li><li><code>SRLI</code>: 0被移动到高位</li><li><code>SRAI</code>: (shift right arithmetic): 原符号位复制到空出的高位</li></ul></blockquote><hr><p><img src="https://image.beenli.cn/img/20200930/HH9oFeg4OyQC.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><code>LUI</code>(load upper immediate): 用于构建32位常数并使用U格式指令。把U-immediate的值放在目的寄存器的高20位，其它低位用0填充。</li><li><code>AUIPC</code>(add upper immediate to pc)：用于构建与pc相关的地址，并使用U格式指令。形成32位的偏移(高20位来自立即数，低12位用0填充)，把这个偏移加到AUIPC指令的地址上，然后把结果放到<code>rd</code>中。（rd = pc-4+im)<ul><li>AUIPC指令支持<code>双指令序列</code>(two-instruction sequences)访问相对PC的任意偏移(for both control-flow transfers and data accesses)</li><li>一个AUIPC和JALR中12位偏移的组合能够转换控制给任意32位的PC相对地址(PC-relative address)，而一个ALIPC加上一个常规load和store指令中的12位立即数偏移能供访问任意32位PC相对地址的数据地址(PC-relative data address)</li><li>当前PC值可以通过设置立即数为0获得，尽管JAL+4指令也能获得本地PC(JAL下一指令)，它可能在简单微架构中造成流水线崩溃，或者在更复杂的微架构中污染BTB(❓)</li></ul></li></ol><h2 id="Register-Register"><a href="#Register-Register" class="headerlink" title="Register-Register"></a>Register-Register</h2><blockquote><p>RV32I定义了几个R型算术运算。所有的运算都读取<code>rs1</code>,<code>rs2</code>寄存器的值作为源操作数，把结果写回<code>rd</code>寄存器。<code>funct7</code>和<code>funct3</code>域选择合适的运算。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/cdJ8aBabLVTk.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><a href="#arith">意义同👆。</a></p><h2 id="NOP-Instruction"><a href="#NOP-Instruction" class="headerlink" title="NOP Instruction"></a>NOP Instruction</h2><p><img src="https://image.beenli.cn/img/20200930/QOhQFMEFTYs1.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>NOP指令：不会改变任何架构上可见的状态。出来推进PC，增加任何适用的性能计数器。NOP被编码为`ADDI x0, x0, 0</li><li>NOPs可以被用来对齐代码段与重要的微架构地址边界。或者为内联代码修改(inline code modification)流出空间。尽管有许多可能的方法去编码NOP,我们使用了规范的NOP编码来允许微架构优化以及更易读的反汇编输出。其它的NOP编码可以用作指示指令(HINT instruction)</li><li>选择ADDI作为NOP编码是因为它在跨一系列系统执行时最可能占用最少的资源;除此之外，该指令仅读取一个寄存器。并且，一个ADDI功能单元在超标量设计中更容易可用，因为adds是最常见的运算</li><li>地址生成单元可以使用相同的硬件够执行ADDI，该硬件被用于base+offset地址计算，而register-register ADD，逻辑运算或移位运算操作需要额外的硬件。</li></ul><h1 id="6-Control-Transfer"><a href="#6-Control-Transfer" class="headerlink" title="6 Control Transfer"></a>6 Control Transfer</h1><blockquote><p>RV32I提供两种控制转义指令：<code>无条件跳转</code>，<code>条件分支</code></p><p>RV32I控制转义指令没有架构上可见的<code>延迟槽</code>(delay slot)</p></blockquote><h2 id="Unconditional-Jumps"><a href="#Unconditional-Jumps" class="headerlink" title="Unconditional Jumps"></a>Unconditional Jumps</h2><p><img src="https://image.beenli.cn/img/20200930/qCmY8sLbKGDK.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>JAL</code>(jump and link)指令使用<code>J-type</code>格式，J-immediate以两字节的倍数编码一个有符号偏移。(in multiple of 2 bytes；则该偏移要乘以2)。偏移符号扩展，然后加上当前指令的地址形成<code>跳转目标地址</code>(jump target address)。Jumps因此能够访问±1 MiB范围。JAL存储下一条指令的地址(pc+4)到<code>rd</code>；</p><p>标准软件调用约定使用x1作为返回地址寄存器，x5作为备用链接寄存器。</p><p><img src="https://image.beenli.cn/img/20200930/VUjOV9BMhinO.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>JALR</code>(jump and link register)：间接跳转指令：使用<code>I-type</code>，目标地址通过把符号扩展的12比特立即数加到rs1上，然后置结果的最低位为0获得；下一条指令的地址(pc+4)写到寄存器rd。如果结果不需要，可以把<code>x0</code>当作目的寄存器。</p><p>如果目标地址没有对齐四字节边界，jar和jarl指令将产生<code>指令地址非对齐</code>异常。</p><p>返回地址<code>预测栈</code>(prediction stack)是高性能取值单元的一个常见特点，要求准确检测用于过程调用和返回的指令是有效的。</p><ul><li>对于RISC-V,关于指令使用的线索通过寄存器号的使用被简单的编码。</li><li>JAL指令应该把返回地址压进返回地址栈(RAS)中，当且仅当<code>rd = x1/x5</code>；</li><li>JALR指令应该push/pop a RAS</li></ul><p><img src="https://image.beenli.cn/img/20200930/WC8l9YmmyroI.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>link is true when the register is either x1 or x5</center><h2 id="Conditional-Branches"><a href="#Conditional-Branches" class="headerlink" title="Conditional Branches"></a>Conditional Branches</h2><blockquote><p>所有分支指令使用<code>B-type</code>格式。</p><p>12比特的立即数用2字节的倍数编码有符号偏移</p><p>立即数符号扩展后与当前指令地址相加，可以访问的地址范围：<code>±4 KiB</code></p></blockquote><p><img src="https://image.beenli.cn/img/20200930/PR0CJpoojIFU.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><code>BEQ</code>:branch equal;&nbsp;&nbsp;<code>BNE</code>: branch not equal;&nbsp;&nbsp;<code>BLT</code>: branch less than;&nbsp;&nbsp;<code>BGE</code>: branch greater than;</p><ul><li>应该对软件进行优化，使顺序代码路径成为最常见的路径，并将较不经常使用的分支代码路径置于行外。软件还应该假设，至少在第一次遇到分支时，预测向后跳转的分支发生，向前跳转的分支不发生。动态预测器应该快速学习任何可预测的分支行为。</li><li>不像一些其它的架构，RISC-V中对于<code>非条件分支</code>应该总是使用<code>jump</code>(JAL with rd=x0)指令而不是条件总是满足的有条件分支指令</li><li>RISC-V跳转也是与pc相关的，并且比分支支持更大的偏置范围，而且不会污染条件分支预测表。</li></ul><h1 id="7-Load-and-Store-😳"><a href="#7-Load-and-Store-😳" class="headerlink" title="7 Load and Store(😳)"></a>7 Load and Store(😳)</h1><blockquote><p>RV32I是一个装载和存储架构：只有<code>load</code>和<code>store</code>指令能够访问内存，算术指令只能操作CPU寄存器。</p></blockquote><ul><li>RV32I提供了32-bit的地址空间，用字节编码。</li><li><code>EEI</code>定义了地址空间的那部分可以被哪些指令合法访问。(e.g.，一些地址可能只能被读，或仅支持按字访问)</li><li>目的寄存器为<code>x0</code>的装载指令将抛出异常，即使装载的值被丢弃也会造成其它的副作用。</li></ul><blockquote><p>In RISC-V，endianness is byte-address invariant</p></blockquote><ul><li><p>如果一个字节以某种顺序(at some endianness)存储到内存某个地址处，那么以字节大小从那个地址以任意的顺序(in any endianness)装载的结果是存储的值。</p></li><li><p>小端(little-endian): 多字节存储时把寄存器最低为字节写到内存字节地址的最低为，随后寄存器的其它字节以权重升序写入。（权重越大的字节占据的内存地址越大）</p></li></ul><hr><p><img src="https://image.beenli.cn/img/20200930/gJvyXMYKv7Ov.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>装载和存储指令用于在寄存器和内存中转换数据。</p><p>Loads: <code>I-type</code></p><p>Stores: <code>S-type</code></p><p>有效地址：立即数符号扩展加上基址寄存器<code>rs1</code></p><p>目的地址：Ⅰ、for load:从内存取值到<code>rd</code>;Ⅱ、for store：复制<code>rs2</code>的值到内存</p></blockquote><h1 id="8-Memory-Ordering"><a href="#8-Memory-Ordering" class="headerlink" title="8 Memory Ordering"></a>8 Memory Ordering</h1><p><img src="https://image.beenli.cn/img/20200930/8gVkNfBMa1IW.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p><code>FENCE</code>：用于排序被其它RISC-V线程，外部设备或者协处理器可见的设备I/O和存储器访问。</p></li><li><p>任何设备输入(I)，设备输出(O)，存储器读取(R),存储器写(W)的组合能够被排序成任何相同的组合。</p></li><li>通俗地说，没有其它线程或者外部设备能够在<code>fence</code>之前的指令集进行任何操作之前，观测到在<code>fence</code>后者的指令集合所做的任何操作。就像一个屏障一样，前面的操作只有先完成，后面的指令结果才能被其它处理器观察到。</li><li>memory-mapped I/O设备很典型地被没有cache的loads和store访问，它们使用I和O而不是R和W。</li><li>指令集扩展也可以描述新的I/O指令，使用fence指令中I和O位进行排序</li></ul><p><img src="https://image.beenli.cn/img/20200930/6dnc1SCYbwDA.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>fence mode域在ins[31:28]；当fm=0000时排序所有的内存操作。</li><li>可选的<code>FENCE.TSO</code>指令其fm=1000；predecessor=RW,并且successor=RW。TSO命令它的前面集合中的所有加载操作先于它的后继集合中的所有内存操作；它的前面集合中的所有存储操作(store operation)都要先于它的后继集合中的所有存储操作</li></ul><h1 id="9-Call-and-Breakpoints"><a href="#9-Call-and-Breakpoints" class="headerlink" title="9 Call and Breakpoints"></a>9 Call and Breakpoints</h1><blockquote><p><a name="system">SYSTEM instruction</a>：被用于访问需要特权访问的系统功能，使用<code>I-type</code>。</p><p>分为两大类：</p><ul><li>自动读-修改-写(read-modify-write)<code>控制状态寄存器</code>(CSRs)。</li><li>潜在的特权指令(potentially privileged instructions)</li></ul><p>系统指令被定义成运行稍简单的实现总是捕获异常给单一的<code>软件异常处理器</code>(software trap handle)；更加复杂的实现可能需要执行更多条系统指令</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/Wf33chpE3JIQ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>这两个指令会向<code>配套执行环境</code>(supporting execution environment)引起一个精确的<code>请求异常</code>(requested trap)。</p><h2 id="ECALL"><a href="#ECALL" class="headerlink" title="ECALL"></a>ECALL</h2><blockquote><p><code>ECALL</code>：向运行环境提出服务请求(service request)</p><p>EEl将定义服务请求的参数如何传递，但通常这些都是在整数寄存器中指定的位置</p></blockquote><h2 id="EBREAK"><a href="#EBREAK" class="headerlink" title="EBREAK"></a>EBREAK</h2><blockquote><p><code>EBREAK</code>：返回控制权给调试器环境(debugging environment)</p></blockquote><h1 id="10-Hint"><a href="#10-Hint" class="headerlink" title="10 Hint"></a>10 Hint</h1><blockquote><p>RV32I为<code>HINT</code>指令保留了大的编码空间，通常是用来和微架构沟通性能提示。HINTs被编码为<a href="#compute">整数计算指令</a>,其中<code>rd=x0</code>。因此，像nop指令一样，HINTs不会改变架构可见的状态，除了增加pc和任何适用的性能计数器。</p></blockquote><p><img src="https://image.beenli.cn/img/20200930/nVtEvPja9AXi.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -887,69 +887,8 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </script>]]></content>
       <categories>
         <category>RISC-V</category>
-        <category>environment</category>
+        <category>spec</category>
       </categories>
-      <tags>
-        <tag>toolkits</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>testbench(1)</title>
-    <url>/posts/26241a85/</url>
-    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化
-<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;
-
-第二种: 定义信号时初始化
-<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)
-
-等价于:
-<span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-    #<span class="hljs-number">5</span>;
-    a=b;
-<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)
-
-等价于
-<span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-	temp = b;
-	#<span class="hljs-number">5</span>;
-	a = temp;
-<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span>
-<span class="hljs-keyword">begin</span>
-	# <span class="hljs-number">10</span>
-	@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span>
-<span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>
-	#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;
-<span class="hljs-keyword">initial</span>
-	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) 
-	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
-<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Digital IC</category>
-        <category>verilog</category>
-      </categories>
-      <tags>
-        <tag>specification</tag>
-      </tags>
   </entry>
   <entry>
     <title>单链表翻转</title>
@@ -1009,6 +948,64 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </categories>
       <tags>
         <tag>C</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>testbench(1)</title>
+    <url>/posts/26241a85/</url>
+    <content><![CDATA[<h2 id="Testbench-1"><a href="#Testbench-1" class="headerlink" title="Testbench(1)"></a><center>Testbench(1)</center></h2><h3 id="1、testbench的结构"><a href="#1、testbench的结构" class="headerlink" title="1、testbench的结构"></a>1、testbench的结构</h3><p><img src="https://image.beenli.cn/img/20200404/5eSun5gqIQrU.png?imageslim" srcset="/img/loading.gif" alt="testbench"></p><ol><li><p>testbench没有<code>输入输出</code>接口</p></li><li><p>测试模块只负责对<code>待测试系统接口</code>提供<code>激励信号</code>;并监控<code>输出</code></p></li><li><p>testbench代码<code>不需要可综合</code>，即不被实现成电路</p></li><li><p>产生适当的激励并达到<code>覆盖率</code>要求</p><hr></li></ol><h3 id="2、测试激励的描述方式"><a href="#2、测试激励的描述方式" class="headerlink" title="2、测试激励的描述方式"></a>2、测试激励的描述方式</h3><ol><li><p><strong>信号的初始化</strong></p><pre><code class="hljs verilog">第一种: <span class="hljs-keyword">initial</span> 初始化
+<span class="hljs-keyword">initial</span> a = <span class="hljs-number">0</span>;
+
+第二种: 定义信号时初始化
+<span class="hljs-keyword">reg</span>[<span class="hljs-number">3</span>:<span class="hljs-number">0</span>] cnt = <span class="hljs-number">4'b1010</span>;</code></pre></li><li><p><strong>延迟控制</strong></p><ol><li><p>延迟语句</p><ul><li><p>外部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> #<span class="hljs-number">5</span> a = b;(等待<span class="hljs-number">5</span>tick后计算右端的值并赋值给左边👈)
+
+等价于:
+<span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+    #<span class="hljs-number">5</span>;
+    a=b;
+<span class="hljs-keyword">end</span></code></pre></li><li><p>内部时间控制</p><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span> a = #<span class="hljs-number">5</span> b;(先计算右端的值，等待<span class="hljs-number">5</span>tick后再把值赋给左边👈)
+
+等价于
+<span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+	temp = b;
+	#<span class="hljs-number">5</span>;
+	a = temp;
+<span class="hljs-keyword">end</span></code></pre><blockquote><p>验证程序如下：</p></blockquote><p><img src="http://image.beenli.cn/img/20200405/Ds3tBF8spFY8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="http://image.beenli.cn/img/20200405/zS4s5qx25VhP.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>可以清楚地看到：</p><p>​ 第一种延时语句，在0-5tick之间只要b变化了,那么第五tick</p><p>时刻a被赋予的值就是b第五时刻的值。</p><p>​ 而第二种延时语句：b的值在0时刻已经定好了，不管</p><p>b在这期间怎么变化，a最终得到的是b在0时刻的值。</p></li></ul></li><li><p>事件语句</p><blockquote><p><strong>@(&lt;事件表达式&gt;);</strong></p><p><strong>@(&lt;事件表达式&gt;)行为语句;</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">initial</span>
+<span class="hljs-keyword">begin</span>
+	# <span class="hljs-number">10</span>
+	@(<span class="hljs-keyword">posedge</span> en) in = ~in; <span class="hljs-comment">//en的👆上升沿到来时,in取反</span>
+<span class="hljs-keyword">end</span></code></pre><p>事件语句<code>@</code>必须等指定事件到来才执行</p></li><li><p>等待语句</p><blockquote><p><strong>wait(&lt;条件表达式&gt;) 行为语句</strong></p></blockquote><pre><code class="hljs verilog"><span class="hljs-keyword">always</span>
+	#<span class="hljs-number">5</span> cnt=cnt+<span class="hljs-number">1'b1</span>;
+<span class="hljs-keyword">initial</span>
+	<span class="hljs-keyword">wait</span>(cnt == <span class="hljs-number">4'b1111</span>) 
+	<span class="hljs-built_in">$display</span>(<span class="hljs-built_in">$time</span>,,,<span class="hljs-string">"cnt = %b"</span>, cnt);
+<span class="hljs-keyword">end</span></code></pre><p>等待语句只有条件为真时才执行。</p><p><img src="http://image.beenli.cn/global/20200404/xTxXL9tRH35N.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>可以看到第0时刻cnt = 0</p><p>第5时刻cnt = 1</p><p>以此类推；直到第75时刻 cnt = 15</p><p>再过10tick 就终止仿真了。总过时常85tick</p></blockquote></li></ol></li></ol><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>verilog</category>
+      </categories>
+      <tags>
+        <tag>specification</tag>
       </tags>
   </entry>
   <entry>
@@ -1077,6 +1074,99 @@ $ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class=
       </categories>
       <tags>
         <tag>online course</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>存储电路</title>
+    <url>/posts/19fa4593/</url>
+    <content><![CDATA[<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><blockquote><p>在复杂的数字电路中，不仅需要对各种数字信号进行<code>算术运算</code>和<code>逻辑运算</code>，而且还需要在运算过程中不断将运算数据和运算结果保存起来。因此，<code>存储电路</code>就成为计算机以及所有复杂数字系统不可缺少的组成部分。</p></blockquote><ul><li><p>分类总结</p><p><img src="http://image.beenli.cn/img/20200806/KInKOkBSpdhF.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><h2 id="二、SR锁存器"><a href="#二、SR锁存器" class="headerlink" title="二、SR锁存器"></a>二、SR锁存器</h2><p class="note note-info">SR锁存器(Set-Reset Latch) 是静态存储单元中最基本，也是电路结构最简单的一种。</p><ol><li><p>或门锁存器</p><p><img src="http://image.beenli.cn/img/20200806/mkE1Uu5jsyux.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>当$R_D$是1或者$S_D$是1而另外一个是0时，可以看到S起到<code>set 1</code>；而R起到<code>reset 0</code>的作用。</li><li>当有一个回到0时(此时两输入都为0)，可以保持原来的状态不变。(因为输出的1反馈到输入)</li><li><span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8">❌</span>不允许输入同为1。（此时输出同为0为无效状态，并且同时变为0时存在竞争冒险）</li></ul></li><li><p>与门锁存器(同理)<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8">🙂</span></p><p><img src="http://image.beenli.cn/img/20200806/ny32DamxXGT9.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h2 id="三、触发器"><a href="#三、触发器" class="headerlink" title="三、触发器"></a>三、触发器</h2><p class="note note-info">触发器与锁存器不同在于：增加了一个触发信号输入端(时钟信号<strong>CLK</strong>)。只有当触发信号到来时，其功能与锁存器相同。</p><h3 id="1、电平触发"><a href="#1、电平触发" class="headerlink" title="1、电平触发"></a>1、电平触发</h3><p class="note note-light">只有触发信号在有效电平的时候，输入信号才能作用。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p><h4 id="①同步SR触发器"><a href="#①同步SR触发器" class="headerlink" title="①同步SR触发器"></a>①同步SR触发器</h4><p><img src="http://image.beenli.cn/img/20200806/w2EFARutEXwH.jpg?imageslim" srcset="/img/loading.gif" alt="cl没有⭕代表高电平有效"></p><center>框图<strong>Cl</strong>外面没有⭕代表高电平有效</center><h4 id="②异步复位置位"><a href="#②异步复位置位" class="headerlink" title="②异步复位置位"></a>②异步复位置位</h4><p>// 将<code>置位信号</code>$S_{D}^{‘}$接入G1, <code>复位信号</code>$R_{D}^{‘}$接G2</p><h4 id="③单端输入-D型号锁存器"><a href="#③单端输入-D型号锁存器" class="headerlink" title="③单端输入(D型号锁存器)"></a>③单端输入(D型号锁存器)</h4><p>// 规避了约束条件SR=0</p><p><img src="http://image.beenli.cn/img/20200806/xIOR3Naxv9I6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="④Transparent-D-Latch"><a href="#④Transparent-D-Latch" class="headerlink" title="④Transparent D-Latch"></a>④Transparent D-Latch</h4><p>// CMOS传输门构成</p><p><img src="http://image.beenli.cn/img/20200806/Gs96RXY8qL57.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>当TG2打开，TG1关闭时。两个反相器串联把截止前瞬间的信号(<code>反相器G1输入电容</code>)锁住。</p><h3 id="2、边沿触发"><a href="#2、边沿触发" class="headerlink" title="2、边沿触发"></a>2、边沿触发</h3><p class="note note-light">提高触发器可靠性，增强抗干扰能力，希望触发器次态仅取决于CLK信号<strong>边沿</strong>到达时刻输入信号的状态。而边沿之前或之后输入状态的变化对触发器的次态没有影响。</p><h4 id="①两个电平触发D触发器"><a href="#①两个电平触发D触发器" class="headerlink" title="①两个电平触发D触发器"></a>①两个电平触发D触发器</h4><p><img src="http://image.beenli.cn/img/20200806/XRFiu2qdjwAn.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>不看置位信号就是两个Transparent D-Latch</li><li>当第一个工作时，第二个保持。透明D锁存器：所以输出能跟随时钟边沿瞬间输入的值</li></ul><h4 id="②维持阻塞-pushpin"><a href="#②维持阻塞-pushpin" class="headerlink" title="②维持阻塞:pushpin:"></a>②维持阻塞<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h4 id="③门电路传输延迟-pushpin"><a href="#③门电路传输延迟-pushpin" class="headerlink" title="③门电路传输延迟:pushpin:"></a>③门电路传输延迟<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h3 id="3、脉冲触发"><a href="#3、脉冲触发" class="headerlink" title="3、脉冲触发"></a>3、脉冲触发</h3><p class="note note-light">为了提高可靠性：希望每个CLK周期里面输出端状态只能改变<strong>一次</strong></p><h4 id="①主从SR"><a href="#①主从SR" class="headerlink" title="①主从SR"></a>①主从SR</h4><p>Master-Slave SR Flip-Flop</p><p><img src="http://image.beenli.cn/img/20200812/sT6pd0FRytWY.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center><strong>￢</strong>：延时输出</center><p><img src="http://image.beenli.cn/img/20200812/Gj3SXcH9aMF3.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>高电平有效，下降沿状态才会改变</center><ul><li>clk高电平<code>主触发器</code>有效，<code>从触发器</code>保持原来状态。</li><li>clk从高变到低时，主触发器被封锁，从触发器按照主触发器相同的状态翻转。</li><li>因此：一个周期输出只可能翻转一次。</li></ul><h4 id="②主从JK-规避SR-1"><a href="#②主从JK-规避SR-1" class="headerlink" title="②主从JK(规避SR=1)"></a>②主从JK(<code>规避SR=1</code>)</h4><p><img src="http://image.beenli.cn/img/20200812/3w2tYTQ9HhKm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script type="math/tex;mode=display">Q^* = S + \overline RQ(for\quad SR)</script><script type="math/tex;mode=display">JK: S=J \overline Q\quad R=KQ</script><script type="math/tex;mode=display">Q^*=J \overline Q+(\overline K+\overline Q)Q=J \overline Q + \overline KQ\quad(for\quad JK)</script><ul><li>clk变低电平时把主触发器的值<code>复制</code>给了次触发器。（所以上边推导时Q即代表中间输出也代表后边输出）</li><li>主触发器有效时(高电平)Q要么为1要么为0，不可能同时为0或者为1。因为G3,G4都为1。它们通过反相器互咬。</li><li>考察当J=1，R=1时，G7,G8输出$Q$和$\overline Q$(不是全0，就🆗)。所以当Q=1，输出为0，当Q=0,输出为1,即反向。</li></ul><h2 id="四、触发器的动态特性-pushpin"><a href="#四、触发器的动态特性-pushpin" class="headerlink" title="四、触发器的动态特性:pushpin:"></a>四、触发器的动态特性<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h2><h2 id="五、References"><a href="#五、References" class="headerlink" title="五、References"></a>五、References</h2><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none;padding-left:0"><li id="fn:1"><span style="display:inline-block;vertical-align:top;padding-right:10px">1.</span><span style="display:inline-block;vertical-align:top">外国教材有时把此电路叫（Gated SR latch), 时钟信号叫做“使能”信号（enable）</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Digital IC</category>
+        <category>digital electronic technique</category>
+      </categories>
+      <tags>
+        <tag>circuits</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>git hooks自动部署hexo</title>
+    <url>/posts/fb29ac9a/</url>
+    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" srcset="/img/loading.gif" alt="git hooks"></p><h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol><li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p><ol><li><p><code>adduser git</code>(创建一个用户)</p></li><li><p>可以给创建的用户设置密钥<code>passwd git</code></p></li><li><p>赋予git用户sudo权限</p><pre><code class="hljs bash">chmod 740 /etc/sudoers</code></pre></li></ol></li></ol><p>vim /etc/sudoer<br></p><pre><code class="hljs stata">
+      `给git用户添加命令权限如下`
+    
+      保存后退出，修改回文件权限`chmod 440 /etc/sudoers`
+      
+      ![<span class="hljs-keyword">mark</span>](http:<span class="hljs-comment">//image.beenli.cn/img/20200408/cSLiyuqjcxOU.jpg?imageslim)</span>
+
+2. 初始化git仓库
+
+   ```bash
+   <span class="hljs-keyword">su</span> git				<span class="hljs-comment">//切换至git用户</span>
+   <span class="hljs-keyword">mkdir</span> blog.git		<span class="hljs-comment">//创建仓库文件夹</span>
+   <span class="hljs-keyword">cd</span> blog.git			<span class="hljs-comment">//进入文件夹</span>
+   git init --bare		<span class="hljs-comment">//使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区</span></code></pre><p></p><ol><li><p>创建网站目录</p><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录
+sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git
+(这一步很重要，否者后续提交没有权限)</code></pre></li><li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)
+<span class="hljs-built_in">cd</span> .ssh
+touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种</code></pre></li><li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录
+touch post-receive				 //创建post-receive文件
+chmod +x post-receive			 //赋予其可执行权限</code></pre><blockquote><p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p></blockquote><p>复制该段代码到刚刚创建的post-receive文件</p><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span>
+<span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span>
+
+GIT_REPO=/home/git/blog.git
+TMP_GIT_CLONE=/tmp/blog
+PUBLIC_WWW=/var/www/blog
+
+rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>
+git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span>
+rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*
+cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span></code></pre><p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p></li><li><p>最后配置hexo的<code>_config.yml</code></p><pre><code class="hljs bash">deploy:
+    <span class="hljs-built_in">type</span>: git
+    repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span>
+    branch: master</code></pre></li></ol><hr><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div><p>[1] <a href="https://tding.top/archives/12a4e7e6.html" rel="external nofollow noreferrer">Hexo 博客部署到 VPS</a></p><p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks" rel="external nofollow noreferrer">git hooks</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Software</category>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+        <tag>Hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -1156,9 +1246,9 @@ gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</
       </tags>
   </entry>
   <entry>
-    <title>存储电路</title>
-    <url>/posts/19fa4593/</url>
-    <content><![CDATA[<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><blockquote><p>在复杂的数字电路中，不仅需要对各种数字信号进行<code>算术运算</code>和<code>逻辑运算</code>，而且还需要在运算过程中不断将运算数据和运算结果保存起来。因此，<code>存储电路</code>就成为计算机以及所有复杂数字系统不可缺少的组成部分。</p></blockquote><ul><li><p>分类总结</p><p><img src="http://image.beenli.cn/img/20200806/KInKOkBSpdhF.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><h2 id="二、SR锁存器"><a href="#二、SR锁存器" class="headerlink" title="二、SR锁存器"></a>二、SR锁存器</h2><p class="note note-info">SR锁存器(Set-Reset Latch) 是静态存储单元中最基本，也是电路结构最简单的一种。</p><ol><li><p>或门锁存器</p><p><img src="http://image.beenli.cn/img/20200806/mkE1Uu5jsyux.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>当$R_D$是1或者$S_D$是1而另外一个是0时，可以看到S起到<code>set 1</code>；而R起到<code>reset 0</code>的作用。</li><li>当有一个回到0时(此时两输入都为0)，可以保持原来的状态不变。(因为输出的1反馈到输入)</li><li><span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8">❌</span>不允许输入同为1。（此时输出同为0为无效状态，并且同时变为0时存在竞争冒险）</li></ul></li><li><p>与门锁存器(同理)<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8">🙂</span></p><p><img src="http://image.beenli.cn/img/20200806/ny32DamxXGT9.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h2 id="三、触发器"><a href="#三、触发器" class="headerlink" title="三、触发器"></a>三、触发器</h2><p class="note note-info">触发器与锁存器不同在于：增加了一个触发信号输入端(时钟信号<strong>CLK</strong>)。只有当触发信号到来时，其功能与锁存器相同。</p><h3 id="1、电平触发"><a href="#1、电平触发" class="headerlink" title="1、电平触发"></a>1、电平触发</h3><p class="note note-light">只有触发信号在有效电平的时候，输入信号才能作用。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p><h4 id="①同步SR触发器"><a href="#①同步SR触发器" class="headerlink" title="①同步SR触发器"></a>①同步SR触发器</h4><p><img src="http://image.beenli.cn/img/20200806/w2EFARutEXwH.jpg?imageslim" srcset="/img/loading.gif" alt="cl没有⭕代表高电平有效"></p><center>框图<strong>Cl</strong>外面没有⭕代表高电平有效</center><h4 id="②异步复位置位"><a href="#②异步复位置位" class="headerlink" title="②异步复位置位"></a>②异步复位置位</h4><p>// 将<code>置位信号</code>$S_{D}^{‘}$接入G1, <code>复位信号</code>$R_{D}^{‘}$接G2</p><h4 id="③单端输入-D型号锁存器"><a href="#③单端输入-D型号锁存器" class="headerlink" title="③单端输入(D型号锁存器)"></a>③单端输入(D型号锁存器)</h4><p>// 规避了约束条件SR=0</p><p><img src="http://image.beenli.cn/img/20200806/xIOR3Naxv9I6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="④Transparent-D-Latch"><a href="#④Transparent-D-Latch" class="headerlink" title="④Transparent D-Latch"></a>④Transparent D-Latch</h4><p>// CMOS传输门构成</p><p><img src="http://image.beenli.cn/img/20200806/Gs96RXY8qL57.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>当TG2打开，TG1关闭时。两个反相器串联把截止前瞬间的信号(<code>反相器G1输入电容</code>)锁住。</p><h3 id="2、边沿触发"><a href="#2、边沿触发" class="headerlink" title="2、边沿触发"></a>2、边沿触发</h3><p class="note note-light">提高触发器可靠性，增强抗干扰能力，希望触发器次态仅取决于CLK信号<strong>边沿</strong>到达时刻输入信号的状态。而边沿之前或之后输入状态的变化对触发器的次态没有影响。</p><h4 id="①两个电平触发D触发器"><a href="#①两个电平触发D触发器" class="headerlink" title="①两个电平触发D触发器"></a>①两个电平触发D触发器</h4><p><img src="http://image.beenli.cn/img/20200806/XRFiu2qdjwAn.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>不看置位信号就是两个Transparent D-Latch</li><li>当第一个工作时，第二个保持。透明D锁存器：所以输出能跟随时钟边沿瞬间输入的值</li></ul><h4 id="②维持阻塞-pushpin"><a href="#②维持阻塞-pushpin" class="headerlink" title="②维持阻塞:pushpin:"></a>②维持阻塞<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h4 id="③门电路传输延迟-pushpin"><a href="#③门电路传输延迟-pushpin" class="headerlink" title="③门电路传输延迟:pushpin:"></a>③门电路传输延迟<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h3 id="3、脉冲触发"><a href="#3、脉冲触发" class="headerlink" title="3、脉冲触发"></a>3、脉冲触发</h3><p class="note note-light">为了提高可靠性：希望每个CLK周期里面输出端状态只能改变<strong>一次</strong></p><h4 id="①主从SR"><a href="#①主从SR" class="headerlink" title="①主从SR"></a>①主从SR</h4><p>Master-Slave SR Flip-Flop</p><p><img src="http://image.beenli.cn/img/20200812/sT6pd0FRytWY.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center><strong>￢</strong>：延时输出</center><p><img src="http://image.beenli.cn/img/20200812/Gj3SXcH9aMF3.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>高电平有效，下降沿状态才会改变</center><ul><li>clk高电平<code>主触发器</code>有效，<code>从触发器</code>保持原来状态。</li><li>clk从高变到低时，主触发器被封锁，从触发器按照主触发器相同的状态翻转。</li><li>因此：一个周期输出只可能翻转一次。</li></ul><h4 id="②主从JK-规避SR-1"><a href="#②主从JK-规避SR-1" class="headerlink" title="②主从JK(规避SR=1)"></a>②主从JK(<code>规避SR=1</code>)</h4><p><img src="http://image.beenli.cn/img/20200812/3w2tYTQ9HhKm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script type="math/tex;mode=display">Q^* = S + \overline RQ(for\quad SR)</script><script type="math/tex;mode=display">JK: S=J \overline Q\quad R=KQ</script><script type="math/tex;mode=display">Q^*=J \overline Q+(\overline K+\overline Q)Q=J \overline Q + \overline KQ\quad(for\quad JK)</script><ul><li>clk变低电平时把主触发器的值<code>复制</code>给了次触发器。（所以上边推导时Q即代表中间输出也代表后边输出）</li><li>主触发器有效时(高电平)Q要么为1要么为0，不可能同时为0或者为1。因为G3,G4都为1。它们通过反相器互咬。</li><li>考察当J=1，R=1时，G7,G8输出$Q$和$\overline Q$(不是全0，就🆗)。所以当Q=1，输出为0，当Q=0,输出为1,即反向。</li></ul><h2 id="四、触发器的动态特性-pushpin"><a href="#四、触发器的动态特性-pushpin" class="headerlink" title="四、触发器的动态特性:pushpin:"></a>四、触发器的动态特性<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h2><h2 id="五、References"><a href="#五、References" class="headerlink" title="五、References"></a>五、References</h2><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none;padding-left:0"><li id="fn:1"><span style="display:inline-block;vertical-align:top;padding-right:10px">1.</span><span style="display:inline-block;vertical-align:top">外国教材有时把此电路叫（Gated SR latch), 时钟信号叫做“使能”信号（enable）</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div><script>
+    <title>数据通路(2)--Control</title>
+    <url>/posts/f0189490/</url>
+    <content><![CDATA[<h1 id="1、ALU控制"><a href="#1、ALU控制" class="headerlink" title="1、ALU控制"></a>1、ALU控制</h1><blockquote><p>MIPS ALU在4位控制信号上定义了6种有效的输入组合</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/VGrg5UNVVt4J.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>存储器访问指令：add</li><li>R型指令：根据指令低6位的funct字段<a href="#link"><sup>1</sup></a> ，ALU执行5种操作中的一种(nor暂时没用)</li><li>branch指令：sub(两个操作数相减判断是否为零)</li></ul><ul><li><code>多级译码</code>：输入：6位funct字段和2位ALUOP字段————&gt;输出：4位ALU control lines</li></ul><p><img src="https://image.beenli.cn/img/20200820/xlEg0oIEPQA5.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控制单元生成ALUOP</center><ul><li>真值表——优化后转换为门电路（坑待定）</li></ul><p><img src="https://image.beenli.cn/img/20200820/fBArSknPUEb4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、主控制单元"><a href="#2、主控制单元" class="headerlink" title="2、主控制单元"></a>2、主控制单元</h1><div id="link"></div><ul><li>指令格式</li></ul><p><img src="https://image.beenli.cn/img/20200820/MLWQrvKbTmz4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>R型指令opcode为0；lw为35；sw为43 ; branch为<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8">4⃣</span></li></ul><p><img src="https://image.beenli.cn/img/20200820/w7nhaHnvyrH3.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>7个多选器控制信号的作用</center><p><img src="https://image.beenli.cn/img/20200820/kdnnx95gnWHt.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控单元产生7个一位控制信号+2位ALUOP</center><ul><li><p>控制信号真值表</p><p><img src="https://image.beenli.cn/img/20200820/xa7NDi0PBA7x.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>op[5:0]取至Instruction[31:26]</p></li><li>RegDst: R为1表示目的寄存器为rd; lw为rs; sw和branch不用写回寄存器堆所以没有目的寄存器。</li><li>ALUSrc: R和branch为0表示ALU第二个操作数来自rt; lw和sw表示第二个操作数来自低16位的扩展。</li><li>MemtoReg: sw和branch为x表示不用写回。R为0表示ALU计算结果写回；lw表示数据寄存器取出来的数写回</li><li>Regwirte: R和lw要写回所以为1。</li><li>MenRead: 只要lw要读所以只有lw为1</li><li>MemWrite: 只有sw要写</li><li>Branch: 只有branch才触发</li><li>ALUOP: R为10；存储为00；branch为01</li></ul><ul><li><p>跳转实现（即改变PC的值）</p><p>其OPcode为2.低26位都是offset_address。</p><p><img src="https://image.beenli.cn/img/20200820/PCxbE327wJVr.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -1178,11 +1268,115 @@ gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</
           });
       </script>]]></content>
       <categories>
-        <category>Digital IC</category>
-        <category>digital electronic technique</category>
+        <category>CS</category>
+        <category>Computer Organization &amp; Design</category>
       </categories>
       <tags>
-        <tag>circuits</tag>
+        <tag>processor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据通路(1)--Basic Datapath</title>
+    <url>/posts/74018a17/</url>
+    <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
+slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
+						  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offset
+lw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。
+beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
+						  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst				  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Organization &amp; Design</category>
+      </categories>
+      <tags>
+        <tag>processor</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据通路(3)--Pipeline &amp; hazards</title>
+    <url>/posts/d4768fc/</url>
+    <content><![CDATA[<h1 id="1、An-Overview-of-Pipeline"><a href="#1、An-Overview-of-Pipeline" class="headerlink" title="1、An Overview of Pipeline"></a>1、An Overview of Pipeline</h1><blockquote><p><code>流水线</code>就像工厂的工人一样，每个工人只做一道工序（每个硬件只做一个功能)，同一时间几道工序同时在做(同一时间多条指令同时执行，每条指令在不同的阶段)，最后一道工序做完即完成了一件产品(所以吞吐量非常大)。</p></blockquote><p><img src="https://image.beenli.cn/img/20200925/CH2JrES42Wqd.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="RISC-V经典流水线可以分为五步"><a href="#RISC-V经典流水线可以分为五步" class="headerlink" title="RISC-V经典流水线可以分为五步"></a>RISC-V经典流水线可以分为五步</h2><ul><li>Fetch instruction from memory（IF)</li><li>Read register and decode the instruction(ID)</li><li>Execute the operation or calculate an address(EX)</li><li>Access an operand in data memory (MEM) [if necessary]</li><li>Write the result into a register(WB) [if necessary]</li></ul><h2 id="面向流水线的指令集设计"><a href="#面向流水线的指令集设计" class="headerlink" title="面向流水线的指令集设计"></a>面向流水线的指令集设计</h2><ul><li><p>RISC-V 指令等长，这一限制简化了第一级取指与第二级译码。</p><p>【x86指令长度不等，从1字节到15字节不等。最近x86体系结构：先转化为简单的操作】</p></li><li><p>RISC-V只有几种指令格式，每一种指令源和目的寄存器字段位置不变。</p><p>【使得第二级在确定指令类型的同时开始读寄存器堆】</p></li><li><p>RISC-V的memory operands仅仅出现在存取指令中(常规ALU指令的操作数直接在第二级寄存器堆读出)。意味着我们可以在执行阶段计算内存地址，然后在下一个阶段访存。</p><p>【如果像x86那样可以操作在内存中的操作数，那么第三、四级将扩展为address stage，memory stage，execute stage】</p></li></ul><h2 id="流水线控制"><a href="#流水线控制" class="headerlink" title="流水线控制"></a>流水线控制</h2><p><img src="https://image.beenli.cn/img/20200925/IekslQjza2wy.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、Pipeline-Hazards"><a href="#2、Pipeline-Hazards" class="headerlink" title="2、Pipeline Hazards"></a>2、Pipeline Hazards</h1><blockquote><p>There are situation in pipelining when the next instruction cannot execute in the following clock cycle. These events are called <code>hazards</code>.</p></blockquote><h2 id="1、Structural-Hazard"><a href="#1、Structural-Hazard" class="headerlink" title="1、Structural Hazard"></a>1、Structural Hazard</h2><p class="note note-info">When a planned instruction cannot execute in the proper clock cycle because the hardware does not support the combination of instructions that are set to execute</p><p><strong></strong></p><center><strong>[由于硬件资源不够导致的冒险]</strong></center><p></p><p>这也是为什么我们我们的IF和MEM分开（指令寄存器和数据寄存器）</p><h2 id="2、Data-Hazard"><a href="#2、Data-Hazard" class="headerlink" title="2、Data Hazard"></a>2、Data Hazard</h2><p class="note note-info">When a planned instruction cannot execute in the proper clock cycle because data that are needed to execute the instruction are not yet available</p><p><strong></strong></p><center><strong>[由于操作数没有准备好导致的冒险]</strong></center><p></p><p>三种经典解决办法</p><ul><li>Reorder code(重新安排代码)</li><li>stall the pipeline(阻塞一个或几个周期)</li><li>bypass or forwarding(旁路或者前推上一条指令运算的结果)</li></ul><h3 id="①Reorder-code"><a href="#①Reorder-code" class="headerlink" title="①Reorder code"></a>①Reorder code</h3><pre><code class="hljs C"><span class="hljs-comment">//code segment in C</span>
+a = b + e;
+c = b + f;
+
+<span class="hljs-comment">//generated RISC-V code for above segment</span>
+ld x1, <span class="hljs-number">0</span>(x31)	<span class="hljs-comment">// Load b   1</span>
+ld x2, <span class="hljs-number">8</span>(x31)	<span class="hljs-comment">// Load e	2</span>
+add x3, x1, x2	<span class="hljs-comment">// b + e	3</span>
+sd x3, <span class="hljs-number">24</span>(x31)	<span class="hljs-comment">// Store a	4</span>
+ld x4, <span class="hljs-number">16</span>(x31)	<span class="hljs-comment">// Load f	5</span>
+add x5, x1, x4	<span class="hljs-comment">// b + f	6</span>
+sd x5, <span class="hljs-number">32</span>(x31)	<span class="hljs-comment">// Store c	7</span>
+
+<span class="hljs-comment">/************** 说明 *****************</span>
+<span class="hljs-comment">1、通过旁路可以去除3对1的依赖(load 指令最少需要两个周期，ALU指令在旁路技术下对下一条指令不会构成数据冒险）</span>
+<span class="hljs-comment">2、通过旁路也可解决sd指令对上一条add指令的依赖</span>
+<span class="hljs-comment">3、需要解决的: 3V2和6V5         */</span>
+
+<span class="hljs-comment">//************* 解决办法 ***************</span>
+把第<span class="hljs-number">5</span>条指令提到第二条指令和第三条中间。</code></pre><h3 id="②Bypassing"><a href="#②Bypassing" class="headerlink" title="②Bypassing"></a>②Bypassing</h3><p><img src="https://image.beenli.cn/img/20200925/9t5mAjk5HVXm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>and指令需要x2，而x2只有等到第一条指令写回才有效(即第五个周期前半段)</li><li>同理or指令</li><li>❓假设: 写寄存器操作发生时钟周期的前半段而读寄存器操作发生在时钟周期后半段</li></ul><p class="note note-info">旁路的核心：前一条指令计算的结果不用等到第五周期写回寄存器堆而提前旁路到其后指令的ALU操作数输入上。</p><p><img src="https://image.beenli.cn/img/20200925/DyyhciQAJVxi.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p>EX冒险（EX/MEM流水线寄存器有需要的值）</p><pre><code class="hljs c"><span class="hljs-keyword">if</span>  (EX/MEM.RegWrite
+<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
+<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) ForwardA = <span class="hljs-number">10</span>
+
+<span class="hljs-keyword">if</span>  (EX/MEM.RegWrite
+<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
+<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd = ID/EX.RegisterRs2)) ForwardB = <span class="hljs-number">10</span></code></pre></li><li><p>MEM hazard</p><pre><code class="hljs c"><span class="hljs-keyword">if</span>  (MEM/WB.RegWrite
+<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd ≠ <span class="hljs-number">0</span>)
+<span class="hljs-keyword">and</span>  <span class="hljs-keyword">not</span>(EX/MEM.RegWrite <span class="hljs-keyword">and</span> (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
+<span class="hljs-keyword">and</span> (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) 
+     <span class="hljs-comment">// 先判断不是EX冒险，不然应该是旁路上一条指令EX/MEM结果旁路上上条MEM/WB</span>
+<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = <span class="hljs-number">01</span>
+
+<span class="hljs-keyword">if</span>  (MEM/WB.RegWrite
+<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd ≠ <span class="hljs-number">0</span>)
+<span class="hljs-keyword">and</span>  <span class="hljs-keyword">not</span>(EX/MEM.RegWrite <span class="hljs-keyword">and</span> (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
+<span class="hljs-keyword">and</span> (EX/MEM.RegisterRd = ID/EX.RegisterRs2))
+<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = <span class="hljs-number">01</span></code></pre><hr></li></ul><p><img src="https://image.beenli.cn/img/20200925/0sMUpSTpeddo.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>旁路单元产生控制信号选着ALU的输入operand。</li></ul><h3 id="③Stalls"><a href="#③Stalls" class="headerlink" title="③Stalls"></a>③Stalls</h3><p class="note note-info">需要阻塞的情形：当一条指令试图读取一个由前一条装载指令读入的寄存器时，就无法使用旁路解决冒险(因为lw指令需要在第四阶段才能产生结果)</p><ol><li><p>冒险检测单元</p><pre><code class="hljs c"><span class="hljs-keyword">if</span>  (ID/EX.MemRead <span class="hljs-keyword">and</span>
+	((ID/EX.RegisterRd = IF/ID.RegisterRs1) <span class="hljs-keyword">or</span>
+		(ID/EX.RegisterRd = IF/ID.RegisterRs2)))
+stall the pipeline</code></pre></li><li><p>检测单元工作在ID阶段。</p></li><li><p>阻塞后面指令的方法：保持PC寄存器和IF/ID流水线寄存器不变。</p></li><li><p>插入一条空指令（nop)：一种不进行任何操作或不改变任何状态的指令。</p><p>实现方法：控制信号全部置为0，这些控制信号在每个时钟周期都向前传递，但不会产生不良影响，因为控制为0，那么所有寄存器和存储器都不进行写操作。</p></li></ol><p><img src="https://image.beenli.cn/img/20200925/2CuKo0v4bF7b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="3、Control-Hazard"><a href="#3、Control-Hazard" class="headerlink" title="3、Control Hazard"></a>3、Control Hazard</h2><p class="note note-info">An instruction must be fetched at every clock cycle to sustain the pipeline, yet in our design the decision about whether to branch doesn't occur until the MEM pipeline stage.<br>(后面的优化🙆‍看到在ID级就可以确定分支)</p><p><strong></strong></p><center><strong>[由于选择✔的指令需要延迟]</strong></center><p></p><h3 id="①Branch"><a href="#①Branch" class="headerlink" title="①Branch"></a>①Branch</h3><ol><li><p>假定分支不发生（如果发生预取和译码的指令要丢弃）</p></li><li><p>缩短分支延迟（提早确定分支，减少flush的指令数）</p><ul><li><p>计算分支目标地址（IF/ID流水线寄存器已经有了PC和立即数字段的值）</p></li><li><p>判断分支条件：需要额外的旁路和冒险检测硬件。【因为分支条件的判断可能依赖于还在流水线中的结果】</p><blockquote><p>两个难点：</p><p>Ⅰ、前面的ALU旁路单元在EX级，所以这里需要一个新的旁路单元工作在ID级。还需要一个<code>equality test logic</code>（对两个寄存器的值按位异或接着或操作）</p><p>Ⅱ、可能数据在ID级旁路不过来。上一条是ALU指令，那么只能<code>stall a cycle</code>；如果是lw指令，那么必须<code>stall two cycles</code>。</p><p>Ⅲ、控制信号新增一个<code>IF.flush</code>信号，把预取的那条指令变成nop指令。</p></blockquote></li></ul></li><li><p>动态分支预测(缓存之前运行分支的信息进行判断)<br>fetching new instructions from the same places as the last time.)</p><ul><li><code>分支预测缓存</code>(branch prediction buffer)也称为<code>分支历史记录表</code>(branch history table):使用分支指令地址地位索引的一小块存储区。</li><li>这类缓存我们实际上不知道预测是否正确，而且它还可能由其他具有相同地址地位的分支设置。</li><li>预测错误❌时，错误的预取指令删除，预测位取反，回到原来的位置（❓得有缓存），继续按照正确的方向取指并执行。</li><li>分支预测缓存可以用很小，用指令地址访问的special buffer in IF pipe stage。如果预测分支，那么从分支target取指令。</li><li>为了改善非常有规律的分支的预测正确率（比如循环，9次分支只有最后一次循环退出不分支）；可以使用<code>两位的预测机制</code>。</li></ul><p><img src="https://image.beenli.cn/img/20200927/XfbMg3jzjpEc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><code>相关预测器</code>（correlation predictors)：不仅使用local branch的信息，还综合global behavior of recently executed branches 。典型的相关预测器为每个分支提供两个两位的预测器，根据上一次分支是否执行选择其中一个预测器，因此全局分支行为可以看成adding additional index bits for the prediction lookup.</li><li><code>竞争预测器</code>(tournament branch predictor)：为每个分支使用多个预测器，并记录哪个预测器预测结果最好。典型的竞争预测器：对每个分支索引包含两个预测结果，一个基于本地信息，一个基于全局分支行为。一个选择器选择哪个作为预测结果。</li><li><code>条件移动指令</code>(conditional move instruction)：不同于分支指令改变PC值，条件移动指令将根据条件改变move指令的目的寄存器。在ARMv8指令集架构中：CSEL X8, X11,X4,NE 如果条件码不为零，复制x11到x8；否则复制X4到X8;</li></ul></li></ol><h3 id="②Exception"><a href="#②Exception" class="headerlink" title="②Exception"></a>②Exception</h3><p class="note note-danger">Control is the most challenging aspect of processor design: it is both the hardest part to get right and toughest part to make fast<br>然而控制中最难的就是实现异常或中断——除分支外改变正常指令执行流</p><p>当异常发生时，处理器必须做的基本事情是：</p><ul><li>在<code>SEPC</code>(supervisor exception cause register)保存出错指令的地址</li><li>把控制权交给操作系统的特定地址处</li></ul><p>对于处理异常的OS,它必须知道异常的原因：</p><ul><li><p>设置一个<code>原因寄存器</code>（Supervisor Exception Cause Register or SCAUSE):其中有个域指示异常的原因</p></li><li><p>使用<code>向量中断</code>(vectored interrupts), 控制权被转移到的地址是由异常原因决定，该地址可能被添加到指向向量中断内存范围的base register中。例如，我们可以使用下面的异常中断向量地址来表示异常种类。</p><p><img src="https://image.beenli.cn/img/20200927/MKHGADukdjKe.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><p>异常在流水线中的实现(使用自前相同的机制，不过这次由异常重置控制信号)</p><ul><li>IF级指令的清除用之前的<code>IF.flush</code>信号</li><li>新增<code>ID.Flush</code>信号和之前的冒险检测单元产生的stall信号进行或运算，然后加在自前的多选器上，实现ID级指令清除</li><li>新增一个<code>EX.Flush</code>信号清除EX级的指令</li><li>为了从异常处理程序的地址取指，只要简单家一个额外的输入到PC的多选器。</li></ul><p><img src="https://image.beenli.cn/img/20200927/W5ek8iOsIVie.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Organization &amp; Design</category>
+      </categories>
+      <tags>
+        <tag>processor</tag>
       </tags>
   </entry>
   <entry>
@@ -1421,140 +1615,6 @@ p = t;
       </categories>
       <tags>
         <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据通路(1)--Basic Datapath</title>
-    <url>/posts/74018a17/</url>
-    <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
-slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
-						  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offset
-lw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。
-beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
-						  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst				  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Organization &amp; Design</category>
-      </categories>
-      <tags>
-        <tag>processor</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据通路(2)--Control</title>
-    <url>/posts/f0189490/</url>
-    <content><![CDATA[<h1 id="1、ALU控制"><a href="#1、ALU控制" class="headerlink" title="1、ALU控制"></a>1、ALU控制</h1><blockquote><p>MIPS ALU在4位控制信号上定义了6种有效的输入组合</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/VGrg5UNVVt4J.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>存储器访问指令：add</li><li>R型指令：根据指令低6位的funct字段<a href="#link"><sup>1</sup></a> ，ALU执行5种操作中的一种(nor暂时没用)</li><li>branch指令：sub(两个操作数相减判断是否为零)</li></ul><ul><li><code>多级译码</code>：输入：6位funct字段和2位ALUOP字段————&gt;输出：4位ALU control lines</li></ul><p><img src="https://image.beenli.cn/img/20200820/xlEg0oIEPQA5.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控制单元生成ALUOP</center><ul><li>真值表——优化后转换为门电路（坑待定）</li></ul><p><img src="https://image.beenli.cn/img/20200820/fBArSknPUEb4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、主控制单元"><a href="#2、主控制单元" class="headerlink" title="2、主控制单元"></a>2、主控制单元</h1><div id="link"></div><ul><li>指令格式</li></ul><p><img src="https://image.beenli.cn/img/20200820/MLWQrvKbTmz4.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>R型指令opcode为0；lw为35；sw为43 ; branch为<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/0034-20e3.png?v8">4⃣</span></li></ul><p><img src="https://image.beenli.cn/img/20200820/w7nhaHnvyrH3.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>7个多选器控制信号的作用</center><p><img src="https://image.beenli.cn/img/20200820/kdnnx95gnWHt.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>主控单元产生7个一位控制信号+2位ALUOP</center><ul><li><p>控制信号真值表</p><p><img src="https://image.beenli.cn/img/20200820/xa7NDi0PBA7x.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>op[5:0]取至Instruction[31:26]</p></li><li>RegDst: R为1表示目的寄存器为rd; lw为rs; sw和branch不用写回寄存器堆所以没有目的寄存器。</li><li>ALUSrc: R和branch为0表示ALU第二个操作数来自rt; lw和sw表示第二个操作数来自低16位的扩展。</li><li>MemtoReg: sw和branch为x表示不用写回。R为0表示ALU计算结果写回；lw表示数据寄存器取出来的数写回</li><li>Regwirte: R和lw要写回所以为1。</li><li>MenRead: 只要lw要读所以只有lw为1</li><li>MemWrite: 只有sw要写</li><li>Branch: 只有branch才触发</li><li>ALUOP: R为10；存储为00；branch为01</li></ul><ul><li><p>跳转实现（即改变PC的值）</p><p>其OPcode为2.低26位都是offset_address。</p><p><img src="https://image.beenli.cn/img/20200820/PCxbE327wJVr.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Organization &amp; Design</category>
-      </categories>
-      <tags>
-        <tag>processor</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据通路(3)--Pipeline &amp; hazards</title>
-    <url>/posts/d4768fc/</url>
-    <content><![CDATA[<h1 id="1、An-Overview-of-Pipeline"><a href="#1、An-Overview-of-Pipeline" class="headerlink" title="1、An Overview of Pipeline"></a>1、An Overview of Pipeline</h1><blockquote><p><code>流水线</code>就像工厂的工人一样，每个工人只做一道工序（每个硬件只做一个功能)，同一时间几道工序同时在做(同一时间多条指令同时执行，每条指令在不同的阶段)，最后一道工序做完即完成了一件产品(所以吞吐量非常大)。</p></blockquote><p><img src="https://image.beenli.cn/img/20200925/CH2JrES42Wqd.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="RISC-V经典流水线可以分为五步"><a href="#RISC-V经典流水线可以分为五步" class="headerlink" title="RISC-V经典流水线可以分为五步"></a>RISC-V经典流水线可以分为五步</h2><ul><li>Fetch instruction from memory（IF)</li><li>Read register and decode the instruction(ID)</li><li>Execute the operation or calculate an address(EX)</li><li>Access an operand in data memory (MEM) [if necessary]</li><li>Write the result into a register(WB) [if necessary]</li></ul><h2 id="面向流水线的指令集设计"><a href="#面向流水线的指令集设计" class="headerlink" title="面向流水线的指令集设计"></a>面向流水线的指令集设计</h2><ul><li><p>RISC-V 指令等长，这一限制简化了第一级取指与第二级译码。</p><p>【x86指令长度不等，从1字节到15字节不等。最近x86体系结构：先转化为简单的操作】</p></li><li><p>RISC-V只有几种指令格式，每一种指令源和目的寄存器字段位置不变。</p><p>【使得第二级在确定指令类型的同时开始读寄存器堆】</p></li><li><p>RISC-V的memory operands仅仅出现在存取指令中(常规ALU指令的操作数直接在第二级寄存器堆读出)。意味着我们可以在执行阶段计算内存地址，然后在下一个阶段访存。</p><p>【如果像x86那样可以操作在内存中的操作数，那么第三、四级将扩展为address stage，memory stage，execute stage】</p></li></ul><h2 id="流水线控制"><a href="#流水线控制" class="headerlink" title="流水线控制"></a>流水线控制</h2><p><img src="https://image.beenli.cn/img/20200925/IekslQjza2wy.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2、Pipeline-Hazards"><a href="#2、Pipeline-Hazards" class="headerlink" title="2、Pipeline Hazards"></a>2、Pipeline Hazards</h1><blockquote><p>There are situation in pipelining when the next instruction cannot execute in the following clock cycle. These events are called <code>hazards</code>.</p></blockquote><h2 id="1、Structural-Hazard"><a href="#1、Structural-Hazard" class="headerlink" title="1、Structural Hazard"></a>1、Structural Hazard</h2><p class="note note-info">When a planned instruction cannot execute in the proper clock cycle because the hardware does not support the combination of instructions that are set to execute</p><p><strong></strong></p><center><strong>[由于硬件资源不够导致的冒险]</strong></center><p></p><p>这也是为什么我们我们的IF和MEM分开（指令寄存器和数据寄存器）</p><h2 id="2、Data-Hazard"><a href="#2、Data-Hazard" class="headerlink" title="2、Data Hazard"></a>2、Data Hazard</h2><p class="note note-info">When a planned instruction cannot execute in the proper clock cycle because data that are needed to execute the instruction are not yet available</p><p><strong></strong></p><center><strong>[由于操作数没有准备好导致的冒险]</strong></center><p></p><p>三种经典解决办法</p><ul><li>Reorder code(重新安排代码)</li><li>stall the pipeline(阻塞一个或几个周期)</li><li>bypass or forwarding(旁路或者前推上一条指令运算的结果)</li></ul><h3 id="①Reorder-code"><a href="#①Reorder-code" class="headerlink" title="①Reorder code"></a>①Reorder code</h3><pre><code class="hljs C"><span class="hljs-comment">//code segment in C</span>
-a = b + e;
-c = b + f;
-
-<span class="hljs-comment">//generated RISC-V code for above segment</span>
-ld x1, <span class="hljs-number">0</span>(x31)	<span class="hljs-comment">// Load b   1</span>
-ld x2, <span class="hljs-number">8</span>(x31)	<span class="hljs-comment">// Load e	2</span>
-add x3, x1, x2	<span class="hljs-comment">// b + e	3</span>
-sd x3, <span class="hljs-number">24</span>(x31)	<span class="hljs-comment">// Store a	4</span>
-ld x4, <span class="hljs-number">16</span>(x31)	<span class="hljs-comment">// Load f	5</span>
-add x5, x1, x4	<span class="hljs-comment">// b + f	6</span>
-sd x5, <span class="hljs-number">32</span>(x31)	<span class="hljs-comment">// Store c	7</span>
-
-<span class="hljs-comment">/************** 说明 *****************</span>
-<span class="hljs-comment">1、通过旁路可以去除3对1的依赖(load 指令最少需要两个周期，ALU指令在旁路技术下对下一条指令不会构成数据冒险）</span>
-<span class="hljs-comment">2、通过旁路也可解决sd指令对上一条add指令的依赖</span>
-<span class="hljs-comment">3、需要解决的: 3V2和6V5         */</span>
-
-<span class="hljs-comment">//************* 解决办法 ***************</span>
-把第<span class="hljs-number">5</span>条指令提到第二条指令和第三条中间。</code></pre><h3 id="②Bypassing"><a href="#②Bypassing" class="headerlink" title="②Bypassing"></a>②Bypassing</h3><p><img src="https://image.beenli.cn/img/20200925/9t5mAjk5HVXm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>and指令需要x2，而x2只有等到第一条指令写回才有效(即第五个周期前半段)</li><li>同理or指令</li><li>❓假设: 写寄存器操作发生时钟周期的前半段而读寄存器操作发生在时钟周期后半段</li></ul><p class="note note-info">旁路的核心：前一条指令计算的结果不用等到第五周期写回寄存器堆而提前旁路到其后指令的ALU操作数输入上。</p><p><img src="https://image.beenli.cn/img/20200925/DyyhciQAJVxi.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p>EX冒险（EX/MEM流水线寄存器有需要的值）</p><pre><code class="hljs c"><span class="hljs-keyword">if</span>  (EX/MEM.RegWrite
-<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
-<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) ForwardA = <span class="hljs-number">10</span>
-
-<span class="hljs-keyword">if</span>  (EX/MEM.RegWrite
-<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
-<span class="hljs-keyword">and</span>  (EX/MEM.RegisterRd = ID/EX.RegisterRs2)) ForwardB = <span class="hljs-number">10</span></code></pre></li><li><p>MEM hazard</p><pre><code class="hljs c"><span class="hljs-keyword">if</span>  (MEM/WB.RegWrite
-<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd ≠ <span class="hljs-number">0</span>)
-<span class="hljs-keyword">and</span>  <span class="hljs-keyword">not</span>(EX/MEM.RegWrite <span class="hljs-keyword">and</span> (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
-<span class="hljs-keyword">and</span> (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) 
-     <span class="hljs-comment">// 先判断不是EX冒险，不然应该是旁路上一条指令EX/MEM结果旁路上上条MEM/WB</span>
-<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = <span class="hljs-number">01</span>
-
-<span class="hljs-keyword">if</span>  (MEM/WB.RegWrite
-<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd ≠ <span class="hljs-number">0</span>)
-<span class="hljs-keyword">and</span>  <span class="hljs-keyword">not</span>(EX/MEM.RegWrite <span class="hljs-keyword">and</span> (EX/MEM.RegisterRd ≠ <span class="hljs-number">0</span>)
-<span class="hljs-keyword">and</span> (EX/MEM.RegisterRd = ID/EX.RegisterRs2))
-<span class="hljs-keyword">and</span>  (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = <span class="hljs-number">01</span></code></pre><hr></li></ul><p><img src="https://image.beenli.cn/img/20200925/0sMUpSTpeddo.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>旁路单元产生控制信号选着ALU的输入operand。</li></ul><h3 id="③Stalls"><a href="#③Stalls" class="headerlink" title="③Stalls"></a>③Stalls</h3><p class="note note-info">需要阻塞的情形：当一条指令试图读取一个由前一条装载指令读入的寄存器时，就无法使用旁路解决冒险(因为lw指令需要在第四阶段才能产生结果)</p><ol><li><p>冒险检测单元</p><pre><code class="hljs c"><span class="hljs-keyword">if</span>  (ID/EX.MemRead <span class="hljs-keyword">and</span>
-	((ID/EX.RegisterRd = IF/ID.RegisterRs1) <span class="hljs-keyword">or</span>
-		(ID/EX.RegisterRd = IF/ID.RegisterRs2)))
-stall the pipeline</code></pre></li><li><p>检测单元工作在ID阶段。</p></li><li><p>阻塞后面指令的方法：保持PC寄存器和IF/ID流水线寄存器不变。</p></li><li><p>插入一条空指令（nop)：一种不进行任何操作或不改变任何状态的指令。</p><p>实现方法：控制信号全部置为0，这些控制信号在每个时钟周期都向前传递，但不会产生不良影响，因为控制为0，那么所有寄存器和存储器都不进行写操作。</p></li></ol><p><img src="https://image.beenli.cn/img/20200925/2CuKo0v4bF7b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="3、Control-Hazard"><a href="#3、Control-Hazard" class="headerlink" title="3、Control Hazard"></a>3、Control Hazard</h2><p class="note note-info">An instruction must be fetched at every clock cycle to sustain the pipeline, yet in our design the decision about whether to branch doesn't occur until the MEM pipeline stage.<br>(后面的优化🙆‍看到在ID级就可以确定分支)</p><p><strong></strong></p><center><strong>[由于选择✔的指令需要延迟]</strong></center><p></p><h3 id="①Branch"><a href="#①Branch" class="headerlink" title="①Branch"></a>①Branch</h3><ol><li><p>假定分支不发生（如果发生预取和译码的指令要丢弃）</p></li><li><p>缩短分支延迟（提早确定分支，减少flush的指令数）</p><ul><li><p>计算分支目标地址（IF/ID流水线寄存器已经有了PC和立即数字段的值）</p></li><li><p>判断分支条件：需要额外的旁路和冒险检测硬件。【因为分支条件的判断可能依赖于还在流水线中的结果】</p><blockquote><p>两个难点：</p><p>Ⅰ、前面的ALU旁路单元在EX级，所以这里需要一个新的旁路单元工作在ID级。还需要一个<code>equality test logic</code>（对两个寄存器的值按位异或接着或操作）</p><p>Ⅱ、可能数据在ID级旁路不过来。上一条是ALU指令，那么只能<code>stall a cycle</code>；如果是lw指令，那么必须<code>stall two cycles</code>。</p><p>Ⅲ、控制信号新增一个<code>IF.flush</code>信号，把预取的那条指令变成nop指令。</p></blockquote></li></ul></li><li><p>动态分支预测(缓存之前运行分支的信息进行判断)<br>fetching new instructions from the same places as the last time.)</p><ul><li><code>分支预测缓存</code>(branch prediction buffer)也称为<code>分支历史记录表</code>(branch history table):使用分支指令地址地位索引的一小块存储区。</li><li>这类缓存我们实际上不知道预测是否正确，而且它还可能由其他具有相同地址地位的分支设置。</li><li>预测错误❌时，错误的预取指令删除，预测位取反，回到原来的位置（❓得有缓存），继续按照正确的方向取指并执行。</li><li>分支预测缓存可以用很小，用指令地址访问的special buffer in IF pipe stage。如果预测分支，那么从分支target取指令。</li><li>为了改善非常有规律的分支的预测正确率（比如循环，9次分支只有最后一次循环退出不分支）；可以使用<code>两位的预测机制</code>。</li></ul><p><img src="https://image.beenli.cn/img/20200927/XfbMg3jzjpEc.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><code>相关预测器</code>（correlation predictors)：不仅使用local branch的信息，还综合global behavior of recently executed branches 。典型的相关预测器为每个分支提供两个两位的预测器，根据上一次分支是否执行选择其中一个预测器，因此全局分支行为可以看成adding additional index bits for the prediction lookup.</li><li><code>竞争预测器</code>(tournament branch predictor)：为每个分支使用多个预测器，并记录哪个预测器预测结果最好。典型的竞争预测器：对每个分支索引包含两个预测结果，一个基于本地信息，一个基于全局分支行为。一个选择器选择哪个作为预测结果。</li><li><code>条件移动指令</code>(conditional move instruction)：不同于分支指令改变PC值，条件移动指令将根据条件改变move指令的目的寄存器。在ARMv8指令集架构中：CSEL X8, X11,X4,NE 如果条件码不为零，复制x11到x8；否则复制X4到X8;</li></ul></li></ol><h3 id="②Exception"><a href="#②Exception" class="headerlink" title="②Exception"></a>②Exception</h3><p class="note note-danger">Control is the most challenging aspect of processor design: it is both the hardest part to get right and toughest part to make fast<br>然而控制中最难的就是实现异常或中断——除分支外改变正常指令执行流</p><p>当异常发生时，处理器必须做的基本事情是：</p><ul><li>在<code>SEPC</code>(supervisor exception cause register)保存出错指令的地址</li><li>把控制权交给操作系统的特定地址处</li></ul><p>对于处理异常的OS,它必须知道异常的原因：</p><ul><li><p>设置一个<code>原因寄存器</code>（Supervisor Exception Cause Register or SCAUSE):其中有个域指示异常的原因</p></li><li><p>使用<code>向量中断</code>(vectored interrupts), 控制权被转移到的地址是由异常原因决定，该地址可能被添加到指向向量中断内存范围的base register中。例如，我们可以使用下面的异常中断向量地址来表示异常种类。</p><p><img src="https://image.beenli.cn/img/20200927/MKHGADukdjKe.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><p>异常在流水线中的实现(使用自前相同的机制，不过这次由异常重置控制信号)</p><ul><li>IF级指令的清除用之前的<code>IF.flush</code>信号</li><li>新增<code>ID.Flush</code>信号和之前的冒险检测单元产生的stall信号进行或运算，然后加在自前的多选器上，实现ID级指令清除</li><li>新增一个<code>EX.Flush</code>信号清除EX级的指令</li><li>为了从异常处理程序的地址取指，只要简单家一个额外的输入到PC的多选器。</li></ul><p><img src="https://image.beenli.cn/img/20200927/W5ek8iOsIVie.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Organization &amp; Design</category>
-      </categories>
-      <tags>
-        <tag>processor</tag>
       </tags>
   </entry>
   <entry>
