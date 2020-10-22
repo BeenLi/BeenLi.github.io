@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>jupyterlab environment</title>
+    <link href="/posts/e121429a/"/>
+    <url>/posts/e121429a/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>The blog is derived from the transition of <a href="https://jupyterlab.readthedocs.io/en/stable/index.html" rel="external nofollow noreferrer">JupyterLab document</a></p></blockquote><h1 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h1><blockquote><p>JupyterLab is the next-generation web-based user interface for Project Jupyter.</p><p>JupyterLab enables you to work with documents and activities such as <a href="https://jupyterlab.readthedocs.io/en/stable/user/notebook.html#notebook" rel="external nofollow noreferrer">Jupyter notebooks</a>, text editors, terminals, and custom components in a flexible, integrated, and extensible manner.</p><p>jupyterlab是下一代基于web的Jupyter项目用户界面；它能让你以灵活、集成和可扩展的方式与文档和活动一起工作，比如notebook，文本编辑器，终端还有自定义组件。</p></blockquote><h1 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h1><ol><li><p>prerequisite</p><p>安装notebook</p><pre><code class="hljs shell">conda install -c conda-forge notebook</code></pre></li><li><p>安装jupyterlab</p><pre><code class="hljs shell">conda install -c conda-forge jupyterlab</code></pre></li></ol><h1 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h1><ol><li><p>在conda prompt中敲如下命令</p><pre><code class="hljs ebnf"><span class="hljs-attribute">jupyter lab</span></code></pre></li><li><p>jupyter lab会自动在浏览器中打开</p><pre><code class="hljs elixir">http(s)<span class="hljs-symbol">://&lt;server</span><span class="hljs-symbol">:port&gt;/&lt;lab-location&gt;/lab</span></code></pre><p>因为JupyterLab是<code>jupyter notebook</code>一个服务器扩展，所以你也能够通过调用<code>jupyter notebook</code>并访问/lab URL来登录JupyterLab。</p></li><li><p>如果👆有问题,多半是kernel有问题;</p><p>首先尝试建立一个干净的jupyter环境</p><pre><code class="hljs sh">conda create -n jlab-test --override-channels --strict-channel-priority -c conda-forge -c anaconda jupyterlab// 创建一个新的环境conda activate jlab-test// 切换到该环境jupyter lab   // 启动jupyterlab</code></pre></li></ol><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>Software</category>
+      
+      <category>jupyter</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>toolkits</tag>
+      
+      <tag>python</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Conda environment</title>
     <link href="/posts/ac51cf39/"/>
     <url>/posts/ac51cf39/</url>
@@ -336,33 +365,6 @@
       <category>RISC-V</category>
       
       <category>environment</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>toolkits</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>jupyter notebook</title>
-    <link href="/posts/2641cf45/"/>
-    <url>/posts/2641cf45/</url>
-    
-    <content type="html"><![CDATA[<center>jupyter notebook</center><h3 id="1、安装"><a href="#1、安装" class="headerlink" title="1、安装"></a>1、安装</h3><ul><li>安装python</li><li>安装pip</li><li>（安装ipython）</li><li>安装jupyter notebook(pip install jupyter notebook)</li></ul><h3 id="2、jupyter命令"><a href="#2、jupyter命令" class="headerlink" title="2、jupyter命令"></a>2、jupyter命令</h3><ul><li><p>查看已经安装的核</p><pre><code class="hljs taggerscript">jupyter kernelspec list Available kernels:  py38       C:<span class="hljs-symbol">\U</span>sers<span class="hljs-symbol">\w</span>anli<span class="hljs-symbol">\A</span>ppData<span class="hljs-symbol">\R</span>oaming<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>y38  python3    C:<span class="hljs-symbol">\P</span>rogramData<span class="hljs-symbol">\j</span>upyter<span class="hljs-symbol">\k</span>ernels<span class="hljs-symbol">\p</span>ython3</code></pre></li><li><p>移除已经安装的核</p><pre><code class="hljs routeros">jupyter kernelspec <span class="hljs-builtin-name">remove</span> [kernelname]</code></pre></li><li><p>安装核</p><pre><code class="hljs brainfuck"><span class="hljs-comment">python</span> <span class="hljs-literal">-</span><span class="hljs-comment">m</span> <span class="hljs-comment">ipykernel</span> <span class="hljs-comment">install</span> <span class="hljs-title">[</span>--<span class="hljs-comment">user</span><span class="hljs-title">]</span> --<span class="hljs-comment">name</span> <span class="hljs-title">[</span><span class="hljs-comment">kernelname</span><span class="hljs-title">]</span></code></pre></li></ul><h3 id="3、conda创建虚拟环境"><a href="#3、conda创建虚拟环境" class="headerlink" title="3、conda创建虚拟环境"></a>3、conda创建虚拟环境</h3><ul><li><p>查看已经有的环境</p><pre><code class="hljs taggerscript">$ conda env list# conda environments:#base                  *  D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>inicondapy38                     D:<span class="hljs-symbol">\A</span>PP<span class="hljs-symbol">\m</span>iniconda<span class="hljs-symbol">\e</span>nvs<span class="hljs-symbol">\p</span>y38</code></pre></li><li><p>安装新的环境</p><pre><code class="hljs routeros">conda create -n py36 <span class="hljs-attribute">python</span>=3.6</code></pre></li><li><p>激活环境/推出环境</p><pre><code class="hljs maxima">conda <span class="hljs-built_in">activate</span> envnameconda <span class="hljs-built_in">deactivate</span></code></pre></li></ul><h3 id="4、遇到的问题"><a href="#4、遇到的问题" class="headerlink" title="4、遇到的问题"></a>4、遇到的问题</h3><ol><li><p>jupyter ImportError: DLL load failed: 找不到指定的程序。(kernel error)</p><ul><li><p>where jupyter</p><p>我发现我有两个jupyter, 两个python</p></li><li><p>试过了网上好多办法都不管用(大多叫你添加环境变量)</p></li><li><p>最终我把其中一个jupyter(有问题的)卸载了，用另外一个就好了。</p></li></ul></li></ol><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
-    
-    
-    <categories>
-      
-      <category>Software</category>
-      
-      <category>jupyter</category>
       
     </categories>
     
