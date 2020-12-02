@@ -4,6 +4,48 @@
   
   
   <entry>
+    <title>batch file(1) -- for statement</title>
+    <link href="/posts/c8d1a621/"/>
+    <url>/posts/c8d1a621/</url>
+    
+    <content type="html"><![CDATA[<script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Install Scala</title>
+    <link href="/posts/74349f7/"/>
+    <url>/posts/74349f7/</url>
+    
+    <content type="html"><![CDATA[<h2 id="1-Install-what"><a href="#1-Install-what" class="headerlink" title="1 Install what"></a>1 Install what</h2><blockquote><p>安装Install意味着安装各种命令行工具「Scala compiler, coursier, sbt…」和构建工具「build tools」</p></blockquote><h2 id="2-how-to-install"><a href="#2-how-to-install" class="headerlink" title="2 how to install"></a>2 how to install</h2><blockquote><p>有两种办法：</p><ol><li>Scala Installer tool：自动安装所有依赖</li><li>手动安装</li></ol></blockquote><h3 id="①-Scala-Installer"><a href="#①-Scala-Installer" class="headerlink" title="① Scala Installer"></a>① Scala Installer</h3><p>Windows msi：<a href="https://downloads.lightbend.com/scala/2.13.4/scala-2.13.4.msi" rel="external nofollow noreferrer">获取安装包Scala-2.13.4</a>(这种方法最简便, 跟Windows其它软件包安装方式一样)</p><hr><p>或者下载<a href="https://github.com/coursier/coursier" rel="external nofollow noreferrer">coursier</a>(Scala工件「artifact」获取器)</p><p><img src="https://image.beenli.cn/img/20201202/S0bzdtb75Nf2.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><p>👇三种方法任选其一</p></blockquote><ol><li><p>下载源代码(自己编译,打包成jar包)</p></li><li><p>下载脚本+jar包</p><ul><li><p>确保你有Java（运行Java —version)</p><p><img src="https://image.beenli.cn/img/20201202/tJcHxloH4grk.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><p>确保环境变量设置正确✔(set <code>JAVA_HOME</code>=<code>/path/to/java/installation</code>)</p><p><font color="red">notes: </font>比如你java.exe在D:\app\jdk\bin\java.exe; 那就设置JAVA_HOME=D:\app\jdk即可,不要再加\</p></li></ul><p><img src="https://image.beenli.cn/img/20201202/8TnE1UtiERJ9.png?imageslim" srcset="/img/loading.gif" alt="coursier"></p><blockquote><p>脚本自动检测你电脑上的Java环境, 如果没有自动下载</p><p>自动下载标准Scala应用程序到~\AppData\Local\Coursier\data\bin</p><p>| <a href="https://ammonite.io/" rel="external nofollow noreferrer">ammonite</a> | improved Scala REPL(相当于ipython) |<br>| ———————————————— | ————————————————— |<br>| cs | coursier |<br>| scala | Scala REPL |<br>| scalac | scala compiler |<br>| sbt | Scala构建工具 |</p></blockquote></li><li><p>下载二进制文件</p></li></ol><h3 id="②-manually"><a href="#②-manually" class="headerlink" title="② manually"></a>② manually</h3><ul><li>下载<a href="https://www.oracle.com/java/technologies/javase-downloads.html" rel="external nofollow noreferrer">Oracle Java 8\11</a></li><li>下载<a href="https://www.scala-sbt.org/download.html" rel="external nofollow noreferrer">sbt</a><ul><li>👆coursier可以看成它的插件，用于解决包依赖问题</li><li>为自己项目选定特定Scala版本，相应的包版本;sbt会帮你自动解决</li></ul></li></ul><h2 id="3-check"><a href="#3-check" class="headerlink" title="3 check"></a>3 check</h2><ol><li><p>如果你用的msi安装包,默认安装在<code>c/Program Files (x86)/scala/bin/</code>下</p></li><li><p>如果使用cs，那么在~/AppData/Local/Coursier/data/bin 下</p><p><img src="https://image.beenli.cn/img/20201202/O5ls0QiHBrPn.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><script>        document.querySelectorAll('.github-emoji')          .forEach(el => {            if (!el.dataset.src) { return; }            const img = document.createElement('img');            img.style = 'display:none !important;';            img.src = el.dataset.src;            img.addEventListener('error', () => {              img.remove();              el.style.color = 'inherit';              el.style.backgroundImage = 'none';              el.style.background = 'none';            });            img.addEventListener('load', () => {              img.remove();            });            document.body.appendChild(img);          });      </script>]]></content>
+    
+    
+    <categories>
+      
+      <category>CS</category>
+      
+      <category>Programming</category>
+      
+      <category>env_problems</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Scala</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Generate constructs</title>
     <link href="/posts/7a9bb3ef/"/>
     <url>/posts/7a9bb3ef/</url>
