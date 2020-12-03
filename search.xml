@@ -266,36 +266,6 @@ mkdir project target</code></pre></li></ul><p><img src="https://image.beenli.cn/
       </tags>
   </entry>
   <entry>
-    <title>AMBA AHB spec(2)--bus interface</title>
-    <url>/posts/d1f5324a/</url>
-    <content><![CDATA[<blockquote><p>The blog is derived from the translation of <code>ARM IHI 0011A</code> AHB specification Copyright © 1999 ARM Limited</p><p>文档链接：<a href="https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw" rel="external nofollow noreferrer">https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw</a> 提取码：mmme</p></blockquote><h1 id="0-Convention"><a href="#0-Convention" class="headerlink" title="0 Convention"></a>0 Convention</h1><h2 id="0-1-timing-parameters"><a href="#0-1-timing-parameters" class="headerlink" title="0.1 timing parameters"></a>0.1 timing parameters</h2><blockquote><p>generic timing parameters that are required to analyze an AMBA design</p><p>• <strong>Tis</strong> - input setup time</p><p>• <strong>Tih</strong> - input hold time</p><p>• <strong>Tov</strong> - output valid time</p><p>• <strong>Toh</strong> - output hold time.</p></blockquote><h2 id="0-2-timing-diagrams"><a href="#0-2-timing-diagrams" class="headerlink" title="0.2 timing diagrams"></a>0.2 timing diagrams</h2><p><img src="https://image.beenli.cn/img/20201009/TFbsAcJR31hk.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><font color="blue">Notes：</font><ul><li>总线和信号中的阴影区域是未定义的，所以可以假定他们在这个区域的值是任意的。它们实际的值不重要，不影响正常的操作。</li><li>单比特信号有时在同一时刻被显示为<code>HIGH</code>和<code>LOW</code>，它们和<code>总线变化</code>(👆Bus change)相似。如果单比特信号像这样显示，意味着它的值不影响附带的描述(accompanying description)</li></ul></blockquote><h1 id="1-Slave"><a href="#1-Slave" class="headerlink" title="1 Slave"></a>1 Slave</h1><blockquote><p>slave对系统内master发起的传输做出响应。slave使用解码器传来的<code>HSELx</code>信号来决定合适对传输做出响应。所有其它被传输需要的信号，例如地址和控制信号，都有master产生。</p></blockquote><h2 id="17-1-Interface-diagram"><a href="#17-1-Interface-diagram" class="headerlink" title="17.1 Interface diagram"></a>17.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201008/qyvxmE48Sr2g.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="17-2-Timing-diagrams"><a href="#17-2-Timing-diagrams" class="headerlink" title="17.2 Timing diagrams"></a>17.2 Timing diagrams</h2><h3 id="17-2-1-Reset"><a href="#17-2-1-Reset" class="headerlink" title="17.2.1 Reset"></a>17.2.1 Reset</h3><p><img src="https://image.beenli.cn/img/20201009/EA3CJd2Uw70d.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p><strong>Tihrst</strong>：reset输入信号保持时间[在时钟边沿后还得保持一段时间保证被采样到] (ih=input hold time; rst=HRESETn)</p></li><li><p><strong>Tisrst</strong>：reset输入信号建立时间[在时钟边沿之前维持valid一段必要的时间，让主触发器能够采样到✔的值]</p></li></ul><h3 id="17-2-2-Normal-signals"><a href="#17-2-2-Normal-signals" class="headerlink" title="17.2.2 Normal signals"></a>17.2.2 Normal signals</h3><hr><p><img src="https://image.beenli.cn/img/20201009/U6kJ4KxjPY3w.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><strong>Tovrdy</strong>：输出信号HREADY的有效时间</li></ul><h3 id="17-2-3-Additional-signals"><a href="#17-2-3-Additional-signals" class="headerlink" title="17.2.3 Additional signals"></a>17.2.3 Additional signals</h3><p><img src="https://image.beenli.cn/img/20201009/sIpc22HODUqP.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2-Master"><a href="#2-Master" class="headerlink" title="2 Master"></a>2 Master</h1><blockquote><p>在AMBA系统中，master有最复杂的总线接口。通常来说，一个AMBA系统设计者会使用预先设计好的master(可能是处理器核，协处理器等)，因此没必要担心master接口的细节。</p></blockquote><h2 id="2-1-Interface-diagram"><a href="#2-1-Interface-diagram" class="headerlink" title="2.1 Interface diagram"></a>2.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201009/HtNGaKLwi8H5.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="3-Arbiter"><a href="#3-Arbiter" class="headerlink" title="3 Arbiter"></a>3 Arbiter</h1><blockquote><p>在AMBA系统中仲裁器的角色：控制哪个master有权访问总线。每个master有一个通向仲裁器的<code>REQUESET/GRANT</code>接口，仲裁器使用一个优先级策略决定当前请求总线的所有master中哪个优先级最高。</p><p>每个master也会产生一个<code>HLOCKx</code>信号，用来向master指示我需要对总线独占访问。(exclusive access to the bus)</p><p>优先级别策略的细节没有规定，而是每个应用自己决定。对于仲裁器使用其它的信号(例如AMBA或non-AMBA)去影响正在使用的优先级策略是可以接受的。</p></blockquote><h2 id="3-1-Interface-diagram"><a href="#3-1-Interface-diagram" class="headerlink" title="3.1 Interface diagram"></a>3.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201009/Le7fV3wAczDf.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="4-Decoder"><a href="#4-Decoder" class="headerlink" title="4 Decoder"></a>4 Decoder</h1><blockquote><p>AMBA系统中的<code>decoder</code>用于完成一个中心化地址译码的功能，通过使它们独立于系统内存映射(system memory map)来提高外设可移植性。</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/XynQ4f67E9KN.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>RISC-V</category>
-        <category>spec</category>
-      </categories>
-      <tags>
-        <tag>specification</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Conda environment</title>
     <url>/posts/ac51cf39/</url>
     <content><![CDATA[<blockquote><p>The blog is derived from the transilation of conda document: <a href="https://docs.conda.io/projects/conda/en/latest/" rel="external nofollow noreferrer">https://docs.conda.io/projects/conda/en/latest/</a></p></blockquote><h1 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h1><blockquote><p><em>Package, dependency and environment management for any language—-Python, R, Ruby, Lua, Scala, Java, JavaScript, C/ C++, FORTRAN</em></p><p>对python, R等语言其包，依赖和环境的管理</p></blockquote><h2 id="1、基本功能"><a href="#1、基本功能" class="headerlink" title="1、基本功能"></a>1、基本功能</h2><ul><li>Conda是一个开源包管理系统和环境管理系统,可以运行在Windows, MacOS, Linux上.</li><li>Conda能够快速安装,运行,升级包和包的依赖.</li><li>Conda能轻易地在本地创建,保存和切换环境.</li><li>conda起初是为<code>Python</code>程序创建,但它能打包和发布(package and distribute)其它语言的软件.</li></ul><h2 id="2、应用场景"><a href="#2、应用场景" class="headerlink" title="2、应用场景"></a>2、应用场景</h2><ol><li>Conda作为包管理器，帮助你找到并安装你需要的包。如果您需要一个需要不同版本Python的包，你不需要切换到另一个环境管理器，因为conda也是一个环境管理器(environment manager)。只需要一些命令，你就能建立一个完全独立的环境去运行不同版本的python，同时在正常环境中继续运行您通常版本的Python</li><li>在conda默认的配置中，conda能够在repo.anaconda.com安装和管理超过7500个包;这些包被Anaconda®构建、评审和维护.</li><li>Conda可以与Travis CI和AppVeyor等持续集成系统相结合，为代码提供频繁的自动化测试。</li></ol><h2 id="3、获取Conda"><a href="#3、获取Conda" class="headerlink" title="3、获取Conda"></a>3、获取Conda</h2><ol><li>通过下载<a href="https://docs.conda.io/projects/conda/en/latest/glossary.html#anaconda-glossary" rel="external nofollow noreferrer">Anaconda</a>®, <a href="https://docs.conda.io/projects/conda/en/latest/glossary.html#miniconda-glossary" rel="external nofollow noreferrer">Miniconda</a>, and <a href="https://docs.continuum.io/anaconda-repository/" rel="external nofollow noreferrer">Anaconda Repository</a></li><li>通过<a href="https://www.anaconda.com/enterprise/" rel="external nofollow noreferrer">Anaconda Enterprise</a>(收费)</li><li>Conda is also available on <a href="https://anaconda.org/conda-forge/conda" rel="external nofollow noreferrer">conda-forge</a>, a community channel</li><li>You may also get conda on <a href="https://pypi.org/" rel="external nofollow noreferrer">PyPI</a>, but that approach may not be as up to date.</li></ol><h2 id="4、Anaconda"><a href="#4、Anaconda" class="headerlink" title="4、Anaconda"></a>4、Anaconda</h2><blockquote><p>anaconda is a graphical user interface that lets you use conda in a web-like interface without having to enter manual commands</p><p>anaconda有图形界面，对用户更加友好,但内核还是conda</p></blockquote><h1 id="Getting-stated"><a href="#Getting-stated" class="headerlink" title="Getting stated"></a>Getting stated</h1><h2 id="1、打开命令行"><a href="#1、打开命令行" class="headerlink" title="1、打开命令行"></a>1、打开命令行</h2><p>如果是Windows,最好用<code>anaconda prompt</code>,貌似cmd也可;Linux就直接在terminal输命令即可.</p><ol><li><p>如果不是最新的，建议更新到最新</p><pre><code class="hljs bash">conda --veriosn
@@ -354,6 +324,36 @@ conda config --<span class="hljs-built_in">set</span> channel_priority <span cla
       <tags>
         <tag>toolkits</tag>
         <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>AMBA AHB spec(2)--bus interface</title>
+    <url>/posts/d1f5324a/</url>
+    <content><![CDATA[<blockquote><p>The blog is derived from the translation of <code>ARM IHI 0011A</code> AHB specification Copyright © 1999 ARM Limited</p><p>文档链接：<a href="https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw" rel="external nofollow noreferrer">https://pan.baidu.com/s/19fG2h8Jw4k29AjWfRBliFw</a> 提取码：mmme</p></blockquote><h1 id="0-Convention"><a href="#0-Convention" class="headerlink" title="0 Convention"></a>0 Convention</h1><h2 id="0-1-timing-parameters"><a href="#0-1-timing-parameters" class="headerlink" title="0.1 timing parameters"></a>0.1 timing parameters</h2><blockquote><p>generic timing parameters that are required to analyze an AMBA design</p><p>• <strong>Tis</strong> - input setup time</p><p>• <strong>Tih</strong> - input hold time</p><p>• <strong>Tov</strong> - output valid time</p><p>• <strong>Toh</strong> - output hold time.</p></blockquote><h2 id="0-2-timing-diagrams"><a href="#0-2-timing-diagrams" class="headerlink" title="0.2 timing diagrams"></a>0.2 timing diagrams</h2><p><img src="https://image.beenli.cn/img/20201009/TFbsAcJR31hk.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><blockquote><font color="blue">Notes：</font><ul><li>总线和信号中的阴影区域是未定义的，所以可以假定他们在这个区域的值是任意的。它们实际的值不重要，不影响正常的操作。</li><li>单比特信号有时在同一时刻被显示为<code>HIGH</code>和<code>LOW</code>，它们和<code>总线变化</code>(👆Bus change)相似。如果单比特信号像这样显示，意味着它的值不影响附带的描述(accompanying description)</li></ul></blockquote><h1 id="1-Slave"><a href="#1-Slave" class="headerlink" title="1 Slave"></a>1 Slave</h1><blockquote><p>slave对系统内master发起的传输做出响应。slave使用解码器传来的<code>HSELx</code>信号来决定合适对传输做出响应。所有其它被传输需要的信号，例如地址和控制信号，都有master产生。</p></blockquote><h2 id="17-1-Interface-diagram"><a href="#17-1-Interface-diagram" class="headerlink" title="17.1 Interface diagram"></a>17.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201008/qyvxmE48Sr2g.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h2 id="17-2-Timing-diagrams"><a href="#17-2-Timing-diagrams" class="headerlink" title="17.2 Timing diagrams"></a>17.2 Timing diagrams</h2><h3 id="17-2-1-Reset"><a href="#17-2-1-Reset" class="headerlink" title="17.2.1 Reset"></a>17.2.1 Reset</h3><p><img src="https://image.beenli.cn/img/20201009/EA3CJd2Uw70d.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><p><strong>Tihrst</strong>：reset输入信号保持时间[在时钟边沿后还得保持一段时间保证被采样到] (ih=input hold time; rst=HRESETn)</p></li><li><p><strong>Tisrst</strong>：reset输入信号建立时间[在时钟边沿之前维持valid一段必要的时间，让主触发器能够采样到✔的值]</p></li></ul><h3 id="17-2-2-Normal-signals"><a href="#17-2-2-Normal-signals" class="headerlink" title="17.2.2 Normal signals"></a>17.2.2 Normal signals</h3><hr><p><img src="https://image.beenli.cn/img/20201009/U6kJ4KxjPY3w.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li><strong>Tovrdy</strong>：输出信号HREADY的有效时间</li></ul><h3 id="17-2-3-Additional-signals"><a href="#17-2-3-Additional-signals" class="headerlink" title="17.2.3 Additional signals"></a>17.2.3 Additional signals</h3><p><img src="https://image.beenli.cn/img/20201009/sIpc22HODUqP.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="2-Master"><a href="#2-Master" class="headerlink" title="2 Master"></a>2 Master</h1><blockquote><p>在AMBA系统中，master有最复杂的总线接口。通常来说，一个AMBA系统设计者会使用预先设计好的master(可能是处理器核，协处理器等)，因此没必要担心master接口的细节。</p></blockquote><h2 id="2-1-Interface-diagram"><a href="#2-1-Interface-diagram" class="headerlink" title="2.1 Interface diagram"></a>2.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201009/HtNGaKLwi8H5.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="3-Arbiter"><a href="#3-Arbiter" class="headerlink" title="3 Arbiter"></a>3 Arbiter</h1><blockquote><p>在AMBA系统中仲裁器的角色：控制哪个master有权访问总线。每个master有一个通向仲裁器的<code>REQUESET/GRANT</code>接口，仲裁器使用一个优先级策略决定当前请求总线的所有master中哪个优先级最高。</p><p>每个master也会产生一个<code>HLOCKx</code>信号，用来向master指示我需要对总线独占访问。(exclusive access to the bus)</p><p>优先级别策略的细节没有规定，而是每个应用自己决定。对于仲裁器使用其它的信号(例如AMBA或non-AMBA)去影响正在使用的优先级策略是可以接受的。</p></blockquote><h2 id="3-1-Interface-diagram"><a href="#3-1-Interface-diagram" class="headerlink" title="3.1 Interface diagram"></a>3.1 Interface diagram</h2><p><img src="https://image.beenli.cn/img/20201009/Le7fV3wAczDf.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><h1 id="4-Decoder"><a href="#4-Decoder" class="headerlink" title="4 Decoder"></a>4 Decoder</h1><blockquote><p>AMBA系统中的<code>decoder</code>用于完成一个中心化地址译码的功能，通过使它们独立于系统内存映射(system memory map)来提高外设可移植性。</p></blockquote><p><img src="https://image.beenli.cn/img/20201009/XynQ4f67E9KN.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>RISC-V</category>
+        <category>spec</category>
+      </categories>
+      <tags>
+        <tag>specification</tag>
       </tags>
   </entry>
   <entry>
@@ -1337,35 +1337,6 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </tags>
   </entry>
   <entry>
-    <title>图床+评论</title>
-    <url>/posts/7928fb24/</url>
-    <content><![CDATA[<h2 id="1、什么是图床"><a href="#1、什么是图床" class="headerlink" title="1、什么是图床"></a>1、什么是图床</h2><blockquote><p>图床一般是指储存图片的服务器；就跟百度网盘差不多。只不过它是专门存储图片的。</p><p>有的也可以存储文件。有很多免费的图床。会赠送10G存储空间</p></blockquote><h2 id="2、为什么要用图床"><a href="#2、为什么要用图床" class="headerlink" title="2、为什么要用图床"></a>2、为什么要用图床</h2><ol><li>用图床很方便。服务器会生成一个外链。在互联网任何地方都能访问到</li><li>用图床访问速度很快。服务商会使用cdn加速</li><li>用图床可以节省本地空间。</li></ol><h2 id="3、七牛云图床的使用"><a href="#3、七牛云图床的使用" class="headerlink" title="3、七牛云图床的使用"></a>3、<a href="https://www.qiniu.com" rel="external nofollow noreferrer">七牛云</a>图床的使用</h2><ol><li>注册一个账号（需要身份认证）</li><li>创建一个存储空间</li></ol><center><img src="http://image.beenli.cn/img/20200404/vzoF3Gv83OLc.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol><li><p>注意空间名称是唯一。</p><p><code>访问控制</code>：选择私有：别人无法访问。如果是写博客或者公众号还是选择公开吧！</p><p>这样外链别人是可以看得到的。</p></li></ol><center><img src="http://image.beenli.cn/img/20200404/powS6CQubT69.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol><li>绑定备案的<code>域名</code></li></ol><center>![mark](http://image.beenli.cn/img/20200404/YHkGJVGQk87W.jpg?imageslim)</center><p>​ 可以看到：如果不绑定自己的域名；系统30天后回收回。那么你之前的外链都失效了</p><p>​ 所以最好绑定自己的域名才上线。</p><ol><li><p>如果你只想试试，那么到这里你就可以结束了。开始体验图床。</p><p><img src="http://image.beenli.cn/img/20200404/uo7Np1Vojilw.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><hr><p>上传完文件，然后返回。你就可以点击<code>操作</code>—-&gt;<code>更多</code>——-&gt;<code>复制外链</code></p><p>这时候你就可以直接从浏览器输入这个外链访问到你刚刚上传的文件。</p></li><li><p>这里推荐一个Windows平台<a href="http://mpic.lzhaofu.cn/" rel="external nofollow noreferrer">图床神器</a>；大概长这样。登陆上你之前注册的七牛云账号就可以使用了。</p><p><img src="http://image.beenli.cn/img/20200404/TdnAh5RKQ2V8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h4 id="用图床上传图片遇到的坑："><a href="#用图床上传图片遇到的坑：" class="headerlink" title="用图床上传图片遇到的坑："></a>用图床上传图片遇到的坑：</h4><ol><li><p>由于七牛云默认生成的外链的是http的，有些浏览器会阻塞这种不安全资源。</p><p>我只好去修改协议。</p></li><li><p>这时遇到第二个坑。要使用https协议，你绑定的域名必须有证书。</p><p>我在网上到处找，买的证书太贵，划不来。免费的证书授权又太慢。</p><p>最后终于找到了一款免费证书ssl发放机构。<a href="https://freessl.cn/" rel="external nofollow noreferrer">freessl</a></p><p>其间要下载一个软件（keymanager)最后生成证书的过程很快几分钟就搞定。</p></li></ol><h2 id="4、Valine评论系统"><a href="#4、Valine评论系统" class="headerlink" title="4、Valine评论系统"></a>4、<a href="https://valine.js.org/" rel="external nofollow noreferrer">Valine</a>评论系统</h2><ol><li><p>hexo的很多主题都内嵌了这个系统，你只需要去<a href="https://www.leancloud.cn/" rel="external nofollow noreferrer">cleancloud</a>注册个账号获取id和key填入配置文件里面就能用</p></li><li><p>如果你想要邮件通知或者后台评论管理可以用这个插件<a href="https://github.com/panjunwen/Valine-Admin" rel="external nofollow noreferrer">Valine-Admin</a></p></li><li><p>项目部署的一定要注意smtp_pass是授权码或者QQ独立密码，不是登陆密码。</p></li><li><p>部署完成效果如下。</p><p><img src="http://image.beenli.cn/img/20200404/2DWW9TYEy7ih.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><center><img src="http://image.beenli.cn/img/20200404/CLyDSF8dzvEd.png?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>Software</category>
-      </categories>
-      <tags>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>单链表翻转</title>
     <url>/posts/39c22857/</url>
     <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a><center>单链表翻转</center></h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><pre><code class="hljs c"><span class="hljs-function">struct ListNode *<span class="hljs-title">reverseList</span><span class="hljs-params">(struct ListNode* head)</span></span>{
@@ -1426,6 +1397,36 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </tags>
   </entry>
   <entry>
+    <title>图床+评论</title>
+    <url>/posts/7928fb24/</url>
+    <content><![CDATA[<h2 id="1、什么是图床"><a href="#1、什么是图床" class="headerlink" title="1、什么是图床"></a>1、什么是图床</h2><blockquote><p>图床一般是指储存图片的服务器；就跟百度网盘差不多。只不过它是专门存储图片的。</p><p>有的也可以存储文件。有很多免费的图床。会赠送10G存储空间</p></blockquote><h2 id="2、为什么要用图床"><a href="#2、为什么要用图床" class="headerlink" title="2、为什么要用图床"></a>2、为什么要用图床</h2><ol><li>用图床很方便。服务器会生成一个外链。在互联网任何地方都能访问到</li><li>用图床访问速度很快。服务商会使用cdn加速</li><li>用图床可以节省本地空间。</li></ol><h2 id="3、七牛云图床的使用"><a href="#3、七牛云图床的使用" class="headerlink" title="3、七牛云图床的使用"></a>3、<a href="https://www.qiniu.com" rel="external nofollow noreferrer">七牛云</a>图床的使用</h2><ol><li>注册一个账号（需要身份认证）</li><li>创建一个存储空间</li></ol><center><img src="http://image.beenli.cn/img/20200404/vzoF3Gv83OLc.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol><li><p>注意空间名称是唯一。</p><p><code>访问控制</code>：选择私有：别人无法访问。如果是写博客或者公众号还是选择公开吧！</p><p>这样外链别人是可以看得到的。</p></li></ol><center><img src="http://image.beenli.cn/img/20200404/powS6CQubT69.jpg?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><ol><li>绑定备案的<code>域名</code></li></ol><center>![mark](http://image.beenli.cn/img/20200404/YHkGJVGQk87W.jpg?imageslim)</center><p>​ 可以看到：如果不绑定自己的域名；系统30天后回收回。那么你之前的外链都失效了</p><p>​ 所以最好绑定自己的域名才上线。</p><ol><li><p>如果你只想试试，那么到这里你就可以结束了。开始体验图床。</p><p><img src="http://image.beenli.cn/img/20200404/uo7Np1Vojilw.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li><li><hr><p>上传完文件，然后返回。你就可以点击<code>操作</code>—-&gt;<code>更多</code>——-&gt;<code>复制外链</code></p><p>这时候你就可以直接从浏览器输入这个外链访问到你刚刚上传的文件。</p></li><li><p>这里推荐一个Windows平台<a href="http://mpic.lzhaofu.cn/" rel="external nofollow noreferrer">图床神器</a>；大概长这样。登陆上你之前注册的七牛云账号就可以使用了。</p><p><img src="http://image.beenli.cn/img/20200404/TdnAh5RKQ2V8.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h4 id="用图床上传图片遇到的坑："><a href="#用图床上传图片遇到的坑：" class="headerlink" title="用图床上传图片遇到的坑："></a>用图床上传图片遇到的坑：</h4><ol><li><p>由于七牛云默认生成的外链的是http的，有些浏览器会阻塞这种不安全资源。</p><p>我只好去修改协议。</p></li><li><p>这时遇到第二个坑。要使用https协议，你绑定的域名必须有证书。</p><p>我在网上到处找，买的证书太贵，划不来。免费的证书授权又太慢。</p><p>最后终于找到了一款免费证书ssl发放机构。<a href="https://freessl.cn/" rel="external nofollow noreferrer">freessl</a></p><p>其间要下载一个软件（keymanager)最后生成证书的过程很快几分钟就搞定。</p></li></ol><h2 id="4、Valine评论系统"><a href="#4、Valine评论系统" class="headerlink" title="4、Valine评论系统"></a>4、<a href="https://valine.js.org/" rel="external nofollow noreferrer">Valine</a>评论系统</h2><ol><li><p>hexo的很多主题都内嵌了这个系统，你只需要去<a href="https://www.leancloud.cn/" rel="external nofollow noreferrer">cleancloud</a>注册个账号获取id和key填入配置文件里面就能用</p></li><li><p>如果你想要邮件通知或者后台评论管理可以用这个插件<a href="https://github.com/panjunwen/Valine-Admin" rel="external nofollow noreferrer">Valine-Admin</a></p></li><li><p>项目部署的一定要注意smtp_pass是授权码或者QQ独立密码，不是登陆密码。</p></li><li><p>部署完成效果如下。</p><p><img src="http://image.beenli.cn/img/20200404/2DWW9TYEy7ih.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><center><img src="http://image.beenli.cn/img/20200404/CLyDSF8dzvEd.png?imageslim" srcset="/img/loading.gif" alt="mark" style="zoom:50%"></center><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>Software</category>
+      </categories>
+      <tags>
+        <tag>toolkits</tag>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>存储电路</title>
     <url>/posts/19fa4593/</url>
     <content><![CDATA[<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><blockquote><p>在复杂的数字电路中，不仅需要对各种数字信号进行<code>算术运算</code>和<code>逻辑运算</code>，而且还需要在运算过程中不断将运算数据和运算结果保存起来。因此，<code>存储电路</code>就成为计算机以及所有复杂数字系统不可缺少的组成部分。</p></blockquote><ul><li><p>分类总结</p><p><img src="http://image.beenli.cn/img/20200806/KInKOkBSpdhF.png?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ul><h2 id="二、SR锁存器"><a href="#二、SR锁存器" class="headerlink" title="二、SR锁存器"></a>二、SR锁存器</h2><p class="note note-info">SR锁存器(Set-Reset Latch) 是静态存储单元中最基本，也是电路结构最简单的一种。</p><ol><li><p>或门锁存器</p><p><img src="http://image.beenli.cn/img/20200806/mkE1Uu5jsyux.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>当$R_D$是1或者$S_D$是1而另外一个是0时，可以看到S起到<code>set 1</code>；而R起到<code>reset 0</code>的作用。</li><li>当有一个回到0时(此时两输入都为0)，可以保持原来的状态不变。(因为输出的1反馈到输入)</li><li><span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/274c.png?v8">❌</span>不允许输入同为1。（此时输出同为0为无效状态，并且同时变为0时存在竞争冒险）</li></ul></li><li><p>与门锁存器(同理)<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f642.png?v8">🙂</span></p><p><img src="http://image.beenli.cn/img/20200806/ny32DamxXGT9.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p></li></ol><h2 id="三、触发器"><a href="#三、触发器" class="headerlink" title="三、触发器"></a>三、触发器</h2><p class="note note-info">触发器与锁存器不同在于：增加了一个触发信号输入端(时钟信号<strong>CLK</strong>)。只有当触发信号到来时，其功能与锁存器相同。</p><h3 id="1、电平触发"><a href="#1、电平触发" class="headerlink" title="1、电平触发"></a>1、电平触发</h3><p class="note note-light">只有触发信号在有效电平的时候，输入信号才能作用。<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p><h4 id="①同步SR触发器"><a href="#①同步SR触发器" class="headerlink" title="①同步SR触发器"></a>①同步SR触发器</h4><p><img src="http://image.beenli.cn/img/20200806/w2EFARutEXwH.jpg?imageslim" srcset="/img/loading.gif" alt="cl没有⭕代表高电平有效"></p><center>框图<strong>Cl</strong>外面没有⭕代表高电平有效</center><h4 id="②异步复位置位"><a href="#②异步复位置位" class="headerlink" title="②异步复位置位"></a>②异步复位置位</h4><p>// 将<code>置位信号</code>$S_{D}^{‘}$接入G1, <code>复位信号</code>$R_{D}^{‘}$接G2</p><h4 id="③单端输入-D型号锁存器"><a href="#③单端输入-D型号锁存器" class="headerlink" title="③单端输入(D型号锁存器)"></a>③单端输入(D型号锁存器)</h4><p>// 规避了约束条件SR=0</p><p><img src="http://image.beenli.cn/img/20200806/xIOR3Naxv9I6.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><h4 id="④Transparent-D-Latch"><a href="#④Transparent-D-Latch" class="headerlink" title="④Transparent D-Latch"></a>④Transparent D-Latch</h4><p>// CMOS传输门构成</p><p><img src="http://image.beenli.cn/img/20200806/Gs96RXY8qL57.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p>当TG2打开，TG1关闭时。两个反相器串联把截止前瞬间的信号(<code>反相器G1输入电容</code>)锁住。</p><h3 id="2、边沿触发"><a href="#2、边沿触发" class="headerlink" title="2、边沿触发"></a>2、边沿触发</h3><p class="note note-light">提高触发器可靠性，增强抗干扰能力，希望触发器次态仅取决于CLK信号<strong>边沿</strong>到达时刻输入信号的状态。而边沿之前或之后输入状态的变化对触发器的次态没有影响。</p><h4 id="①两个电平触发D触发器"><a href="#①两个电平触发D触发器" class="headerlink" title="①两个电平触发D触发器"></a>①两个电平触发D触发器</h4><p><img src="http://image.beenli.cn/img/20200806/XRFiu2qdjwAn.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ul><li>不看置位信号就是两个Transparent D-Latch</li><li>当第一个工作时，第二个保持。透明D锁存器：所以输出能跟随时钟边沿瞬间输入的值</li></ul><h4 id="②维持阻塞-pushpin"><a href="#②维持阻塞-pushpin" class="headerlink" title="②维持阻塞:pushpin:"></a>②维持阻塞<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h4 id="③门电路传输延迟-pushpin"><a href="#③门电路传输延迟-pushpin" class="headerlink" title="③门电路传输延迟:pushpin:"></a>③门电路传输延迟<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h4><h3 id="3、脉冲触发"><a href="#3、脉冲触发" class="headerlink" title="3、脉冲触发"></a>3、脉冲触发</h3><p class="note note-light">为了提高可靠性：希望每个CLK周期里面输出端状态只能改变<strong>一次</strong></p><h4 id="①主从SR"><a href="#①主从SR" class="headerlink" title="①主从SR"></a>①主从SR</h4><p>Master-Slave SR Flip-Flop</p><p><img src="http://image.beenli.cn/img/20200812/sT6pd0FRytWY.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center><strong>￢</strong>：延时输出</center><p><img src="http://image.beenli.cn/img/20200812/Gj3SXcH9aMF3.png?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>高电平有效，下降沿状态才会改变</center><ul><li>clk高电平<code>主触发器</code>有效，<code>从触发器</code>保持原来状态。</li><li>clk从高变到低时，主触发器被封锁，从触发器按照主触发器相同的状态翻转。</li><li>因此：一个周期输出只可能翻转一次。</li></ul><h4 id="②主从JK-规避SR-1"><a href="#②主从JK-规避SR-1" class="headerlink" title="②主从JK(规避SR=1)"></a>②主从JK(<code>规避SR=1</code>)</h4><p><img src="http://image.beenli.cn/img/20200812/3w2tYTQ9HhKm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><script type="math/tex;mode=display">Q^* = S + \overline RQ(for\quad SR)</script><script type="math/tex;mode=display">JK: S=J \overline Q\quad R=KQ</script><script type="math/tex;mode=display">Q^*=J \overline Q+(\overline K+\overline Q)Q=J \overline Q + \overline KQ\quad(for\quad JK)</script><ul><li>clk变低电平时把主触发器的值<code>复制</code>给了次触发器。（所以上边推导时Q即代表中间输出也代表后边输出）</li><li>主触发器有效时(高电平)Q要么为1要么为0，不可能同时为0或者为1。因为G3,G4都为1。它们通过反相器互咬。</li><li>考察当J=1，R=1时，G7,G8输出$Q$和$\overline Q$(不是全0，就🆗)。所以当Q=1，输出为0，当Q=0,输出为1,即反向。</li></ul><h2 id="四、触发器的动态特性-pushpin"><a href="#四、触发器的动态特性-pushpin" class="headerlink" title="四、触发器的动态特性:pushpin:"></a>四、触发器的动态特性<span class="github-emoji" style="display:inline;vertical-align:middle;color: transparent;background:no-repeat url(https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8) center/contain" data-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4cc.png?v8">📌</span></h2><h2 id="五、References"><a href="#五、References" class="headerlink" title="五、References"></a>五、References</h2><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none;padding-left:0"><li id="fn:1"><span style="display:inline-block;vertical-align:top;padding-right:10px">1.</span><span style="display:inline-block;vertical-align:top">外国教材有时把此电路叫（Gated SR latch), 时钟信号叫做“使能”信号（enable）</span><a href="#fnref:1" rev="footnote"> ↩</a></li></ol></div></div><script>
@@ -1453,6 +1454,74 @@ make linux</code></pre><blockquote><p>编译出来的工具带有前缀：<code>
       </categories>
       <tags>
         <tag>circuits</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>操作系统-熟悉实验环境(1)</title>
+    <url>/posts/9cf5ff72/</url>
+    <content><![CDATA[<h2 id="熟悉实验环境"><a href="#熟悉实验环境" class="headerlink" title="熟悉实验环境"></a><center>熟悉实验环境</center></h2><h3 id="1、x86模拟器Bochs1"><a href="#1、x86模拟器Bochs1" class="headerlink" title="1、x86模拟器Bochs1"></a>1、x86模拟器<a href="http://bochs.sourceforge.net/" rel="external nofollow noreferrer">Bochs</a><a href="#link"><sup>1</sup></a></h3><p class="note note-info">Bochs is a highly portable open source IA-32 (x86) PC emulator written in C++, that runs on most popular platforms. It includes emulation of the Intel x86 CPU, common I/O devices, and a custom BIOS. Bochs can be compiled to emulate many different x86 CPUs, from early 386 to the most recent x86-64 Intel and AMD processors which may even not reached the market yet.</p><p>可以看到<code>Boch</code>可以模拟<code>intel x86 CPU</code></p><p>在它模拟出的环境中可以运行 Linux、DOS 和各种版本的 Windows 等多种操作系统</p><h3 id="2、操作系统Ubuntu"><a href="#2、操作系统Ubuntu" class="headerlink" title="2、操作系统Ubuntu"></a>2、操作系统<a href="https://ubuntu.com/" rel="external nofollow noreferrer">Ubuntu</a></h3><p>因为有些实验内容涉及到在自己改进的 <code>Linux 0.11</code>下，运行自己编的应用程序。被改进的功能都是高 版本 Linux 内核已经具有的，在其上确认自己编写的应用程序无误后，再用之测试自己改进的 Linux 0.11，可以更有信心些。</p><h3 id="3、实验压缩包hit-oslab"><a href="#3、实验压缩包hit-oslab" class="headerlink" title="3、实验压缩包hit-oslab"></a>3、实验压缩包<a href="https://github.com/hoverwinter/HIT-OSLab" rel="external nofollow noreferrer">hit-oslab</a></h3><p>文件结构:</p><pre><code class="hljs bash">.
+..
+└── bocks
+|   	├── BIOS-bochs-latest
+|       ├── bochs-dbg
+|   	├── bochs-gdb
+|   	├── bochsrc.bxrc
+|   	├── bochsrc-gdb.bxrc
+|       └── vgabios.bin
+|
+└── hdc
+|   	└── umounted
+└── Linux-0.11
+|		└── boot
+|		├── kernel
+|		├── fs
+|		├── lib
+|		├── init				
+|		├── mm
+|		├── tools			
+|		├── include
+|		├── tags
+|		└── Makefile
+├── dbg-asm
+├── dbg-c
+├── gdb
+├── gdb-cmd.txt
+├── run
+├── rungdb
+└── mount-hdc</code></pre><ol><li><p>Image文件</p><p>我们在宿主操作系统也就是ubuntu上对Linux 0.11进行开发，修改和编译。</p><p>之后在Linux-0.11目录会生成一个<code>Image</code>的文件。（编译后的目标文件）</p><p><br></p><p>该文件包含引导和所以内核的二进制代码。</p><p class="note note-primary">oslab 采用 bochs 模拟器加载这个 Image 文件，模拟执行 Linux 0.11，这样省却了重新启动计算机的麻烦。</p></li><li><p>bochs目录</p><p>bochs目录是与bochs相关的执行文件、数据文件和配置文件</p></li><li><p>run 脚本</p><p><code>run</code> 是 运行bochs的脚本命令</p><p>运行后bochs会自动在他的</p><p>虚拟软驱——linux-0.11/Image</p><p>虚拟硬盘——hdc-0.11.img</p><p class="note note-primary">在 0.11 下访问文件系统，访问的就是 hdc-0.11.img 文件内虚拟的文件系统。<br>退出bochs之前现存盘，运行sync命令</p></li><li><p>hdc-0.11.img 文件</p><p>文件的格式是 Minix 文件系统的镜像。Linux 所有版本都支持这种格式的文件系统</p><p>所以可以在宿主系统上挂载该文件系统。达到宿主系统和Linux 0.11之间文件交换的效果</p><p>其中包含的文件有：</p><ul><li>Bash shell；</li><li>一些基本的 Linux 命令、工具，比如 cp、rm、mv、tar；</li><li>vi 编辑器；</li><li>gcc 1.4 编译器，可用来编译标准 C 程序；</li><li>as86 和 ld86；</li><li>Linux 0.11 的源代码，可在 0.11 下编译，然后覆盖现有的二进制内核。</li></ul></li><li><p>编译</p><blockquote><p>make all(make 命令会自动跳过未被修改的文件 )</p><p>如果重新编译没有效果可以试试删除中间文件: make clean &amp;&amp; make all</p></blockquote></li><li><p>运行</p><p><code>./run</code></p></li></ol><h3 id="4、调试"><a href="#4、调试" class="headerlink" title="4、调试"></a>4、调试</h3><ol><li><p>汇编级调试</p><p><code>./dbg-asm</code></p></li><li><p>C语言调试</p><ol><li><p><code>./dbg-c</code></p></li><li><p><code>./rungdb</code>(新开一个窗口)</p><blockquote><p>注意：启动的顺序不能交换，否则 gdb 无法连接。</p></blockquote></li></ol></li></ol><h3 id="5、文件交换"><a href="#5、文件交换" class="headerlink" title="5、文件交换"></a>5、文件交换</h3><pre><code class="hljs bash"><span class="hljs-comment"># 启动挂载脚本</span>
+$ <span class="hljs-built_in">cd</span> ~/oslab
+$ sudo ./mount-hdc
+
+<span class="hljs-comment"># 进入文件系统</span>
+$ <span class="hljs-built_in">cd</span> ./mount-hdc/
+
+<span class="hljs-comment"># 读写完毕，卸载文件系统</span>
+$ <span class="hljs-built_in">cd</span> ~/oslab
+$ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><div id="link"></div><p>[1] <a href="https://mooc.study.163.com/course/1000002004?tid=2402971010#/info" rel="external nofollow noreferrer">哈尔滨工业大学.操作系统</a></p><script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>]]></content>
+      <categories>
+        <category>CS</category>
+        <category>OS</category>
+      </categories>
+      <tags>
+        <tag>online course</tag>
       </tags>
   </entry>
   <entry>
@@ -1532,47 +1601,14 @@ gtkwave filename.vcd				<span class="hljs-comment">// 查看仿真的波形图</
       </tags>
   </entry>
   <entry>
-    <title>操作系统-熟悉实验环境(1)</title>
-    <url>/posts/9cf5ff72/</url>
-    <content><![CDATA[<h2 id="熟悉实验环境"><a href="#熟悉实验环境" class="headerlink" title="熟悉实验环境"></a><center>熟悉实验环境</center></h2><h3 id="1、x86模拟器Bochs1"><a href="#1、x86模拟器Bochs1" class="headerlink" title="1、x86模拟器Bochs1"></a>1、x86模拟器<a href="http://bochs.sourceforge.net/" rel="external nofollow noreferrer">Bochs</a><a href="#link"><sup>1</sup></a></h3><p class="note note-info">Bochs is a highly portable open source IA-32 (x86) PC emulator written in C++, that runs on most popular platforms. It includes emulation of the Intel x86 CPU, common I/O devices, and a custom BIOS. Bochs can be compiled to emulate many different x86 CPUs, from early 386 to the most recent x86-64 Intel and AMD processors which may even not reached the market yet.</p><p>可以看到<code>Boch</code>可以模拟<code>intel x86 CPU</code></p><p>在它模拟出的环境中可以运行 Linux、DOS 和各种版本的 Windows 等多种操作系统</p><h3 id="2、操作系统Ubuntu"><a href="#2、操作系统Ubuntu" class="headerlink" title="2、操作系统Ubuntu"></a>2、操作系统<a href="https://ubuntu.com/" rel="external nofollow noreferrer">Ubuntu</a></h3><p>因为有些实验内容涉及到在自己改进的 <code>Linux 0.11</code>下，运行自己编的应用程序。被改进的功能都是高 版本 Linux 内核已经具有的，在其上确认自己编写的应用程序无误后，再用之测试自己改进的 Linux 0.11，可以更有信心些。</p><h3 id="3、实验压缩包hit-oslab"><a href="#3、实验压缩包hit-oslab" class="headerlink" title="3、实验压缩包hit-oslab"></a>3、实验压缩包<a href="https://github.com/hoverwinter/HIT-OSLab" rel="external nofollow noreferrer">hit-oslab</a></h3><p>文件结构:</p><pre><code class="hljs bash">.
-..
-└── bocks
-|   	├── BIOS-bochs-latest
-|       ├── bochs-dbg
-|   	├── bochs-gdb
-|   	├── bochsrc.bxrc
-|   	├── bochsrc-gdb.bxrc
-|       └── vgabios.bin
-|
-└── hdc
-|   	└── umounted
-└── Linux-0.11
-|		└── boot
-|		├── kernel
-|		├── fs
-|		├── lib
-|		├── init				
-|		├── mm
-|		├── tools			
-|		├── include
-|		├── tags
-|		└── Makefile
-├── dbg-asm
-├── dbg-c
-├── gdb
-├── gdb-cmd.txt
-├── run
-├── rungdb
-└── mount-hdc</code></pre><ol><li><p>Image文件</p><p>我们在宿主操作系统也就是ubuntu上对Linux 0.11进行开发，修改和编译。</p><p>之后在Linux-0.11目录会生成一个<code>Image</code>的文件。（编译后的目标文件）</p><p><br></p><p>该文件包含引导和所以内核的二进制代码。</p><p class="note note-primary">oslab 采用 bochs 模拟器加载这个 Image 文件，模拟执行 Linux 0.11，这样省却了重新启动计算机的麻烦。</p></li><li><p>bochs目录</p><p>bochs目录是与bochs相关的执行文件、数据文件和配置文件</p></li><li><p>run 脚本</p><p><code>run</code> 是 运行bochs的脚本命令</p><p>运行后bochs会自动在他的</p><p>虚拟软驱——linux-0.11/Image</p><p>虚拟硬盘——hdc-0.11.img</p><p class="note note-primary">在 0.11 下访问文件系统，访问的就是 hdc-0.11.img 文件内虚拟的文件系统。<br>退出bochs之前现存盘，运行sync命令</p></li><li><p>hdc-0.11.img 文件</p><p>文件的格式是 Minix 文件系统的镜像。Linux 所有版本都支持这种格式的文件系统</p><p>所以可以在宿主系统上挂载该文件系统。达到宿主系统和Linux 0.11之间文件交换的效果</p><p>其中包含的文件有：</p><ul><li>Bash shell；</li><li>一些基本的 Linux 命令、工具，比如 cp、rm、mv、tar；</li><li>vi 编辑器；</li><li>gcc 1.4 编译器，可用来编译标准 C 程序；</li><li>as86 和 ld86；</li><li>Linux 0.11 的源代码，可在 0.11 下编译，然后覆盖现有的二进制内核。</li></ul></li><li><p>编译</p><blockquote><p>make all(make 命令会自动跳过未被修改的文件 )</p><p>如果重新编译没有效果可以试试删除中间文件: make clean &amp;&amp; make all</p></blockquote></li><li><p>运行</p><p><code>./run</code></p></li></ol><h3 id="4、调试"><a href="#4、调试" class="headerlink" title="4、调试"></a>4、调试</h3><ol><li><p>汇编级调试</p><p><code>./dbg-asm</code></p></li><li><p>C语言调试</p><ol><li><p><code>./dbg-c</code></p></li><li><p><code>./rungdb</code>(新开一个窗口)</p><blockquote><p>注意：启动的顺序不能交换，否则 gdb 无法连接。</p></blockquote></li></ol></li></ol><h3 id="5、文件交换"><a href="#5、文件交换" class="headerlink" title="5、文件交换"></a>5、文件交换</h3><pre><code class="hljs bash"><span class="hljs-comment"># 启动挂载脚本</span>
-$ <span class="hljs-built_in">cd</span> ~/oslab
-$ sudo ./mount-hdc
-
-<span class="hljs-comment"># 进入文件系统</span>
-$ <span class="hljs-built_in">cd</span> ./mount-hdc/
-
-<span class="hljs-comment"># 读写完毕，卸载文件系统</span>
-$ <span class="hljs-built_in">cd</span> ~/oslab
-$ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><div id="link"></div><p>[1] <a href="https://mooc.study.163.com/course/1000002004?tid=2402971010#/info" rel="external nofollow noreferrer">哈尔滨工业大学.操作系统</a></p><script>
+    <title>数据通路(1)--Basic Datapath</title>
+    <url>/posts/74018a17/</url>
+    <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
+slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
+						  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offset
+lw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。
+beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
+						  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst				  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -1593,10 +1629,10 @@ $ sudo umount hdc</code></pre><hr><h3 id="Reference"><a href="#Reference" class=
       </script>]]></content>
       <categories>
         <category>CS</category>
-        <category>OS</category>
+        <category>Computer Organization &amp; Design</category>
       </categories>
       <tags>
-        <tag>online course</tag>
+        <tag>processor</tag>
       </tags>
   </entry>
   <entry>
@@ -1835,41 +1871,6 @@ p = t;
       </categories>
       <tags>
         <tag>C</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据通路(1)--Basic Datapath</title>
-    <url>/posts/74018a17/</url>
-    <content><![CDATA[<h1 id="1、Preface"><a href="#1、Preface" class="headerlink" title="1、Preface"></a>1、Preface</h1><blockquote><p>计算机性能：①指令数目(编译器和指令集），②时钟周期长度(组合电路最大延时)，③每条指令所需要的时钟周期数(处理器架构，指令类别，多发射超标量流水)</p></blockquote><p>本篇只是一个基本的<code>MIPS</code>实现。</p><ul><li>存储器访问指令：取字(<code>lw</code>) 和存字(<code>sw</code>)</li><li>算数逻辑指令：加法(<code>add</code>)、减法(<code>sub</code>)、与运算(<code>and</code>)、或运算(<code>or</code>)和小于则设置(<code>slt</code>)</li><li>分支指令：相等则分支(<code>beq</code>)和跳转(<code>j</code>)</li></ul><p><img src="https://image.beenli.cn/img/20200820/yKiuzyrIln7F.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li><p><code>R指令</code>对应算数逻辑指令。(rs, rt对应两个源操作数，rd对应目的寄存器)</p><pre><code class="hljs assembly">add $t1, $t2, $t3 # $t1=$t2+$t3
-slt $to, $s0, $a1 # reg $t0 = 0 if $s0 &gt;= $a1</code></pre></li><li><p><code>I指令</code>对应访存和分支指令。</p><pre><code class="hljs assembly">sw $t1, offset_value($t2) # 把$t1的值存到以$t2为基址加上16位地址偏移上去。
-						  # rs=$t2, rt=$t1(目标寄存器),[15:0]=offset
-lw $t1, offset_value($t2) # 把$t2为基址加上16位地址偏移所在地址的值存到t1。
-beq $t3, $zero, loop1	  # if($t3==$zero) go to loop1
-						  # loop1是后16位。rs=$t3,rt=$zero;</code></pre></li><li><p><code>J指令</code>对应无条件跳转</p><pre><code class="hljs assembly">j for2tst				  # jump tp for2tst</code></pre></li></ol><h1 id="2、An-Overview-of-the-Implementation"><a href="#2、An-Overview-of-the-Implementation" class="headerlink" title="2、An Overview of the Implementation"></a>2、An Overview of the Implementation</h1><ul><li>实现每条指令的前两步是一样的<ol><li>程序计数器(PC)指向指令所在的存储单元，并从中取出指令。(PC是地址)</li><li>通过指令字段内容，选择读取一个或两个寄存器。对于取字指令，只需读一个寄存器即<code>rs</code>,而其它大多数指令要求读取两个寄存器（<code>rs</code>， <code>rt</code>)。</li></ol></li></ul><blockquote><p>前面两步完成后，为完成指令而进行的后续步骤则取决于具体的指令类型</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/U2dhJ3SxBt84.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><ol><li>所有指令中除了<code>jump</code>，在读取寄存器后都要使用ALU。<ul><li>访存指令：address calculation</li><li>算术逻辑指令：operation execution</li><li>分支指令：comparison</li></ul></li><li>ALU之后又各不相同<ul><li>访问Data Memory: <code>store指令</code>要写入数据到data memory；<code>load指令</code>要从memory读数据</li><li>写回registers: <code>R指令</code>需要把ALU计算的结果; <code>load指令</code>要data memory读出的数据</li><li>改变PC: 如果分支成立那么改变PC值，否则自增4。</li></ul></li></ol><h1 id="3、Building-a-Datapath"><a href="#3、Building-a-Datapath" class="headerlink" title="3、Building a Datapath"></a>3、Building a Datapath</h1><blockquote><p>数据通路部件：一个用来操作或保存处理器中数据的单元。在MPIS实现中，数据通路部件包括<code>指令存储器</code>、<code>数据存储器</code>、<code>寄存器堆</code>、<code>ALU</code>、<code>加法器</code>.</p></blockquote><h2 id="3-1、basic-components"><a href="#3-1、basic-components" class="headerlink" title="3.1、basic components"></a>3.1、basic components</h2><p><img src="https://image.beenli.cn/img/20200820/N8jUdro8qK22.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>取指令，更新指令</center><p><img src="https://image.beenli.cn/img/20200820/mNdvEm8uGB4b.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>根据寄存器号取操作数进行ALU运算</center><p><img src="https://image.beenli.cn/img/20200820/wXPwKwvLR8RN.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>向内存读或者写数据</center><h2 id="3-2、combination-components"><a href="#3-2、combination-components" class="headerlink" title="3.2、combination components"></a>3.2、combination components</h2><p><img src="https://image.beenli.cn/img/20200820/96jAaA7ct7r0.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><p><img src="https://image.beenli.cn/img/20200820/0PQCr6vCD7Dm.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>branch指令需要[15:0]左移两位并符号扩展到32位与PC相加组成新的PC</center><h2 id="3-3、single-data-path"><a href="#3-3、single-data-path" class="headerlink" title="3.3、single data path"></a>3.3、single data path</h2><blockquote><p>假设我们在<code>一个时钟周期</code>内执行任意一条指令。那意味着每条指令不能用某个部件两次或以上。所以任何需要重复的部件都必须被复制。</p><p>1、需要一个指令存储器外，还需要一个数据存储器</p><p>2、尽管有的功能单元需要复制，但在执行不同指令时，很多功能单元可以被共享(复用)</p></blockquote><p><img src="https://image.beenli.cn/img/20200820/v7L4zwoVuOAJ.jpg?imageslim" srcset="/img/loading.gif" alt="mark"></p><center>复用ALU和寄存器堆</center><script>
-        document.querySelectorAll('.github-emoji')
-          .forEach(el => {
-            if (!el.dataset.src) { return; }
-            const img = document.createElement('img');
-            img.style = 'display:none !important;';
-            img.src = el.dataset.src;
-            img.addEventListener('error', () => {
-              img.remove();
-              el.style.color = 'inherit';
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-            });
-            img.addEventListener('load', () => {
-              img.remove();
-            });
-            document.body.appendChild(img);
-          });
-      </script>]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Computer Organization &amp; Design</category>
-      </categories>
-      <tags>
-        <tag>processor</tag>
       </tags>
   </entry>
   <entry>
