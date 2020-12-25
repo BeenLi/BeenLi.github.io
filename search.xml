@@ -605,7 +605,66 @@
   <entry>
     <title>YOLOv3 in PyTorch</title>
     <url>/posts/9e0400c7/</url>
-    <content><![CDATA[]]></content>
+    <content><![CDATA[<h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><blockquote>
+<p><code>YOLO</code>, aka “You Only Look Once”—&gt; 名字是不是很酷</p>
+<p>YOLO是<code>object detection</code>领域非常出名的算法，它以速度快同时兼顾性能著称。</p>
+</blockquote>
+<h2 id="1-Net-Architecture"><a href="#1-Net-Architecture" class="headerlink" title="1 Net Architecture"></a>1 Net Architecture</h2><p><img src="https://image.beenli.cn/img/20201225/3crM6aHe8hd1.png?imageslim" alt="Figure1 YOLOv3 Network Architecture"></p>
+<p><img src="https://image.beenli.cn/img/20201225/OyauoNS5dlmi.png?imageslim" alt="Figure2 Yolo_v3_Structure"></p>
+<ul>
+<li><code>concatenate层</code>在Yolo里面叫做<code>route</code>层</li>
+<li><code>res_unit层</code>在Yolo里面叫做<code>shortcut</code>层</li>
+<li><code>detection层</code>在Yolo里面叫做<code>yolo</code>层</li>
+</ul>
+<h2 id="2-Details"><a href="#2-Details" class="headerlink" title="2 Details"></a>2 Details</h2><p><img src="https://image.beenli.cn/img/20201225/Fewd3cB5ftsc.png?imageslim" alt="Figure3 Yolov3 anchor box"></p>
+<ol>
+<li><p>输入层:<code>416*416*3</code></p>
+</li>
+<li><p>将输入划分为$S * S$ grid, 每个格子有三个预先设定好长($p_w$)和宽($p_h$)的anchor box；如果物体的中心落在哪个grid, 那个grid就负责探测该物体。</p>
+<p><img src="https://image.beenli.cn/img/20201225/msBsRFJ838Rv.png?imageslim" alt="coordinate transform"></p>
+</li>
+<li><p>每个anchor box有85个数据[$t_x, t_y, t_w, t_h, objectscore, c1, c2…]$，分别代表：</p>
+<ul>
+<li>预测框中心点坐标：网络实际输出的是$t_x 和 t_y$, 为了让该cell预测的物体中心一定落在该cell上，加了个sigmoid函数。</li>
+<li>预测框长和宽: 防止梯度下降不稳定，所以进行了对数空间变换，网络给出$t_x, t_h$, 真实的长和宽由👆公式计算。</li>
+<li>是否有物体的概率: 如果没有物体，后续类别的置信分数将没有作用</li>
+<li>一共预测80个类别，每个类别的置信分数。</li>
+</ul>
+</li>
+</ol>
+<p><img src="https://image.beenli.cn/img/20201225/OEr4juQiwsBl.jpg?imageslim" alt="scale output"></p>
+<ol>
+<li><p>有三种scale的输出层，分别为：<code>13 * 13 * 85；26 * 26 * 85；52 * 52 * 85</code>；</p>
+<p>每个cell有三个anchor box;所以每个输入一共有$(13\times13+26\times26+52\times52)\times3=10647$个预测框</p>
+</li>
+<li><p>这么多输出框肯定绝大部分是重复预测或者不正确的预测，需要剔除不好的框</p>
+<ul>
+<li>设置<code>object score</code>阈值，比如低于0.6的去除</li>
+<li>设置<code>IOU</code>阈值，进行<code>Non-maximum Suppression</code></li>
+</ul>
+</li>
+</ol>
+<h1 id="Implementation-in-PyTorch"><a href="#Implementation-in-PyTorch" class="headerlink" title="Implementation in PyTorch"></a>Implementation in PyTorch</h1><p><img src="https://image.beenli.cn/img/20201225/hGvI8gvYywrx.png?imageslim" alt="mark"></p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ol>
+<li><a href="https://blog.paperspace.com/how-to-implement-a-yolo-object-detector-in-pytorch/">how-to-implement-a-yolo-object-detector-in-pytorch</a></li>
+<li><a href="https://arxiv.org/pdf/1506.02640.pdf">YOLO V1: You Only Look Once: Unified, Real-Time Object Detection</a></li>
+<li><a href="https://arxiv.org/pdf/1612.08242.pdf">YOLO V2: YOLO9000: Better, Faster, Stronger</a></li>
+<li><a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf">YOLO V3: An Incremental Improvement</a></li>
+<li><a href="https://www.youtube.com/watch?v=DNEm4fJ-rto">IOU</a></li>
+<li><a href="https://arxiv.org/pdf/1311.2524.pdf">Bounding Box Regression (Appendix C)</a></li>
+<li><a href="https://www.youtube.com/watch?v=A46HZGR5fMw">Non maximum suppresion</a></li>
+<li><a href="http://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html">PyTorch Official Tutorial</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Programming</category>
+        <category>ML</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
+        <tag>PyTorch</tag>
+      </tags>
   </entry>
   <entry>
     <title>AMBA AHB spec(2)--bus interface</title>
@@ -1615,6 +1674,94 @@ pass result values back from the invocation of a task. A function is used as an 
       </tags>
   </entry>
   <entry>
+    <title>git hooks自动部署hexo</title>
+    <url>/posts/fb29ac9a/</url>
+    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" alt="git hooks"></p>
+<h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol>
+<li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p>
+<ol>
+<li><p><code>adduser git</code>(创建一个用户)</p>
+</li>
+<li><p>可以给创建的用户设置密钥<code>passwd git</code></p>
+</li>
+<li><p>赋予git用户sudo权限</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">chmod 740 /etc/sudoers<br>      <br></code></pre></td></tr></tbody></table></figure>
+<p>vim  /etc/sudoer</p>
+<figure class="highlight awk"><table><tbody><tr><td class="code"><pre><code class="hljs awk"><br>      `给git用户添加命令权限如下`<br>    <br>      保存后退出，修改回文件权限`chmod <span class="hljs-number">440</span> <span class="hljs-regexp">/etc/</span>sudoers`<br>      <br>      ![mark](http:<span class="hljs-regexp">//im</span>age.beenli.cn<span class="hljs-regexp">/img/</span><span class="hljs-number">20200408</span>/cSLiyuqjcxOU.jpg?imageslim)<br><br><span class="hljs-number">2</span>. 初始化git仓库<br><br>   ```bash<br>   su git				<span class="hljs-regexp">//</span>切换至git用户<br>   mkdir blog.git		<span class="hljs-regexp">//</span>创建仓库文件夹<br>   cd blog.git			<span class="hljs-regexp">//</span>进入文件夹<br>   git init --bare		<span class="hljs-regexp">//</span>使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区<br></code></pre></td></tr></tbody></table></figure></li>
+</ol>
+</li>
+<li><p>创建网站目录</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录<br>sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git<br>(这一步很重要，否者后续提交没有权限)<br></code></pre></td></tr></tbody></table></figure></li>
+<li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)<br><span class="hljs-built_in">cd</span> .ssh<br>touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种<br></code></pre></td></tr></tbody></table></figure></li>
+<li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录<br>touch post-receive				 //创建post-receive文件<br>chmod +x post-receive			 //赋予其可执行权限<br></code></pre></td></tr></tbody></table></figure>
+<blockquote>
+<p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p>
+</blockquote>
+<p>复制该段代码到刚刚创建的post-receive文件</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span><br><br>GIT_REPO=/home/git/blog.git<br>TMP_GIT_CLONE=/tmp/blog<br>PUBLIC_WWW=/var/www/blog<br><br>rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span><br>git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span><br>rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*<br>cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span><br></code></pre></td></tr></tbody></table></figure>
+<p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p>
+</li>
+<li><p>最后配置hexo的<code>_config.yml</code></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">deploy:<br>    <span class="hljs-built_in">type</span>: git<br>    repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span><br>    branch: master<br></code></pre></td></tr></tbody></table></figure>
+</li>
+</ol>
+<hr>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div>
+
+<p>[1] <a href="https://tding.top/archives/12a4e7e6.html">Hexo 博客部署到 VPS</a></p>
+<p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">git hooks</a></p>
+]]></content>
+      <categories>
+        <category>Software</category>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>git</tag>
+        <tag>Hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>jupyterlab environment</title>
+    <url>/posts/e121429a/</url>
+    <content><![CDATA[<blockquote>
+<p>The blog is derived from the transition of <a href="https://jupyterlab.readthedocs.io/en/stable/index.html">JupyterLab document</a></p>
+</blockquote>
+<h1 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h1><blockquote>
+<p>JupyterLab is the next-generation web-based user interface for Project Jupyter.</p>
+<p>JupyterLab enables you to work with documents and activities such as <a href="https://jupyterlab.readthedocs.io/en/stable/user/notebook.html#notebook">Jupyter notebooks</a>, text editors, terminals, and custom components in a flexible, integrated, and extensible manner.</p>
+<p>jupyterlab是下一代基于web的Jupyter项目用户界面；它能让你以灵活、集成和可扩展的方式与文档和活动一起工作，比如notebook，文本编辑器，终端还有自定义组件。</p>
+</blockquote>
+<h1 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h1><ol>
+<li><p>prerequisite</p>
+<p>安装notebook</p>
+<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><code class="hljs shell">conda install -c conda-forge notebook<br></code></pre></td></tr></tbody></table></figure></li>
+<li><p>安装jupyterlab</p>
+<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><code class="hljs shell">conda install -c conda-forge jupyterlab<br></code></pre></td></tr></tbody></table></figure>
+<h1 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h1></li>
+<li><p>在conda prompt中敲如下命令</p>
+<figure class="highlight ebnf"><table><tbody><tr><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">jupyter lab</span><br></code></pre></td></tr></tbody></table></figure></li>
+<li><p>jupyter lab会自动在浏览器中打开</p>
+ <figure class="highlight elixir"><table><tbody><tr><td class="code"><pre><code class="hljs elixir">http(s)<span class="hljs-symbol">://&lt;server</span><span class="hljs-symbol">:port&gt;/&lt;lab-location&gt;/lab</span><br></code></pre></td></tr></tbody></table></figure>
+<p> 因为JupyterLab是<code>jupyter notebook</code>一个服务器扩展，所以你也能够通过调用<code>jupyter notebook</code>并访问/lab URL来登录JupyterLab。</p>
+</li>
+<li><p>如果👆有问题,多半是kernel有问题;</p>
+<p> 首先尝试建立一个干净的jupyter环境</p>
+ <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><code class="hljs sh">conda create -n jlab-test --override-channels --strict-channel-priority -c conda-forge -c anaconda jupyterlab		// 创建一个新的环境<br>conda activate jlab-test				// 切换到该环境<br>jupyter lab							   // 启动jupyterlab<br></code></pre></td></tr></tbody></table></figure>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Software</category>
+        <category>jupyter</category>
+      </categories>
+      <tags>
+        <tag>python</tag>
+        <tag>toolkits</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>VIM Plug-in</title>
     <url>/posts/b71407e8/</url>
     <content><![CDATA[<h2 id="VIM-Plugs"><a href="#VIM-Plugs" class="headerlink" title="VIM-Plugs"></a><center>VIM-Plugs</center></h2><h5 id="1、vim-plug-插件管理器"><a href="#1、vim-plug-插件管理器" class="headerlink" title="1、vim-plug: 插件管理器"></a>1、<a href="https://github.com/junegunn/vim-plug">vim-plug</a>: 插件管理器</h5><figure class="highlight plain"><table><tbody><tr><td class="code"><pre><code class="hljs CQL">call plug#begin('D:/App/vim/vim81/vimfiles/plugs')//插件安装目录(可以随意定)<br><br>" Shorthand notation for plugin<br>Plug 'foo/bar'                   //插件下载地址，GitHub可以简写<br><br>call plug#end()					// 函数结束标志<br></code></pre></td></tr></tbody></table></figure>
@@ -1736,91 +1883,24 @@ pass result values back from the invocation of a task. A function is used as an 
       </tags>
   </entry>
   <entry>
-    <title>git hooks自动部署hexo</title>
-    <url>/posts/fb29ac9a/</url>
-    <content><![CDATA[<h2 id="git-hooks-自动部署hexo"><a href="#git-hooks-自动部署hexo" class="headerlink" title="git hooks 自动部署hexo"></a><center>git hooks 自动部署hexo</center></h2><h2 id="1、原理大致如下"><a href="#1、原理大致如下" class="headerlink" title="1、原理大致如下"></a>1、原理大致如下</h2><p><img src="http://image.beenli.cn/img/20200408/OX4sMTrK26wD.png?imageslim" alt="git hooks"></p>
-<h2 id="2、实施过程"><a href="#2、实施过程" class="headerlink" title="2、实施过程"></a>2、实施过程</h2><ol>
-<li><p>在服务器上搭建一个git服务器<a href="#link"><sup>1</sup></a></p>
-<ol>
-<li><p><code>adduser git</code>(创建一个用户)</p>
-</li>
-<li><p>可以给创建的用户设置密钥<code>passwd git</code></p>
-</li>
-<li><p>赋予git用户sudo权限</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">chmod 740 /etc/sudoers<br>      <br></code></pre></td></tr></tbody></table></figure>
-<p>vim  /etc/sudoer</p>
-<figure class="highlight awk"><table><tbody><tr><td class="code"><pre><code class="hljs awk"><br>      `给git用户添加命令权限如下`<br>    <br>      保存后退出，修改回文件权限`chmod <span class="hljs-number">440</span> <span class="hljs-regexp">/etc/</span>sudoers`<br>      <br>      ![mark](http:<span class="hljs-regexp">//im</span>age.beenli.cn<span class="hljs-regexp">/img/</span><span class="hljs-number">20200408</span>/cSLiyuqjcxOU.jpg?imageslim)<br><br><span class="hljs-number">2</span>. 初始化git仓库<br><br>   ```bash<br>   su git				<span class="hljs-regexp">//</span>切换至git用户<br>   mkdir blog.git		<span class="hljs-regexp">//</span>创建仓库文件夹<br>   cd blog.git			<span class="hljs-regexp">//</span>进入文件夹<br>   git init --bare		<span class="hljs-regexp">//</span>使用--bare参数初始化为裸仓库，这样创建的仓库不包含工作区<br></code></pre></td></tr></tbody></table></figure></li>
-</ol>
-</li>
-<li><p>创建网站目录</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">sudo mkdir /var/www/blog					//创建网站根目录<br>sudo chown -R git.git /var/www/blog		//把blog目录以及子目录属组改为git<br>(这一步很重要，否者后续提交没有权限)<br></code></pre></td></tr></tbody></table></figure></li>
-<li><p>配置密钥[详情见:ssh协议](<a href="https://www.beenli.cn/posts/782a8ece/">https://www.beenli.cn/posts/782a8ece/</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">mkdir .ssh				//创建.ssh目录(默认你在git用户的~目录下)<br><span class="hljs-built_in">cd</span> .ssh<br>touch authorized_keys	//把你本地生成的公钥拷贝到此文件夹种<br></code></pre></td></tr></tbody></table></figure></li>
-<li><p>配置<code>hooks</code>(git 用户下)<a href="#link"><sup>2</sup></a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> ~/blog.git/hooks					//切换到hooks目录<br>touch post-receive				 //创建post-receive文件<br>chmod +x post-receive			 //赋予其可执行权限<br></code></pre></td></tr></tbody></table></figure>
-<blockquote>
-<p>The <code>post-receive</code> hook runs after the entire process is completed and can be used to update other services or notify users. It takes the same stdin data as the <code>pre-receive</code> hook. Examples include emailing a list, notifying a continuous integration server, or updating a ticket-tracking system – you can even parse the commit messages to see if any tickets need to be opened, modified, or closed. This script can’t stop the push process, but the client doesn’t disconnect until it has completed, so be careful if you try to do anything that may take a long time.</p>
-</blockquote>
-<p>复制该段代码到刚刚创建的post-receive文件</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash"><span class="hljs-meta">#!/bin/bash</span><br><span class="hljs-built_in">echo</span> <span class="hljs-string">"post-receive hook is running..."</span><br><br>GIT_REPO=/home/git/blog.git<br>TMP_GIT_CLONE=/tmp/blog<br>PUBLIC_WWW=/var/www/blog<br><br>rm -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span><br>git <span class="hljs-built_in">clone</span> <span class="hljs-variable">$GIT_REPO</span> <span class="hljs-variable">$TMP_GIT_CLONE</span><br>rm -rf <span class="hljs-variable">${PUBLIC_WWW}</span>/*<br>cp -rf <span class="hljs-variable">${TMP_GIT_CLONE}</span>/* <span class="hljs-variable">${PUBLIC_WWW}</span><br></code></pre></td></tr></tbody></table></figure>
-<p>在执行<code>cp</code>（复制)命令的时候，<code>.git</code> 作为隐藏目录不会被拷贝到 Web 根目录下，也就避免了将整个仓库历史暴露在 Web 服务中。</p>
-</li>
-<li><p>最后配置hexo的<code>_config.yml</code></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">deploy:<br>    <span class="hljs-built_in">type</span>: git<br>    repository: git@VPS IP:/~/blog.git  <span class="hljs-comment"># 默认22端口</span><br>    branch: master<br></code></pre></td></tr></tbody></table></figure>
-</li>
-</ol>
+    <title>单链表翻转</title>
+    <url>/posts/39c22857/</url>
+    <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a><center>单链表翻转</center></h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><figure class="highlight c"><table><tbody><tr><td class="code"><pre><code class="hljs c"><span class="hljs-function">struct ListNode *<span class="hljs-title">reverseList</span><span class="hljs-params">(struct ListNode* head)</span></span>{<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNOde</span> *<span class="hljs-title">newHead</span> =</span> NUll;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">node</span> =</span> <span class="hljs-literal">NULL</span>;<br>    <span class="hljs-keyword">while</span> (head != <span class="hljs-literal">NULL</span>) {<br>        <span class="hljs-comment">//1. 对之前的链表做头删</span><br>        node = head; <span class="hljs-comment">// node始终指向head的前驱</span><br>        head = head-&gt;next;<br><br>        <span class="hljs-comment">//2. 对新链表做头插</span><br>        node-&gt;next = newHead;<br>        newHead = node;<br>    }<br>    <span class="hljs-keyword">return</span> newHead;<br>}<br></code></pre></td></tr></tbody></table></figure>
+<a id="more"></a>
+<p><img src="/assets/photoes/reverse_linked_list.jpg" style="zoom:80%;"></p>
 <hr>
-<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><div id="link"></div>
-
-<p>[1] <a href="https://tding.top/archives/12a4e7e6.html">Hexo 博客部署到 VPS</a></p>
-<p>[2] <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">git hooks</a></p>
+<h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><figure class="highlight c"><table><tbody><tr><td class="code"><pre><code class="hljs c"><span class="hljs-function">struct ListNode *<span class="hljs-title">reverseList</span><span class="hljs-params">(struct ListNode* head)</span> </span>{<br>	<span class="hljs-keyword">if</span> (head == <span class="hljs-literal">NULL</span>) { <span class="hljs-comment">// 如果为NULL，那么后指针越界。</span><br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>	}<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">p0</span> =</span> <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">p1</span> =</span> head;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">p2</span> =</span> head-&gt;next;<br>	<span class="hljs-keyword">while</span> (p1 != <span class="hljs-literal">NULL</span>) {<br>		p1-&gt;next = p0;<br><br>		p0 = p1; <br>		p1 = p2;<br>		<span class="hljs-keyword">if</span> (p2 != <span class="hljs-literal">NULL</span>) {<br>			p2 = p2-&gt;next;<br>		}<br>	}<br>	<span class="hljs-keyword">return</span> p0;<br>}<br></code></pre></td></tr></tbody></table></figure>
+<p><img src="/assets/photoes/three_pointer.jpg" style="zoom:80%;"></p>
+<blockquote>
+<p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387">参考博客</a></p>
+</blockquote>
 ]]></content>
       <categories>
-        <category>Software</category>
-        <category>Git</category>
+        <category>CS</category>
+        <category>Data Structure</category>
       </categories>
       <tags>
-        <tag>git</tag>
-        <tag>Hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>jupyterlab environment</title>
-    <url>/posts/e121429a/</url>
-    <content><![CDATA[<blockquote>
-<p>The blog is derived from the transition of <a href="https://jupyterlab.readthedocs.io/en/stable/index.html">JupyterLab document</a></p>
-</blockquote>
-<h1 id="Preface"><a href="#Preface" class="headerlink" title="Preface"></a>Preface</h1><blockquote>
-<p>JupyterLab is the next-generation web-based user interface for Project Jupyter.</p>
-<p>JupyterLab enables you to work with documents and activities such as <a href="https://jupyterlab.readthedocs.io/en/stable/user/notebook.html#notebook">Jupyter notebooks</a>, text editors, terminals, and custom components in a flexible, integrated, and extensible manner.</p>
-<p>jupyterlab是下一代基于web的Jupyter项目用户界面；它能让你以灵活、集成和可扩展的方式与文档和活动一起工作，比如notebook，文本编辑器，终端还有自定义组件。</p>
-</blockquote>
-<h1 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h1><ol>
-<li><p>prerequisite</p>
-<p>安装notebook</p>
-<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><code class="hljs shell">conda install -c conda-forge notebook<br></code></pre></td></tr></tbody></table></figure></li>
-<li><p>安装jupyterlab</p>
-<figure class="highlight shell"><table><tbody><tr><td class="code"><pre><code class="hljs shell">conda install -c conda-forge jupyterlab<br></code></pre></td></tr></tbody></table></figure>
-<h1 id="Start"><a href="#Start" class="headerlink" title="Start"></a>Start</h1></li>
-<li><p>在conda prompt中敲如下命令</p>
-<figure class="highlight ebnf"><table><tbody><tr><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">jupyter lab</span><br></code></pre></td></tr></tbody></table></figure></li>
-<li><p>jupyter lab会自动在浏览器中打开</p>
- <figure class="highlight elixir"><table><tbody><tr><td class="code"><pre><code class="hljs elixir">http(s)<span class="hljs-symbol">://&lt;server</span><span class="hljs-symbol">:port&gt;/&lt;lab-location&gt;/lab</span><br></code></pre></td></tr></tbody></table></figure>
-<p> 因为JupyterLab是<code>jupyter notebook</code>一个服务器扩展，所以你也能够通过调用<code>jupyter notebook</code>并访问/lab URL来登录JupyterLab。</p>
-</li>
-<li><p>如果👆有问题,多半是kernel有问题;</p>
-<p> 首先尝试建立一个干净的jupyter环境</p>
- <figure class="highlight sh"><table><tbody><tr><td class="code"><pre><code class="hljs sh">conda create -n jlab-test --override-channels --strict-channel-priority -c conda-forge -c anaconda jupyterlab		// 创建一个新的环境<br>conda activate jlab-test				// 切换到该环境<br>jupyter lab							   // 启动jupyterlab<br></code></pre></td></tr></tbody></table></figure>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Software</category>
-        <category>jupyter</category>
-      </categories>
-      <tags>
-        <tag>python</tag>
-        <tag>toolkits</tag>
+        <tag>C</tag>
       </tags>
   </entry>
   <entry>
@@ -2018,27 +2098,6 @@ pass result values back from the invocation of a task. A function is used as an 
       </categories>
       <tags>
         <tag>specification</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>单链表翻转</title>
-    <url>/posts/39c22857/</url>
-    <content><![CDATA[<h5 id="单链表翻转"><a href="#单链表翻转" class="headerlink" title="单链表翻转"></a><center>单链表翻转</center></h5><h6 id="解法一、拆卸-拼接"><a href="#解法一、拆卸-拼接" class="headerlink" title="解法一、拆卸+拼接"></a><code>解法一</code>、拆卸+拼接</h6><figure class="highlight c"><table><tbody><tr><td class="code"><pre><code class="hljs c"><span class="hljs-function">struct ListNode *<span class="hljs-title">reverseList</span><span class="hljs-params">(struct ListNode* head)</span></span>{<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNOde</span> *<span class="hljs-title">newHead</span> =</span> NUll;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">node</span> =</span> <span class="hljs-literal">NULL</span>;<br>    <span class="hljs-keyword">while</span> (head != <span class="hljs-literal">NULL</span>) {<br>        <span class="hljs-comment">//1. 对之前的链表做头删</span><br>        node = head; <span class="hljs-comment">// node始终指向head的前驱</span><br>        head = head-&gt;next;<br><br>        <span class="hljs-comment">//2. 对新链表做头插</span><br>        node-&gt;next = newHead;<br>        newHead = node;<br>    }<br>    <span class="hljs-keyword">return</span> newHead;<br>}<br></code></pre></td></tr></tbody></table></figure>
-<a id="more"></a>
-<p><img src="/assets/photoes/reverse_linked_list.jpg" style="zoom:80%;"></p>
-<hr>
-<h6 id="解法二、三指针法"><a href="#解法二、三指针法" class="headerlink" title="解法二、三指针法"></a><code>解法二</code>、三指针法</h6><figure class="highlight c"><table><tbody><tr><td class="code"><pre><code class="hljs c"><span class="hljs-function">struct ListNode *<span class="hljs-title">reverseList</span><span class="hljs-params">(struct ListNode* head)</span> </span>{<br>	<span class="hljs-keyword">if</span> (head == <span class="hljs-literal">NULL</span>) { <span class="hljs-comment">// 如果为NULL，那么后指针越界。</span><br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>	}<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">p0</span> =</span> <span class="hljs-literal">NULL</span>;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">p1</span> =</span> head;<br>	<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ListNode</span> *<span class="hljs-title">p2</span> =</span> head-&gt;next;<br>	<span class="hljs-keyword">while</span> (p1 != <span class="hljs-literal">NULL</span>) {<br>		p1-&gt;next = p0;<br><br>		p0 = p1; <br>		p1 = p2;<br>		<span class="hljs-keyword">if</span> (p2 != <span class="hljs-literal">NULL</span>) {<br>			p2 = p2-&gt;next;<br>		}<br>	}<br>	<span class="hljs-keyword">return</span> p0;<br>}<br></code></pre></td></tr></tbody></table></figure>
-<p><img src="/assets/photoes/three_pointer.jpg" style="zoom:80%;"></p>
-<blockquote>
-<p><a href="https://blog.csdn.net/qq_42351880/article/details/88637387">参考博客</a></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>CS</category>
-        <category>Data Structure</category>
-      </categories>
-      <tags>
-        <tag>C</tag>
       </tags>
   </entry>
   <entry>

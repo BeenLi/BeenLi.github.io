@@ -8,9 +8,27 @@
     <link href="/posts/9e0400c7/"/>
     <url>/posts/9e0400c7/</url>
     
-    <content type="html"><![CDATA[]]></content>
+    <content type="html"><![CDATA[<h1 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h1><blockquote><p><code>YOLO</code>, aka “You Only Look Once”—&gt; 名字是不是很酷</p><p>YOLO是<code>object detection</code>领域非常出名的算法，它以速度快同时兼顾性能著称。</p></blockquote><h2 id="1-Net-Architecture"><a href="#1-Net-Architecture" class="headerlink" title="1 Net Architecture"></a>1 Net Architecture</h2><p><img src="https://image.beenli.cn/img/20201225/3crM6aHe8hd1.png?imageslim" alt="Figure1 YOLOv3 Network Architecture"></p><p><img src="https://image.beenli.cn/img/20201225/OyauoNS5dlmi.png?imageslim" alt="Figure2 Yolo_v3_Structure"></p><ul><li><code>concatenate层</code>在Yolo里面叫做<code>route</code>层</li><li><code>res_unit层</code>在Yolo里面叫做<code>shortcut</code>层</li><li><code>detection层</code>在Yolo里面叫做<code>yolo</code>层</li></ul><h2 id="2-Details"><a href="#2-Details" class="headerlink" title="2 Details"></a>2 Details</h2><p><img src="https://image.beenli.cn/img/20201225/Fewd3cB5ftsc.png?imageslim" alt="Figure3 Yolov3 anchor box"></p><ol><li><p>输入层:<code>416*416*3</code></p></li><li><p>将输入划分为$S * S$ grid, 每个格子有三个预先设定好长($p_w$)和宽($p_h$)的anchor box；如果物体的中心落在哪个grid, 那个grid就负责探测该物体。</p><p><img src="https://image.beenli.cn/img/20201225/msBsRFJ838Rv.png?imageslim" alt="coordinate transform"></p></li><li><p>每个anchor box有85个数据[$t_x, t_y, t_w, t_h, objectscore, c1, c2…]$，分别代表：</p><ul><li>预测框中心点坐标：网络实际输出的是$t_x 和 t_y$, 为了让该cell预测的物体中心一定落在该cell上，加了个sigmoid函数。</li><li>预测框长和宽: 防止梯度下降不稳定，所以进行了对数空间变换，网络给出$t_x, t_h$, 真实的长和宽由👆公式计算。</li><li>是否有物体的概率: 如果没有物体，后续类别的置信分数将没有作用</li><li>一共预测80个类别，每个类别的置信分数。</li></ul></li></ol><p><img src="https://image.beenli.cn/img/20201225/OEr4juQiwsBl.jpg?imageslim" alt="scale output"></p><ol><li><p>有三种scale的输出层，分别为：<code>13 * 13 * 85；26 * 26 * 85；52 * 52 * 85</code>；</p><p>每个cell有三个anchor box;所以每个输入一共有$(13\times13+26\times26+52\times52)\times3=10647$个预测框</p></li><li><p>这么多输出框肯定绝大部分是重复预测或者不正确的预测，需要剔除不好的框</p><ul><li>设置<code>object score</code>阈值，比如低于0.6的去除</li><li>设置<code>IOU</code>阈值，进行<code>Non-maximum Suppression</code></li></ul></li></ol><h1 id="Implementation-in-PyTorch"><a href="#Implementation-in-PyTorch" class="headerlink" title="Implementation in PyTorch"></a>Implementation in PyTorch</h1><p><img src="https://image.beenli.cn/img/20201225/hGvI8gvYywrx.png?imageslim" alt="mark"></p><h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ol><li><a href="https://blog.paperspace.com/how-to-implement-a-yolo-object-detector-in-pytorch/">how-to-implement-a-yolo-object-detector-in-pytorch</a></li><li><a href="https://arxiv.org/pdf/1506.02640.pdf">YOLO V1: You Only Look Once: Unified, Real-Time Object Detection</a></li><li><a href="https://arxiv.org/pdf/1612.08242.pdf">YOLO V2: YOLO9000: Better, Faster, Stronger</a></li><li><a href="https://pjreddie.com/media/files/papers/YOLOv3.pdf">YOLO V3: An Incremental Improvement</a></li><li><a href="https://www.youtube.com/watch?v=DNEm4fJ-rto">IOU</a></li><li><a href="https://arxiv.org/pdf/1311.2524.pdf">Bounding Box Regression (Appendix C)</a></li><li><a href="https://www.youtube.com/watch?v=A46HZGR5fMw">Non maximum suppresion</a></li><li><a href="http://pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html">PyTorch Official Tutorial</a></li></ol>]]></content>
     
     
+    <categories>
+      
+      <category>CS</category>
+      
+      <category>Programming</category>
+      
+      <category>ML</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>python</tag>
+      
+      <tag>PyTorch</tag>
+      
+    </tags>
     
   </entry>
   
