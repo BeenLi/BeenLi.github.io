@@ -1214,80 +1214,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Linux常用命令</title>
-    <url>/posts/d0edc1ed/</url>
-    <content><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol>
-<li><p>建立软链接<a href="https://man.linuxde.net/ln:link">ln</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">ln -s [源文件] [链接文件] (创建软链接)<br></code></pre></td></tr></tbody></table></figure>
-<p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">ln -s ~/oslab/gdb /usr/<span class="hljs-built_in">local</span>/bin/gdb<br></code></pre></td></tr></tbody></table></figure>
-<p class="note note-info">ln -snf  ~/oslab/xxx /usr/local/bin/gdb(修改)</p>
-
-<hr>
-</li>
-<li><p>移动文件<a href="https://man.linuxde.net/mv">mv</a></p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">mv [<span class="hljs-built_in">source</span>] [target]<br></code></pre></td></tr></tbody></table></figure>
-<p>例如：</p>
-<ol>
-<li>​    <code>mv ~/oslab/oslab/*  ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li>
-<li><code>mv  a.txt  b.tax</code> 把文件名a.txt改为b.txt</li>
-</ol>
-<hr>
-</li>
-<li><p>设置权限<a href="https://man.linuxde.net/chmod">chmod</a>；<a href="https://man.linuxde.net/chown">chown</a></p>
-<p><code>r</code> 读取权限，数字代号为<code>4</code>;<br><code>w</code> 写入权限，数字代号为<code>2</code>；<br><code>x</code> 执行或切换权限，数字代号为<code>1</code>；<br><code>-</code> 不具任何权限，数字代号为<code>0</code>；    </p>
-</li>
-</ol>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center">7</th>
-<th style="text-align:center">rwx</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center"><strong>6</strong></td>
-<td style="text-align:center"><strong>rw-</strong></td>
-</tr>
-<tr>
-<td style="text-align:center"><strong>5</strong></td>
-<td style="text-align:center"><strong>r-x</strong></td>
-</tr>
-<tr>
-<td style="text-align:center"><strong>4</strong></td>
-<td style="text-align:center"><strong>r—</strong></td>
-</tr>
-<tr>
-<td style="text-align:center"><strong>3</strong></td>
-<td style="text-align:center"><strong>-wx</strong></td>
-</tr>
-<tr>
-<td style="text-align:center"><strong>2</strong></td>
-<td style="text-align:center"><strong>-w-</strong></td>
-</tr>
-<tr>
-<td style="text-align:center"><strong>1</strong></td>
-<td style="text-align:center"><strong>—x</strong></td>
-</tr>
-<tr>
-<td style="text-align:center"><strong>0</strong></td>
-<td style="text-align:center"><strong>—-</strong></td>
-</tr>
-</tbody>
-</table>
-</div>
-   <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">chmod u+x,g+w f0　　			 //为文件f0设置自己可以执行，组员可以写入的权限<br>chmod u=rwx,g=rw,o=r f0	 	  //为文件f0设置自己可以读写执行，同组可以读写。其他人可以读<br>chmod 764 f0				  // 效果同上<br>chmod a+x f0				  // 所有人都可以执行<br><br>chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子目录的文件属主改成 liu：<br></code></pre></td></tr></tbody></table></figure>
-]]></content>
-      <categories>
-        <category>Linux</category>
-      </categories>
-      <tags>
-        <tag>toolkits</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>IEEE Standard(1)--Conventions</title>
     <url>/posts/7b1b9603/</url>
     <content><![CDATA[<h1 id="1、Overview"><a href="#1、Overview" class="headerlink" title="1、Overview"></a>1、Overview</h1><h2 id="1-1-Convention"><a href="#1-1-Convention" class="headerlink" title="1.1 Convention"></a>1.1 Convention</h2><p><code>shall</code>: 用于法定的要求（mandatory requirement）</p>
@@ -1478,6 +1404,80 @@
       </categories>
       <tags>
         <tag>specification</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Linux常用命令</title>
+    <url>/posts/d0edc1ed/</url>
+    <content><![CDATA[<h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a><center>Linux常用命令</center></h2><ol>
+<li><p>建立软链接<a href="https://man.linuxde.net/ln:link">ln</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">ln -s [源文件] [链接文件] (创建软链接)<br></code></pre></td></tr></tbody></table></figure>
+<p>例如：在<code>~/oslab/</code>下有一个可执行文件<code>gdb</code><br>你只能用<code>./gdb</code>去执行它。<br>但是你可以把它链接到<code>$PATH</code>下，这样你可以在任意路径都可以执行</p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">ln -s ~/oslab/gdb /usr/<span class="hljs-built_in">local</span>/bin/gdb<br></code></pre></td></tr></tbody></table></figure>
+<p class="note note-info">ln -snf  ~/oslab/xxx /usr/local/bin/gdb(修改)</p>
+
+<hr>
+</li>
+<li><p>移动文件<a href="https://man.linuxde.net/mv">mv</a></p>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">mv [<span class="hljs-built_in">source</span>] [target]<br></code></pre></td></tr></tbody></table></figure>
+<p>例如：</p>
+<ol>
+<li>​    <code>mv ~/oslab/oslab/*  ~/oslab/</code> (把<code>~/oslab/oslab/</code>下的文件全部 复制到<code>~/oslab/</code>)</li>
+<li><code>mv  a.txt  b.tax</code> 把文件名a.txt改为b.txt</li>
+</ol>
+<hr>
+</li>
+<li><p>设置权限<a href="https://man.linuxde.net/chmod">chmod</a>；<a href="https://man.linuxde.net/chown">chown</a></p>
+<p><code>r</code> 读取权限，数字代号为<code>4</code>;<br><code>w</code> 写入权限，数字代号为<code>2</code>；<br><code>x</code> 执行或切换权限，数字代号为<code>1</code>；<br><code>-</code> 不具任何权限，数字代号为<code>0</code>；    </p>
+</li>
+</ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">7</th>
+<th style="text-align:center">rwx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>6</strong></td>
+<td style="text-align:center"><strong>rw-</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>5</strong></td>
+<td style="text-align:center"><strong>r-x</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>4</strong></td>
+<td style="text-align:center"><strong>r—</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>3</strong></td>
+<td style="text-align:center"><strong>-wx</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>2</strong></td>
+<td style="text-align:center"><strong>-w-</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>1</strong></td>
+<td style="text-align:center"><strong>—x</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>0</strong></td>
+<td style="text-align:center"><strong>—-</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+   <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">chmod u+x,g+w f0　　			 //为文件f0设置自己可以执行，组员可以写入的权限<br>chmod u=rwx,g=rw,o=r f0	 	  //为文件f0设置自己可以读写执行，同组可以读写。其他人可以读<br>chmod 764 f0				  // 效果同上<br>chmod a+x f0				  // 所有人都可以执行<br><br>chown -R liu /usr/meng		  //将目录/usr/meng及其下面的所有文件、子目录的文件属主改成 liu：<br></code></pre></td></tr></tbody></table></figure>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>toolkits</tag>
       </tags>
   </entry>
   <entry>
