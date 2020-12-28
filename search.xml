@@ -1509,13 +1509,13 @@
 <ol>
 <li><p>自行把刚刚上传的公钥上传到服务器指定用户<code>.ssh/</code>目录下的<code>authorized_keys</code>下。（认证密钥可以有很多把，多个localhost可以各自上传自己的🔒到服务器上。也可以所有人公用一把锁。）</p>
 </li>
-<li><p><code>ssh-copy-id -i [./y.pub] username@vps ip(-i指定路径，默认是在.ssh下)</code></p>
+<li><p><code>ssh-copy-id -i [./y.pub] username@ip (-i指定路径，默认是在.ssh下)</code></p>
 <p>这一步也是要认证密码的。不然什么人都可以上锁就乱套。</p>
 </li>
 </ol>
 </li>
 <li><p>免密登录服务器</p>
-<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">ssh -i[dir] username@vps ip(-i指定密钥所在，默认在.ssh/下)<br></code></pre></td></tr></tbody></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">ssh -i[dir] username@ip (-i指定密钥所在，默认在.ssh/下)<br></code></pre></td></tr></tbody></table></figure>
 <p class="note note-success">如果之前产生密钥对时设置了密码，这里还是要输入一遍哪个密码的。如果为空就可以直接免密进入了</p>
 </li>
 <li><p>脚本文件加速登录<a href="#link"><sup>2</sup></a></p>
