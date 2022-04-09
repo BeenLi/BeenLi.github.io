@@ -749,7 +749,7 @@
 </ul>
 <h2 id="2-4-gem5常见的模型"><a href="#2-4-gem5常见的模型" class="headerlink" title="2.4 gem5常见的模型"></a>2.4 gem5常见的模型</h2><ol>
 <li><p><code>CPU 模型</code></p>
-<p><img src="CPU model.png" alt="cpu model"></p>
+<p><img src="https://image.beenli.cn/CPU%20model.png?imageslim" alt="cpu model"></p>
 <ul>
 <li>从左到右建模得越来越详细，实现的功能也更多，但是仿真速度越来越慢。</li>
 </ul>
@@ -775,7 +775,7 @@
 </div>
 <ol>
 <li><p><code>内存 模型</code></p>
-<p><img src="Memory system.png" alt="memory system"></p>
+<p><img src="https://image.beenli.cn/Memory%20system.png?imageslim" alt="memory system"></p>
 <ul>
 <li>gem5提供两种内存模型：<code>Classic</code> 和 <code>Ruby</code></li>
 <li>在上图的例子中不需要使用Ruby选项运行gem5。但是如果研究缓存一致性协议，则可能需要使用Ruby模型，因为它提供了扩展性好的内存系统(SLICC用于缓存协议的领域专用语言），详细的统计数据和部件仿真模型。</li>
@@ -807,7 +807,7 @@
 <p>所有的仿真对象需要放在<code>gem5/src</code>目录下面，每次修改后需要重新编译，才能在仿真脚本中引用得到。</p>
 </blockquote>
 <ol>
-<li><p><code>Python file</code><br> <img src="python file.png" alt="Python file"></p>
+<li><p><code>Python file</code><br> <img src="https://image.beenli.cn/python%20file.png?imageslim" alt="Python file"></p>
 <ul>
 <li>创建一个与C++对象同名的类，并继承SimObject</li>
 <li>指明C++头文件位置(相对gem5/src目录的位置)</li>
@@ -815,15 +815,15 @@
 </ul>
 </li>
 <li><p><code>C++文件</code>(一个头文件声明，一个文件进行函数实现)</p>
-<p><img src="c++ head file.png" alt="c++ head file"></p>
-<p><img src="c++ file.png" alt="C++文件"></p>
+<p><img src="https://image.beenli.cn/c++%20head%20file.png?imageslim" alt="c++ head file"></p>
+<p><img src="https://image.beenli.cn/c++%20file.png?imageslim" alt="C++文件"></p>
 <ul>
 <li>C++对象继承SimObject,同时使用<code>member initializer lists(成员初始化列表)</code>给类成员在构造函数中赋初值</li>
 <li>gem5有一种机制，根据python对象名自动创建一个<code>xxxParams</code>类，并且该类包含了python文件中给的初始值。</li>
 </ul>
 </li>
 <li><p>SConscript文件(类似cmake中的CMakeLists.txt)</p>
-<p> <img src="scons file.png" alt="scons file"></p>
+<p> <img src="https://image.beenli.cn/scons%20file.png?imageslim" alt="scons file"></p>
 <ul>
 <li>SConscript相当于python脚本，可以写任何符合python语法的程序。</li>
 <li>Import，DebugFlag，SimObject, Source都是Scons提供的方法，便于用户使用。</li>
@@ -848,7 +848,7 @@
 <p>仿真命令类似如下：</p>
 <p><code>build/ARM/gem5.opt --debug-flags=HelloExample configs/learning_gem5/part2/hello_goodbye.py</code></p>
 </blockquote>
-<p><img src="helloExample.png" alt="仿真结果"></p>
+<p><img src="https://image.beenli.cn/helloExample.png?imageslim" alt="仿真结果"></p>
 <blockquote>
 <hr>
 <p>完整的实验步骤请参考<a href="https://www.gem5.org/documentation/learning_gem5/part2/helloobject/">官网教程</a></p>
@@ -857,7 +857,7 @@
 <p>DVFS全称为动态电压频率缩放，是一种重要的电源管理方法。本部分内容主要来自2013年的一篇论文<a href="#refer-anchor-3"><sup>3</sup></a></p>
 </blockquote>
 <p>想要在gem5中模型DVFS需要做哪些东西呢？</p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\dvfs架构.png" alt="DVFS在gem5系统中的架构"></p>
+<p><img src="https://image.beenli.cn/dvfs%E6%9E%B6%E6%9E%84.png?imageslim" alt="DVFS在gem5系统中的架构"></p>
 <ul>
 <li>硬件支持<ul>
 <li>CPU等硬件支持多频率电压工作</li>
@@ -875,19 +875,19 @@
 </ul>
 </li>
 </ul>
-<h2 id="4-1-DVFS-controller"><a href="#4-1-DVFS-controller" class="headerlink" title="4.1 DVFS controller"></a>4.1 DVFS controller</h2><p><img src="2021-08-25-gem5简介和dvfs应用初探\dvfs_controller.png" alt="dvfs controller"></p>
+<h2 id="4-1-DVFS-controller"><a href="#4-1-DVFS-controller" class="headerlink" title="4.1 DVFS controller"></a>4.1 DVFS controller</h2><p><img src="https://image.beenli.cn/dvfs_controller.png?imageslim" alt="dvfs controller"></p>
 <ul>
 <li>外部提供三个寄存器：<code>domain_id</code>(每个时钟域下可以有多个仿真对象),<code>Freq level</code>(从012开始编号,编号越小频率越高),<code>Ack</code>(只读寄存器，读完清零，当当前转换完成时硬件置1)</li>
 <li>内部记录各个时钟域的相关信息，并响应请求进行时钟电压的变换。</li>
 <li>还需要抽象一个<code>DVFS Handler</code>仿真对象(不是IO设备),方便用户将时钟域配置进去。</li>
 </ul>
-<h2 id="4-2-Linux-cpufreq-driver"><a href="#4-2-Linux-cpufreq-driver" class="headerlink" title="4.2 Linux cpufreq driver"></a>4.2 Linux cpufreq driver</h2><p><img src="2021-08-25-gem5简介和dvfs应用初探\cpufreq驱动.png" alt="cpufreq 驱动"></p>
+<h2 id="4-2-Linux-cpufreq-driver"><a href="#4-2-Linux-cpufreq-driver" class="headerlink" title="4.2 Linux cpufreq driver"></a>4.2 Linux cpufreq driver</h2><p><img src="https://image.beenli.cn/cpufreq%E9%A9%B1%E5%8A%A8.png?imageslim" alt="cpufreq 驱动"></p>
 <ul>
 <li>Linux内核一般有DVFS管理驱动程序。<code>performance</code>: 始终以最大频率运行;<code>powersave</code>: 始终以最低频率运行;<code>userspace</code>:用户自行调整频率，通过向<code>scaling_stepeed</code>文件写入频率值。<code>ondemand</code>:系统根据负载需要自行调整频率。</li>
 <li>下层驱动需要与dvfs controller交互，同时给上层管理程序提供服务。这部分特定于硬件实现，但是只要符合上层驱动的接口规范，就可以不用修改地复用上层模块。</li>
 <li>当需要模拟不同的电压-频率点时，只需要修改设备树文件，底层驱动从设备树文件初始化硬件，而不需重新编译下层驱动。</li>
 </ul>
-<h2 id="4-3-power-model"><a href="#4-3-power-model" class="headerlink" title="4.3 power model"></a>4.3 power model</h2><p><img src="2021-08-25-gem5简介和dvfs应用初探\power model.png" alt="能耗模型"></p>
+<h2 id="4-3-power-model"><a href="#4-3-power-model" class="headerlink" title="4.3 power model"></a>4.3 power model</h2><p><img src="https://image.beenli.cn/power%20model.png?imageslim" alt="能耗模型"></p>
 <blockquote>
 <p>gem5是个模块化的系统，通过累加每个模块的能耗得出整体的能耗。每个模块分为5种电源状态，每个状态又分别由动态功耗和静态功耗组成。模块处于何种状态由系统决定，模块每种状态下计算功耗的公式人为给定。</p>
 </blockquote>
@@ -896,8 +896,8 @@
 </blockquote>
 <ul>
 <li><p>目前最新版本(v21.0.1.0)的gem5已经内置了DVFS controller，并且提供了DVFS_Handler仿真对象</p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\dvfs配置脚本.png" alt="dvfs配置脚本"></p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\dvfs系统状态文件.png" alt="系统参数文件"></p>
+<p><img src="https://image.beenli.cn/dvfs%E9%85%8D%E7%BD%AE%E8%84%9A%E6%9C%AC.png?imageslim" alt="dvfs配置脚本"></p>
+<p><img src="https://image.beenli.cn/dvfs%E7%B3%BB%E7%BB%9F%E7%8A%B6%E6%80%81%E6%96%87%E4%BB%B6.png?imageslim" alt="系统参数文件"></p>
 <blockquote>
 <ul>
 <li><p>在系统仿真配置文件中使能DVFS_Handler，并将需要模拟的时钟域注册进去。</p>
@@ -912,19 +912,19 @@
 <li>当gem5以全系统模式仿真时，通过设置不同DVFS governor，即不同的策略，来实现动态的电压频率缩放。</li>
 <li>本次实验使用的<a href="https://github.com/gem5/linux-arm-gem5/commits/gem5/v4.4">v4.4内核</a>，底层驱动为<code>arm-gem5-mc</code></li>
 </ul>
-<p><img src="C:\Users\wanli\iCloudDrive\FDIClab\gem5介绍和DVFS应用初探\arm-gem5-mc.png" alt="底层驱动"></p>
+<p><img src="https://image.beenli.cn/arm-gem5-mc.png?imageslim" alt="底层驱动"></p>
 </li>
 </ul>
 <h2 id="5-1-功耗估计模型"><a href="#5-1-功耗估计模型" class="headerlink" title="5.1 功耗估计模型"></a>5.1 功耗估计模型</h2><blockquote>
 <p>下面代码见gem5/configs/example/arm/fs_power.py文件</p>
 </blockquote>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\功耗估计模型.png" alt="功耗估计模型"></p>
+<p><img src="https://image.beenli.cn/%E5%8A%9F%E8%80%97%E4%BC%B0%E8%AE%A1%E6%A8%A1%E5%9E%8B.png?imageslim" alt="功耗估计模型"></p>
 <blockquote>
 <p>gem5提供的<code>MathExprPowerModel</code>类，用于用公式表达一种电源状态下模块的动静态功耗。gem5提供的<code>PowerModel</code>类用于封装模块4种状态下的功耗模型。</p>
 <p>每个模块一般都会有各种统计信息可以用于功耗公式中，例如CPU模块的统计参数见:<code>gem5/src/cpu/base.cc</code>中的   <code>ADD_STAT(numCycles, UNIT_CYCLE, "Number of cpu cycles simulated")</code>等。Cache模块的统计参数见:<code>gem5/src/mem/cache/base.cc</code>中的<code>ADD_STAT(overallMisses, UNIT_COUNT, "number of overall misses")</code>等。</p>
 <p>如果遇到<code>fatal: Failed to evaluate power expressions: [...]</code>，多半是因为当前模块没有该统计参数或者名称输入错误。解决办法：用vscode打开gem5/src文件夹，然后搜索ADD_STAT(xxx)，查看当前参数在哪个类中定义；或者查找相近的统计参数名称进行比对。</p>
 </blockquote>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\注册功耗模型到模块中.png" alt="注册功耗模型到模块中"></p>
+<p><img src="https://image.beenli.cn/%E6%B3%A8%E5%86%8C%E5%8A%9F%E8%80%97%E6%A8%A1%E5%9E%8B%E5%88%B0%E6%A8%A1%E5%9D%97%E4%B8%AD.png?imageslim" alt="注册功耗模型到模块中"></p>
 <blockquote>
 <p>将之前定义的<code>CPUPowerModel</code>类注册到系统中所有CPU中，这样全系统仿真时才会有CPU的功耗统计结果。</p>
 <p>最后，可以设置每间隔多长时间，dump一次统计数据(👇使用间隔为0.01s仿真时间，默认为1s)</p>
@@ -938,13 +938,13 @@
 <ol>
 <li>首先在gem5/configs/example/arm/devices.py中的<code>CpuCluster</code>类中self.clk_domain中，加入<code>domain_id=system.numCpuClusters()</code>，因为domain_id必须唯一。(当系统实例化bigCluster时domai_id=0，接着实例化littleCluster时domain_id=1)</li>
 </ol>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\时钟域devices.png" alt="设置域id"></p>
+<p><img src="https://image.beenli.cn/%E6%97%B6%E9%92%9F%E5%9F%9Fdevices.png?imageslim" alt="设置域id"></p>
 <ol>
 <li><p>接在在gem5/configs/example/arm/fs_bigLITTLE.py，加入对大小核时钟和电压的命令行参数输入。</p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\参数配置电压和时钟.png" alt="参数配置电压和时钟"></p>
+<p><img src="https://image.beenli.cn/%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E7%94%B5%E5%8E%8B%E5%92%8C%E6%97%B6%E9%92%9F.png?imageslim" alt="参数配置电压和时钟"></p>
 </li>
 <li><p>将电压和频率配置进<code>CpuCluster</code>中</p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\fs_bigLITTLE.png" alt="注册电压和频率"></p>
+<p><img src="https://image.beenli.cn/fs_bigLITTLE.png?imageslim" alt="注册电压和频率"></p>
 </li>
 </ol>
 <h2 id="5-3-全系统仿真"><a href="#5-3-全系统仿真" class="headerlink" title="5.3 全系统仿真"></a>5.3 全系统仿真</h2>   <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; <span class="hljs-built_in">cd</span> your/gem5/main/directory<br>&gt; build/ARM/gem5.opt \<br>--debug-flags=dvfs_handler,EnergyCtrl \<br>--debug-file=dvfs_debug.log  \<br>configs/example/arm/fs_power.py  \<br>--kernel=../full_system_for_gem5/binaries/vmlinux_4.4 \<br>--cache  \<br>--dvfs \<br>--big-cpu-clock 3GHz 2GHz 1GHz 900MHz \<br>--big-cpu-voltage 1.0V 0.9V 0.8V 0.5V \<br>--little-cpu-clock 2GHz 1GHz 800MHz 500MHz \<br>--little-cpu-voltage 1.0V 0.8V 0.6V 0.5Vs<br></code></pre></td></tr></tbody></table></figure>
@@ -958,18 +958,18 @@
 <hr>
 <ol>
 <li><p>另开一个终端，输入命令<code>telnet localhost 3456</code>，等待两到三小时后(因为默认大核使用的O3 CPU，小核使用的Minor CPU，所以启动Linux很慢)，进入Linux命令行，输入root即可。</p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\进入Linux命令行.png" alt="进入Linux命令行"></p>
+<p><img src="https://image.beenli.cn/%E8%BF%9B%E5%85%A5Linux%E5%91%BD%E4%BB%A4%E8%A1%8C.png?imageslim" alt="进入Linux命令行"></p>
 </li>
 <li><p>进入cpufreq目录(dvfs内核接口)</p>
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; <span class="hljs-built_in">cd</span> /sys/devices/system/cpu/cpu0/cpufreq<br>&gt; ls<br></code></pre></td></tr></tbody></table></figure>
 <blockquote>
 <p>该目录下有很多与dvfs有关的信息文件，比如<code>scaling_driver</code>即底层驱动名称，scaling_governor为高层驱动名称。cpuinfo_tarnsition_latency为频率调整时间，cpuinfo_cur_freq为当前CPU频率等。</p>
 </blockquote>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\cpufreq directory.png" alt="cpufreq 目录"></p>
+<p><img src="https://image.beenli.cn/cpufreq%20directory.png?imageslim" alt="cpufreq 目录"></p>
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; cat scaling_available_frequencies<br></code></pre></td></tr></tbody></table></figure>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\scaling_frequency.png" alt="可以调整的频率"></p>
+<p><img src="https://image.beenli.cn/scaling_frequency.png?imageslim" alt="可以调整的频率"></p>
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; <span class="hljs-built_in">echo</span> <span class="hljs-string">"userspace"</span> &gt; scaling_governor<br>&gt; cat cpuinfo_cur_freq<br>&gt; <span class="hljs-built_in">echo</span> <span class="hljs-string">"3003003"</span> &gt; scaling_setspeed<br>&gt; cat cpuinfo_cur_freq<br></code></pre></td></tr></tbody></table></figure>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\手动调频率.png" alt="手动调频"></p>
+<p><img src="https://image.beenli.cn/%E6%89%8B%E5%8A%A8%E8%B0%83%E9%A2%91%E7%8E%87.png?imageslim" alt="手动调频"></p>
 </li>
 </ol>
 <h2 id="5-4-Benchmark比较"><a href="#5-4-Benchmark比较" class="headerlink" title="5.4 Benchmark比较"></a>5.4 Benchmark比较</h2><blockquote>
@@ -984,15 +984,15 @@
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; <span class="hljs-built_in">echo</span> <span class="hljs-string">"ondemand"</span> &gt; /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor<br>&gt; m5 checkpoint<br></code></pre></td></tr></tbody></table></figure></li>
 <li><p>从<code>perfermance</code>恢复，然后开始执行程序</p>
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; build/ARM/gem5.opt \<br>--debug-flags=dvfs_handler,EnergyCtrl \<br>--debug-file=dvfs_debug.log  \<br>configs/example/arm/fs_power.py  \<br>--kernel=../full_system_for_gem5/binaries/vmlinux_4.4 \<br>--cache  \<br>--dvfs \<br>--big-cpu-clock 3GHz 2GHz 1GHz 900MHz \<br>--big-cpu-voltage 1.0V 0.9V 0.8V 0.5V \<br>--little-cpu-clock 2GHz 1GHz 800MHz 500MHz \<br>--little-cpu-voltage 1.0V 0.8V 0.6V 0.5Vs<br>--retore-from m5out/performance<br><br>&gt; ./genome_roi_lock -g256 -s16 -n16384 -t1<br></code></pre></td></tr></tbody></table></figure>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\perfermance_time.png" alt="performance运行时间"></p>
+<p><img src="https://image.beenli.cn/perfermance_time.png?imageslim" alt="performance运行时间"></p>
 <p>再开一个窗口，查看gem5统计的数据(<code>gem5/m5out/stats.txt</code>)</p>
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; cat -n stats.txt | grep -E <span class="hljs-string">'system.bigCluster.clk_domain.clock|simSeconds|system.bigCluster.cpus.power_model.dy*|system.bigCluster.cpus.power_model.st*'</span><br></code></pre></td></tr></tbody></table></figure>
 <p><img src="2021-08-25-gem5简介和dvfs应用初探\performance_statistic.png" alt="performance 统计数据"></p>
 </li>
 <li><p>从<code>ondemand</code>中恢复,然后开始执行程序</p>
 <figure class="highlight bash"><table><tbody><tr><td class="code"><pre><code class="hljs bash">&gt; build/ARM/gem5.opt \<br>--debug-flags=dvfs_handler,EnergyCtrl \<br>--debug-file=dvfs_debug.log  \<br>configs/example/arm/fs_power.py  \<br>--kernel=../full_system_for_gem5/binaries/vmlinux_4.4 \<br>--cache  \<br>--dvfs \<br>--big-cpu-clock 3GHz 2GHz 1GHz 900MHz \<br>--big-cpu-voltage 1.0V 0.9V 0.8V 0.5V \<br>--little-cpu-clock 2GHz 1GHz 800MHz 500MHz \<br>--little-cpu-voltage 1.0V 0.8V 0.6V 0.5Vs<br>--retore-from m5out/ondemand<br><br>&gt; ./genome_roi_lock -g256 -s16 -n16384 -t1<br></code></pre></td></tr></tbody></table></figure>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\ondemand_time_2.png" alt="ondemand 运行时间"></p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\on_demand_statistic_2.png" alt="Ondemand统计数据"></p>
+<p><img src="https://image.beenli.cn/ondemand_time_2.png?imageslim" alt="ondemand 运行时间"></p>
+<p><img src="https://image.beenli.cn/on_demand_statistic_2.png?imageslim" alt="Ondemand统计数据"></p>
 <ul>
 <li><p>从statistic可以看出，在跑程序之前CPU工作在最低频率下，即图中的clock=1111(900MHz)；当进入程序时，governor将CPU频率从1111变化到333(即3GHz)，以最高频率工作。当工作完成后，CPU继续以3GHz进行程序的收尾部分，然后在某一瞬间，变化到1GHz(1000)，如果后续没有负载则在这个过渡态待一会儿，又将CPU调度到900MHz工作。</p>
 <p><img src="2021-08-25-gem5简介和dvfs应用初探\Ondemand全过程.png" alt="Ondemand时序图"></p>
@@ -1010,7 +1010,7 @@
 </ol>
 <h2 id="5-5-遗留问题"><a href="#5-5-遗留问题" class="headerlink" title="5.5 遗留问题"></a>5.5 遗留问题</h2><ol>
 <li><p>为什么只有CPU0(即大核)能够应用DVFS，而CPU1(小核)不能动态调整频率。</p>
-<p><img src="2021-08-25-gem5简介和dvfs应用初探\dvfs_log.png" alt="dvfs_debug log"></p>
+<p><img src="https://image.beenli.cn/dvfs_log.png?imageslim" alt="dvfs_debug log"></p>
 <blockquote>
 <p>通过查看<code>dvfs_debug.log</code>文件，可以看到系统成功初始化两个domain域，大核域id为0；小核域id为1。并且初始化的电压-频率点与命令行手动输入的相吻合。由此判断DVFS的底层驱动是正确的。但是<code>/sys/devices/system/cpu/</code>文件夹下只有<code>cpu0</code>提供上层模块用户接口的<code>cpufreq</code>文件夹，而<code>cpu0</code>却没有，猜测可能的原因是目前官方提供的内核的dvfs高层驱动只支持挂载一个域。</p>
 </blockquote>
@@ -1036,6 +1036,14 @@
 <li>[5] V. Spiliopoulos, A. Bagdia, A. Hansson, P. Aldworth, and S. Kaxiras, ‘Introducing DVFS-Management in a Full-System Simulator’, in Proc. 21st International Symposium on Modeling, Analysis and Simulation of Computer and Telecommunication Systems, 2013.</li>
 </ul>
 <!-- flag of hidden posts -->]]></content>
+      <categories>
+        <category>CS</category>
+        <category>Computer Organization &amp; Design</category>
+      </categories>
+      <tags>
+        <tag>Architecture</tag>
+        <tag>gem5</tag>
+      </tags>
   </entry>
   <entry>
     <title>AMBA AHB spec(1)--bus scheme</title>
