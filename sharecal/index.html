@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShareCal — 两个人的共享日历 / A calendar built for two</title>
+<meta name="description" content="ShareCal 是一款严格两人配对的情侣共享日历 iOS App：把各自挑选的日历同步到 iCloud 互相可见，不上传账号密码、不依赖自建服务器。ShareCal is a strictly two-person shared calendar for couples — mirror selected calendars into a private iCloud share, with no servers and no tracking.">
+<meta property="og:title" content="ShareCal — 两个人的共享日历">
+<meta property="og:description" content="严格两人配对的情侣共享日历。数据只存在你们两个人的 iCloud 里。">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --bg:#0f1020; --bg2:#171936; --card:#1c1e3d; --line:#2b2e54;
+    --txt:#eef0ff; --muted:#a6abce; --brand:#7c83ff; --brand2:#52d0c8; --accent:#ff8fa3;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,#2a2d63 0%,transparent 60%),
+               radial-gradient(900px 600px at -10% 20%,#1d3b54 0%,transparent 55%),
+               var(--bg);
+    color:var(--txt);line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+  /* lang toggle */
+  .langbar{position:fixed;top:16px;right:18px;z-index:50;display:flex;gap:4px;
+    background:rgba(28,30,61,.7);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:4px}
+  .langbar button{font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:none;
+    padding:6px 14px;border-radius:999px;cursor:pointer;transition:.2s}
+  .langbar button.active{color:#fff;background:linear-gradient(120deg,var(--brand),var(--brand2))}
+
+  /* hero */
+  header.hero{padding:120px 0 70px;text-align:center}
+  .badge{display:inline-block;font-size:13px;font-weight:600;color:var(--brand2);
+    border:1px solid var(--line);border-radius:999px;padding:6px 14px;margin-bottom:26px;background:rgba(82,208,200,.07)}
+  .hero h1{font-size:clamp(40px,7vw,76px);font-weight:800;letter-spacing:-.02em;line-height:1.05;
+    background:linear-gradient(120deg,#fff 20%,var(--brand) 70%,var(--brand2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:18px}
+  .hero p.tag{font-size:clamp(18px,2.6vw,24px);color:var(--muted);max-width:640px;margin:0 auto 14px}
+  .hero p.sub{font-size:16px;color:var(--muted);max-width:600px;margin:0 auto 38px;opacity:.85}
+  .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-size:16px;font-weight:700;padding:15px 28px;border-radius:14px;transition:transform .15s,box-shadow .2s;border:1px solid transparent}
+  .btn-primary{background:linear-gradient(120deg,var(--brand),var(--brand2));color:#0b0c1c;box-shadow:0 10px 30px -10px var(--brand)}
+  .btn-primary:hover{transform:translateY(-2px)}
+  .btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--txt)}
+  .btn-ghost:hover{background:rgba(255,255,255,.09);transform:translateY(-2px)}
+
+  /* sections */
+  section{padding:64px 0}
+  .eyebrow{text-align:center;color:var(--brand2);font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  h2.title{text-align:center;font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.01em;margin-bottom:46px}
+
+  /* features */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  .feat{background:linear-gradient(180deg,var(--card),#191b38);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .feat .ic{font-size:26px;margin-bottom:12px}
+  .feat h3{font-size:18px;margin-bottom:8px}
+  .feat p{color:var(--muted);font-size:14.5px}
+
+  /* screenshots */
+  .shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:26px;align-items:start}
+  .shot{text-align:center}
+  .shot img{width:100%;max-width:280px;border-radius:24px;border:1px solid var(--line);box-shadow:0 30px 60px -25px #000}
+  .shot span{display:block;margin-top:14px;color:var(--muted);font-weight:600;font-size:15px}
+
+  /* privacy */
+  .privacy{background:linear-gradient(180deg,#15233a,#141631);border:1px solid var(--line);border-radius:24px;padding:46px;text-align:center}
+  .privacy h2{font-size:clamp(24px,3.4vw,34px);font-weight:800;margin-bottom:16px}
+  .privacy p{color:var(--muted);max-width:680px;margin:0 auto 26px}
+  .pills{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .pill{font-size:13.5px;font-weight:600;color:var(--txt);background:rgba(124,131,255,.1);border:1px solid var(--line);border-radius:999px;padding:9px 16px}
+
+  /* opensource */
+  .os{text-align:center}
+  .os code{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:3px 9px;font-size:14px}
+
+  footer{border-top:1px solid var(--line);padding:40px 0 60px;text-align:center;color:var(--muted);font-size:14px}
+  footer a{color:var(--brand);font-weight:600}
+  .hide{display:none!important}
+  @media(max-width:540px){header.hero{padding:96px 0 50px}}
+</style>
+</head>
+<body>
+
+<div class="langbar">
+  <button data-set-lang="zh" class="active">中文</button>
+  <button data-set-lang="en">EN</button>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="badge" data-zh="iOS · SwiftUI · 开源" data-en="iOS · SwiftUI · Open source">iOS · SwiftUI · 开源</span>
+    <h1>ShareCal</h1>
+    <p class="tag" data-zh="两个人的共享日历。" data-en="A calendar built for two.">两个人的共享日历。</p>
+    <p class="sub" data-zh="把你们各自挑选的日历同步到 iCloud，彼此可见。不上传账号密码，不依赖任何自建服务器——所有数据只存在你们两个人自己的 iCloud 里。"
+       data-en="Mirror the calendars you each choose into a private iCloud share, visible to both of you. No passwords uploaded, no servers — your data lives only in the two of you’s own iCloud.">把你们各自挑选的日历同步到 iCloud，彼此可见。不上传账号密码，不依赖任何自建服务器——所有数据只存在你们两个人自己的 iCloud 里。</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://testflight.apple.com/join/42BdyA1N" target="_blank" rel="noopener">
+        <span data-zh="加入 TestFlight 测试" data-en="Join the TestFlight beta">加入 TestFlight 测试</span>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/BeenLi/ShareCal" target="_blank" rel="noopener">
+        <span data-zh="在 GitHub 查看源码" data-en="View source on GitHub">在 GitHub 查看源码</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow" data-zh="核心功能" data-en="Features">核心功能</p>
+    <h2 class="title" data-zh="为「两个人」而设计" data-en="Designed for exactly two">为「两个人」而设计</h2>
+    <div class="grid">
+      <div class="feat"><div class="ic">🔗</div>
+        <h3 data-zh="两人配对" data-en="Two-person pairing">两人配对</h3>
+        <p data-zh="通过一条 iCloud 共享链接配对。配对确立后，经旧链接加入的第三人会在同步时被自动移除——始终只有你们两个人。"
+           data-en="Pair through a single iCloud share link. Once paired, anyone joining via an old link is auto-removed on sync — always just the two of you.">通过一条 iCloud 共享链接配对。配对确立后，经旧链接加入的第三人会在同步时被自动移除——始终只有你们两个人。</p></div>
+      <div class="feat"><div class="ic">🗓️</div>
+        <h3 data-zh="日程同步" data-en="Calendar sync">日程同步</h3>
+        <p data-zh="从系统日历（EventKit）镜像你挑选的日历，支持「完整详情 / 仅忙碌」可见性控制；本地增删改每次同步自动收敛。"
+           data-en="Mirror the system calendars you pick via EventKit, with “full details / busy only” visibility. Local edits reconcile automatically on every sync.">从系统日历（EventKit）镜像你挑选的日历，支持「完整详情 / 仅忙碌」可见性控制；本地增删改每次同步自动收敛。</p></div>
+      <div class="feat"><div class="ic">✉️</div>
+        <h3 data-zh="日程邀请" data-en="Event invitations">日程邀请</h3>
+        <p data-zh="给对方发日程邀请，接受后自动写入对方系统日历；待处理 / 已接受 / 已拒绝 / 已取消状态双向同步。"
+           data-en="Send your partner an event invite; on accept it’s written into their calendar. Pending / accepted / declined / cancelled states sync both ways.">给对方发日程邀请，接受后自动写入对方系统日历；待处理 / 已接受 / 已拒绝 / 已取消状态双向同步。</p></div>
+      <div class="feat"><div class="ic">💬</div>
+        <h3 data-zh="评论与动态" data-en="Comments & activity">评论与动态</h3>
+        <p data-zh="对任意一方的日程留言，支持编辑、删除与已读状态；「动态」Tab 按事件聚合双方评论，未读数显示在角标。"
+           data-en="Comment on either side’s events, with edit / delete / read state. The Activity tab aggregates both sides’ comments, unread count on the badge.">对任意一方的日程留言，支持编辑、删除与已读状态；「动态」Tab 按事件聚合双方评论，未读数显示在角标。</p></div>
+      <div class="feat"><div class="ic">🔔</div>
+        <h3 data-zh="系统通知" data-en="Notifications">系统通知</h3>
+        <p data-zh="对方评论我的日程、收到 / 被回应邀请、历史申请及其回复会推送本地通知——只有这几类，纯日历改动不打扰。"
+           data-en="Local notifications for partner comments, invites and their replies, and history requests — only these; plain calendar edits never nag you.">对方评论我的日程、收到 / 被回应邀请、历史申请及其回复会推送本地通知——只有这几类，纯日历改动不打扰。</p></div>
+      <div class="feat"><div class="ic">🌐</div>
+        <h3 data-zh="中英双语 · 昵称体系" data-en="Bilingual · nicknames">中英双语 · 昵称体系</h3>
+        <p data-zh="内置中 / 英文案，可在设置中切换。对方显示为「备注名 &gt; 同步昵称 &gt; 兜底」，从不展示邮箱等 iCloud 身份。"
+           data-en="Built-in EN / ZH, switchable in Settings. Your partner shows as “note name &gt; synced nickname &gt; fallback” — never an iCloud email.">内置中 / 英文案，可在设置中切换。对方显示为「备注名 &gt; 同步昵称 &gt; 兜底」，从不展示邮箱等 iCloud 身份。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow" data-zh="界面" data-en="Screenshots">界面</p>
+    <h2 class="title" data-zh="四个 Tab，一目了然" data-en="Four tabs, at a glance">四个 Tab，一目了然</h2>
+    <div class="shots">
+      <div class="shot"><img src="assets/calendar.png" alt="Calendar"><span data-zh="日历 · 双列时间轴" data-en="Calendar · dual timeline">日历 · 双列时间轴</span></div>
+      <div class="shot"><img src="assets/activity.png" alt="Activity"><span data-zh="动态 · 评论聚合" data-en="Activity · comments">动态 · 评论聚合</span></div>
+      <div class="shot"><img src="assets/invites.png" alt="Invites"><span data-zh="邀请 · 待办列表" data-en="Invites · to-do">邀请 · 待办列表</span></div>
+      <div class="shot"><img src="assets/settings.png" alt="Settings"><span data-zh="设置 · 配对与共享" data-en="Settings · pairing">设置 · 配对与共享</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="privacy">
+      <h2 data-zh="隐私优先，没有服务器" data-en="Privacy first, no server">隐私优先，没有服务器</h2>
+      <p data-zh="ShareCal 不运行任何自有服务器，也没有广告、第三方分析或追踪 SDK。日历数据只存在你的设备本地，以及你和伴侣自己的 iCloud / CloudKit 共享中。要共享哪些日历，完全由你决定。"
+         data-en="ShareCal runs no server of its own, and ships no ads, third-party analytics, or tracking SDKs. Calendar data lives only on your device and inside your own iCloud / CloudKit share. You decide exactly which calendars to share.">ShareCal 不运行任何自有服务器，也没有广告、第三方分析或追踪 SDK。日历数据只存在你的设备本地，以及你和伴侣自己的 iCloud / CloudKit 共享中。要共享哪些日历，完全由你决定。</p>
+      <div class="pills">
+        <span class="pill" data-zh="🔒 数据只在你们的 iCloud" data-en="🔒 Only in your iCloud">🔒 数据只在你们的 iCloud</span>
+        <span class="pill" data-zh="🚫 无广告 / 无追踪" data-en="🚫 No ads / no tracking">🚫 无广告 / 无追踪</span>
+        <span class="pill" data-zh="🧩 无第三方依赖" data-en="🧩 No 3rd-party deps">🧩 无第三方依赖</span>
+        <span class="pill" data-zh="👥 严格两人制" data-en="👥 Strictly two people">👥 严格两人制</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="os">
+  <div class="wrap">
+    <p class="eyebrow" data-zh="开源" data-en="Open source">开源</p>
+    <h2 class="title" data-zh="完全开源，欢迎查看" data-en="Fully open source">完全开源，欢迎查看</h2>
+    <p style="color:var(--muted);max-width:620px;margin:0 auto 28px" data-zh="SwiftUI + SwiftData + CloudKit + EventKit，无任何第三方依赖。代码托管在 GitHub："
+       data-en="SwiftUI + SwiftData + CloudKit + EventKit, with zero third-party dependencies. Source on GitHub:">SwiftUI + SwiftData + CloudKit + EventKit，无任何第三方依赖。代码托管在 GitHub：</p>
+    <p style="margin-bottom:30px"><code>github.com/BeenLi/ShareCal</code></p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/BeenLi/ShareCal" target="_blank" rel="noopener">
+        <span data-zh="前往 GitHub 仓库" data-en="Open the repository">前往 GitHub 仓库</span>
+      </a>
+      <a class="btn btn-ghost" href="https://testflight.apple.com/join/42BdyA1N" target="_blank" rel="noopener">
+        <span data-zh="加入 TestFlight" data-en="Join TestFlight">加入 TestFlight</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p data-zh="ShareCal · 一款严格两人配对的情侣共享日历" data-en="ShareCal · a strictly two-person shared calendar for couples">ShareCal · 一款严格两人配对的情侣共享日历</p>
+    <p style="margin-top:8px">
+      <a href="https://github.com/BeenLi/ShareCal">GitHub</a> ·
+      <a href="https://testflight.apple.com/join/42BdyA1N">TestFlight</a> ·
+      <a href="https://beenli.github.io/">BeenLi</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var nodes = document.querySelectorAll('[data-zh]');
+    function apply(lang){
+      document.documentElement.lang = (lang==='en') ? 'en' : 'zh';
+      nodes.forEach(function(n){
+        var v = n.getAttribute('data-'+lang);
+        if(v!=null) n.innerHTML = v;
+      });
+      document.querySelectorAll('[data-set-lang]').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-set-lang')===lang);
+      });
+      try{ localStorage.setItem('sharecal-lang', lang); }catch(e){}
+    }
+    document.querySelectorAll('[data-set-lang]').forEach(function(b){
+      b.addEventListener('click', function(){ apply(b.getAttribute('data-set-lang')); });
+    });
+    var saved;
+    try{ saved = localStorage.getItem('sharecal-lang'); }catch(e){}
+    var initial = saved || ((navigator.language||'zh').toLowerCase().indexOf('zh')===0 ? 'zh' : 'en');
+    apply(initial);
+  })();
+</script>
+</body>
+</html>
